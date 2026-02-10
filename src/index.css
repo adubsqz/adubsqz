@@ -4,11 +4,15 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   margin: 0;
   min-height: 100vh;
-  color: #E8E6E3;
-  background:
-    radial-gradient(circle at top, rgba(248, 250, 252, 0.12), transparent 55%),
-    radial-gradient(circle at bottom, rgba(88, 28, 135, 0.4), transparent 60%),
-    linear-gradient(135deg, #020617, #030712 45%, #020617 100%);
+  color: #F5F5F5;
+  background-color: #0a0a0a;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.65)),
+    url('/photos/unsplash/etienne-girardet-5Rhi-078nls-unsplash.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
 
 html {
@@ -16,7 +20,7 @@ html {
 }
 
 ::selection {
-  background-color: rgba(251, 191, 36, 0.35);
+  background-color: rgba(148, 163, 184, 0.35);
   color: #F9FAFB;
 }
 

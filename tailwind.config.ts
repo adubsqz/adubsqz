@@ -9,13 +9,13 @@ export default {
         display: ['Instrument Serif', 'Georgia', 'serif'],
       },
       colors: {
-        'photo-bg': '#050816',
-        'photo-panel': '#050712',
-        'photo-fg': '#E8E6E3',
-        'photo-muted': '#8A8784',
-        'photo-border': '#2A2A2A',
-        'photo-accent': '#FBBF24',
-        'photo-accent-soft': '#4C1D95',
+        'photo-bg': '#02040A',
+        'photo-panel': '#050608',
+        'photo-fg': '#F5F5F5',
+        'photo-muted': '#9CA3AF',
+        'photo-border': '#27272A',
+        'photo-accent': '#F9FAFB',
+        'photo-accent-soft': '#4B5563',
       },
       keyframes: {
         'fade-up': {

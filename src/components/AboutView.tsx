@@ -3,7 +3,7 @@ import { ABOUT } from '../data';
 export default function AboutView() {
   return (
     <div className="max-w-2xl space-y-6">
-      <div className="relative overflow-hidden rounded-3xl border border-photo-border/80 bg-black/40">
+      <div className="relative overflow-hidden rounded-3xl bg-black/45">
         <img
           src="/photos/still-life/kodak_200_c_41_ABOUTME.jpg"
           alt="Portrait of Alexander Ames seated in a chair, photographed on film."
