@@ -1,4 +1,4 @@
-export type PageView = 'home' | 'gallery' | 'about';
+export type PageView = 'gallery' | 'about';
 
 export interface Photo {
   id: string;

@@ -7,12 +7,30 @@ import type { PhotoCollection } from './types';
  */
 
 const stillLifePhotos = [
-  { id: 'sl-1', src: '/photos/still-life/01.jpg', alt: 'Still life', caption: '' },
-  { id: 'sl-2', src: '/photos/still-life/02.jpg', alt: 'Still life', caption: '' },
-  { id: 'sl-3', src: '/photos/still-life/03.jpg', alt: 'Still life', caption: '' },
-  { id: 'sl-4', src: '/photos/still-life/04.jpg', alt: 'Still life', caption: '' },
-  { id: 'sl-5', src: '/photos/still-life/05.jpg', alt: 'Still life', caption: '' },
-  { id: 'sl-6', src: '/photos/still-life/06.jpg', alt: 'Still life', caption: '' },
+  {
+    id: 'sl-1',
+    src: '/photos/still-life/kodak_200_c_41_40860_119374_268264_000008400008.jpg',
+    alt: 'kodak 200 c-41 frame 000008400008',
+    caption: '',
+  },
+  {
+    id: 'sl-2',
+    src: '/photos/still-life/kodak_200_c_41_40860_119374_268264_000008400016.jpg',
+    alt: 'kodak 200 c-41 frame 000008400016',
+    caption: '',
+  },
+  {
+    id: 'sl-3',
+    src: '/photos/still-life/kodak_200_c_41_40860_119374_268264_000008400028.jpg',
+    alt: 'kodak 200 c-41 frame 000008400028',
+    caption: '',
+  },
+  {
+    id: 'sl-4',
+    src: '/photos/still-life/kodak_200_c_41_40860_119374_268264_000008400035.jpg',
+    alt: 'kodak 200 c-41 frame 000008400035',
+    caption: '',
+  },
 ];
 
 export const COLLECTIONS: PhotoCollection[] = [

@@ -80,6 +80,12 @@ export default function GalleryView() {
         Gallery
       </h2>
 
+      <p className="text-[0.7rem] sm:text-xs italic text-photo-muted mb-6 max-w-xl">
+        *none of these pictures have been edited and are displayed exactly how they developed
+        <br />
+        **if you&apos;d like a deeper contrast, saturation, any editing at all, click on the photo to open a couple edited versions by clicking the next ({'>'}) button
+      </p>
+
       {COLLECTIONS.map((collection) => (
         <section key={collection.id} className="mb-12 last:mb-0">
           <h3 className="font-display text-xl text-photo-fg mb-2">

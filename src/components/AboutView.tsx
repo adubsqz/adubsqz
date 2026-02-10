@@ -2,16 +2,27 @@ import { ABOUT } from '../data';
 
 export default function AboutView() {
   return (
-    <div className="max-w-xl">
-      <h2 className="font-display text-2xl sm:text-3xl text-photo-fg mb-6">
-        About
-      </h2>
-      <p className="font-display text-xl text-photo-muted mb-4">
-        {ABOUT.name}
-      </p>
-      <p className="text-photo-fg leading-relaxed mb-8">
-        {ABOUT.bio}
-      </p>
+    <div className="max-w-2xl space-y-6">
+      <div className="relative overflow-hidden rounded-3xl border border-photo-border/80 bg-black/40">
+        <img
+          src="/photos/still-life/kodak_200_c_41_ABOUTME.jpg"
+          alt="Portrait of Alexander Ames seated in a chair, photographed on film."
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent" />
+        <div className="absolute bottom-5 sm:bottom-7 left-5 sm:left-7 right-5 sm:right-7">
+          <p className="text-[0.7rem] tracking-[0.25em] uppercase text-photo-muted mb-2">
+            Alexander Ames
+          </p>
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl leading-tight mb-3">
+            Film, rediscovered.
+          </h2>
+          <p className="text-xs sm:text-sm md:text-[0.9rem] leading-relaxed text-slate-100/90 max-w-xl">
+            {ABOUT.bio}
+          </p>
+        </div>
+      </div>
+
       <div className="flex flex-wrap gap-4">
         {ABOUT.socials.map((social) => (
           <a
