@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #0C0C0C;
+  color: #E8E6E3;
+}
+
+/* Deter casual right-click save (images still viewable; not a strong protection) */
+.gallery-image {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+}
