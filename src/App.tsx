@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { PageView } from './types';
 import GalleryView from './components/GalleryView';
 import AboutView from './components/AboutView';
-import { ABOUT } from './data';
+import ContactModal from './components/ContactModal';
 
 const NAV_ITEMS: { id: PageView; label: string }[] = [
   { id: 'gallery', label: 'Gallery' },
@@ -11,6 +11,7 @@ const NAV_ITEMS: { id: PageView; label: string }[] = [
 
 export default function App() {
   const [view, setView] = useState<PageView>('gallery');
+  const [showContact, setShowContact] = useState(false);
 
   return (
     <div className="min-h-screen bg-photo-bg text-photo-fg font-sans antialiased">
@@ -42,11 +43,19 @@ export default function App() {
               })}
             </nav>
 
-            <div className="hidden md:block text-[0.65rem] text-photo-muted max-w-xs leading-relaxed">
-              Do you like the site? By trade, Alexander works as a data scientist and software
-              engineer at a biomolecular research company focused on fighting cancer.
+            <div className="text-[0.65rem] text-photo-muted max-w-xs leading-relaxed">
+              I made this site and hosted it for free (and so could you).{' '}
+              <button
+                type="button"
+                onClick={() => setShowContact(true)}
+                className="text-photo-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-accent rounded"
+              >
+                Contact me
+              </button>
+              {' '}if you&apos;re interested.
             </div>
           </aside>
+          {showContact && <ContactModal onClose={() => setShowContact(false)} />}
 
           <section className="md:flex-1">
             <div className="rounded-3xl border border-photo-border/70 bg-photo-panel/90 shadow-[0_26px_80px_rgba(0,0,0,0.85)] backdrop-blur-md p-5 sm:p-7 md:p-8 animate-fade-up">

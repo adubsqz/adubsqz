@@ -45,6 +45,7 @@ export const COLLECTIONS: PhotoCollection[] = [
 export const ABOUT = {
   name: 'Alexander Ames',
   tagline: 'Photography',
+  contactEmail: 'alexanderthomasames@gmail.com',
   bio: 'Originally from the Southwest, Alexander moved to New York several years ago and rediscovered his love for film photography. He first learned the craft in high school, spending long hours in the darkroom developing film and printing on Ilford paper—a passion that stayed dormant until recently. Do you like the site? By trade, Alexander works as a data scientist and software engineer at a biomolecular research company focused on fighting cancer.',
   socials: [
     { name: 'Instagram', url: 'https://www.instagram.com/adubsqz/' },
