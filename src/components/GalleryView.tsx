@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
+import WatermarkedImage from './WatermarkedImage';
 
 const PER_PAGE = 4;
 
@@ -24,23 +25,21 @@ function PhotoCard({
   if (failed) return null;
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-fg focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg"
-    >
-      <img
+    <div className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-fg focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg">
+      <WatermarkedImage
         src={photo.src}
         alt={photo.alt}
         className="gallery-image w-full h-auto object-cover border border-photo-border hover:border-photo-muted transition-colors"
         loading="lazy"
         decoding="async"
         onError={handleError}
+        onClick={onClick}
+        watermarkOpacity={0.3}
       />
       {photo.caption && (
         <p className="mt-2 text-photo-muted text-sm">{photo.caption}</p>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -69,11 +68,12 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
         Close
       </button>
       <div className="lightbox-frame max-w-[calc(100vw-1rem)] max-h-[180vh] flex items-center justify-center">
-        <img
+        <WatermarkedImage
           src={photo.src}
           alt={photo.alt}
           className="max-w-full max-h-[calc(180vh-0.5rem)] w-auto h-auto object-contain block pointer-events-none"
-          onClick={(e) => e.stopPropagation()}
+          watermarkOpacity={0.35}
+          loading="eager"
         />
       </div>
     </div>

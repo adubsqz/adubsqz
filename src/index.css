@@ -13,10 +13,23 @@ body {
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
+  /* Security: Disable text selection globally */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Allow selection only for specific interactive elements */
+input,
+textarea,
+button {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 ::selection {
@@ -24,12 +37,27 @@ html {
   color: #F9FAFB;
 }
 
-/* Deter casual right-click save (images still viewable; not a strong protection) */
+/* Enhanced image protection */
 .gallery-image {
   user-select: none;
   -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   -webkit-user-drag: none;
-  pointer-events: auto;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* Prevent image dragging globally */
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
 }
 
 /* Lightbox film-strip frame: slim borders, maximum picture visible */
