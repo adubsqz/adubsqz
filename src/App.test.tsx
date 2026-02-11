@@ -1,53 +1,54 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
 describe('App', () => {
-  it('renders navigation with Gallery and About', () => {
+  it('renders navigation with Gallery and About tabs', () => {
     render(<App />);
-    expect(screen.getByRole('button', { name: /gallery/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /about/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /gallery/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /about/i })).toBeInTheDocument();
   });
 
   it('shows Gallery view by default', () => {
     render(<App />);
-    expect(screen.getByRole('heading', { name: /gallery/i })).toBeInTheDocument();
+    expect(screen.getByText(/none of these photos have been altered/i)).toBeInTheDocument();
+    expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
   });
 
-  it('switches to About view when About is clicked', async () => {
+  it('switches to About view when About tab is clicked', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByRole('button', { name: /about/i }));
+    await user.click(screen.getByRole('tab', { name: /about/i }));
     expect(screen.getByText(/film, rediscovered/i)).toBeInTheDocument();
     expect(screen.getByText(/Alexander Ames/)).toBeInTheDocument();
   });
 
-  it('switches back to Gallery when Gallery is clicked after viewing About', async () => {
+  it('switches back to Gallery when Gallery tab is clicked after viewing About', async () => {
     const user = userEvent.setup();
     render(<App />);
-    await user.click(screen.getByRole('button', { name: /about/i }));
-    await user.click(screen.getByRole('button', { name: /gallery/i }));
-    expect(screen.getByRole('heading', { name: /gallery/i })).toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: /about/i }));
+    await user.click(screen.getByRole('tab', { name: /gallery/i }));
+    expect(screen.getByText(/none of these photos have been altered/i)).toBeInTheDocument();
   });
 
-  it('opens contact modal when "Contact me" is clicked', async () => {
+  it('opens contact modal when Contact me is clicked from About page', async () => {
     const user = userEvent.setup();
     render(<App />);
-    const contactLink = screen.getByRole('button', { name: /contact me/i });
-    await user.click(contactLink);
+    await user.click(screen.getByRole('tab', { name: /about/i }));
+    await user.click(screen.getByRole('button', { name: /contact me/i }));
     expect(screen.getByRole('dialog', { name: /contact/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
   });
 
-  it('closes contact modal when Close button is clicked', async () => {
+  it('closes contact modal when Close is clicked', async () => {
     const user = userEvent.setup();
     render(<App />);
+    await user.click(screen.getByRole('tab', { name: /about/i }));
     await user.click(screen.getByRole('button', { name: /contact me/i }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    const closeButton = screen.getByRole('button', { name: /close/i });
-    await user.click(closeButton);
+    await user.click(screen.getByRole('button', { name: /close/i }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

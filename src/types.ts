@@ -1,4 +1,5 @@
 export type PageView = 'gallery' | 'about';
+export type GalleryFilter = 'bw' | 'color';
 
 export interface Photo {
   id: string;

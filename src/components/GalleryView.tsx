@@ -1,20 +1,27 @@
 import { useState, useEffect } from 'react';
 import { COLLECTIONS } from '../data';
-import type { Photo } from '../types';
+import type { Photo, PhotoCollection } from '../types';
+import type { GalleryFilter } from '../types';
 
-function PhotoCard({ photo, onClick }: { photo: Photo; onClick: () => void }) {
+const PER_PAGE = 4;
+
+function PhotoCard({
+  photo,
+  onClick,
+  onFail,
+}: {
+  photo: Photo;
+  onClick: () => void;
+  onFail: () => void;
+}) {
   const [failed, setFailed] = useState(false);
 
-  if (failed) {
-    return (
-      <div
-        className="aspect-[4/3] border border-photo-border bg-photo-border/30 flex items-center justify-center text-photo-muted text-sm"
-        aria-hidden
-      >
-        <span className="sr-only">Image unavailable</span>
-      </div>
-    );
-  }
+  const handleError = () => {
+    setFailed(true);
+    onFail();
+  };
+
+  if (failed) return null;
 
   return (
     <button
@@ -28,7 +35,7 @@ function PhotoCard({ photo, onClick }: { photo: Photo; onClick: () => void }) {
         className="gallery-image w-full h-auto object-cover border border-photo-border hover:border-photo-muted transition-colors"
         loading="lazy"
         decoding="async"
-        onError={() => setFailed(true)}
+        onError={handleError}
       />
       {photo.caption && (
         <p className="mt-2 text-photo-muted text-sm">{photo.caption}</p>
@@ -61,52 +68,97 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
       >
         Close
       </button>
-      <img
-        src={photo.src}
-        alt={photo.alt}
-        className="max-w-full max-h-[90vh] w-auto h-auto object-contain pointer-events-none"
-        onClick={(e) => e.stopPropagation()}
-      />
+      <div className="lightbox-frame max-w-[calc(100vw-1rem)] max-h-[180vh] flex items-center justify-center">
+        <img
+          src={photo.src}
+          alt={photo.alt}
+          className="max-w-full max-h-[calc(180vh-0.5rem)] w-auto h-auto object-contain block pointer-events-none"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
     </div>
   );
 }
 
-export default function GalleryView() {
+function CollectionSection({
+  collection,
+  onPhotoClick,
+}: {
+  collection: PhotoCollection;
+  onPhotoClick: (photo: Photo) => void;
+}) {
+  const [page, setPage] = useState(1);
+  const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
+  const photos = collection.photos;
+  const totalPages = Math.max(1, Math.ceil(photos.length / PER_PAGE));
+  const start = (page - 1) * PER_PAGE;
+  const pagePhotos = photos.slice(start, start + PER_PAGE);
+  const pagePhotosToShow = pagePhotos.filter((p) => !failedIds.has(p.id));
+
+  const handleFail = (id: string) => setFailedIds((prev) => new Set(prev).add(id));
+
+  if (photos.length === 0) return null;
+
+  return (
+    <section>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        {pagePhotosToShow.map((photo) => (
+          <PhotoCard
+            key={photo.id}
+            photo={photo}
+            onClick={() => onPhotoClick(photo)}
+            onFail={() => handleFail(photo.id)}
+          />
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+          <p className="text-photo-muted text-sm">
+            Page {page} of {totalPages}
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page <= 1}
+              className="px-4 py-2 text-sm uppercase tracking-wider text-photo-muted hover:text-photo-fg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page >= totalPages}
+              className="px-4 py-2 text-sm uppercase tracking-wider text-photo-muted hover:text-photo-fg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+interface GalleryViewProps {
+  filter: GalleryFilter;
+}
+
+export default function GalleryView({ filter }: GalleryViewProps) {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
+  const collection = COLLECTIONS.find((c) => c.id === `still-life-${filter}`) ?? COLLECTIONS[0];
 
   return (
     <div>
-      <h2 className="font-display text-2xl sm:text-3xl text-photo-fg mb-8">
-        Gallery
-      </h2>
-
-      <p className="text-[0.7rem] sm:text-xs italic text-photo-muted mb-6 max-w-xl">
-        *none of these pictures have been edited and are displayed exactly how they developed
-        <br />
-        **if you&apos;d like a deeper contrast, saturation, any editing at all, click on the photo to open a couple edited versions by clicking the next ({'>'}) button
+      <p className="text-[0.6rem] sm:text-xs italic text-photo-muted mb-8 max-w-xl">
+        *none of these photos have been altered and are shown exactly how they
+        were shot and thus developed
       </p>
 
-      {COLLECTIONS.map((collection) => (
-        <section key={collection.id} className="mb-12 last:mb-0">
-          <h3 className="font-display text-xl text-photo-fg mb-2">
-            {collection.title}
-          </h3>
-          {collection.description && (
-            <p className="text-photo-muted text-sm mb-6 max-w-xl">
-              {collection.description}
-            </p>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {collection.photos.map((photo) => (
-              <PhotoCard
-                key={photo.id}
-                photo={photo}
-                onClick={() => setLightboxPhoto(photo)}
-              />
-            ))}
-          </div>
-        </section>
-      ))}
+      <CollectionSection
+        collection={collection}
+        onPhotoClick={setLightboxPhoto}
+      />
 
       {lightboxPhoto && (
         <Lightbox

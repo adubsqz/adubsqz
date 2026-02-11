@@ -1,6 +1,10 @@
 import { ABOUT } from '../data';
 
-export default function AboutView() {
+interface AboutViewProps {
+  onContactClick?: () => void;
+}
+
+export default function AboutView({ onContactClick }: AboutViewProps) {
   return (
     <div className="max-w-2xl space-y-6">
       <div className="relative overflow-hidden rounded-3xl bg-black/45">
@@ -36,6 +40,24 @@ export default function AboutView() {
           </a>
         ))}
       </div>
+
+      <p className="text-[0.65rem] sm:text-xs italic text-photo-muted pt-4 border-t border-photo-border/50">
+        I made this site and hosted it for free (and so could you).{' '}
+        {onContactClick ? (
+          <>
+            <button
+              type="button"
+              onClick={onContactClick}
+              className="text-photo-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-accent rounded"
+            >
+              Contact me
+            </button>
+            {' '}if you&apos;re interested.
+          </>
+        ) : (
+          'Contact me if you&apos;re interested.'
+        )}
+      </p>
     </div>
   );
 }

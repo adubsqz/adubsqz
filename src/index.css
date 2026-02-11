@@ -31,3 +31,37 @@ html {
   -webkit-user-drag: none;
   pointer-events: auto;
 }
+
+/* Lightbox film-strip frame: slim borders, maximum picture visible */
+.lightbox-frame {
+  --frame: 2px;
+  position: relative;
+  padding: var(--frame);
+  background: #000;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+/* Perforations in top/bottom border area */
+.lightbox-frame::before,
+.lightbox-frame::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--frame);
+  background: repeating-linear-gradient(
+    90deg,
+    #000 0,
+    #000 1px,
+    #222 1px,
+    #222 3px
+  );
+}
+
+.lightbox-frame::before {
+  top: 0;
+}
+
+.lightbox-frame::after {
+  bottom: 0;
+}

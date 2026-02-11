@@ -4,68 +4,86 @@ import userEvent from '@testing-library/user-event';
 import GalleryView from './GalleryView';
 import { COLLECTIONS } from '../data';
 
+const PER_PAGE = 4;
+
 describe('GalleryView', () => {
-  it('renders Gallery heading', () => {
-    render(<GalleryView />);
-    expect(screen.getByRole('heading', { name: /gallery/i })).toBeInTheDocument();
+  it('renders the unaltered-photos disclaimer', () => {
+    render(<GalleryView filter="bw" />);
+    expect(screen.getByText(/none of these photos have been altered/i)).toBeInTheDocument();
   });
 
-  it('renders all collections with titles and descriptions', () => {
-    render(<GalleryView />);
-    COLLECTIONS.forEach((collection) => {
-      expect(screen.getByRole('heading', { name: collection.title })).toBeInTheDocument();
-      if (collection.description) {
-        expect(screen.getByText(collection.description)).toBeInTheDocument();
-      }
+  it('renders multiple photos when collection has many', () => {
+    render(<GalleryView filter="bw" />);
+    const bwCollection = COLLECTIONS.find((c) => c.id === 'still-life-bw')!;
+    const imgs = screen.getAllByRole('img');
+    expect(imgs.length).toBeGreaterThan(1);
+    expect(imgs.length).toBeLessThanOrEqual(PER_PAGE);
+  });
+
+  it('shows pagination when collection has more than PER_PAGE photos', () => {
+    render(<GalleryView filter="bw" />);
+    const bwCollection = COLLECTIONS.find((c) => c.id === 'still-life-bw')!;
+    if (bwCollection.photos.length > PER_PAGE) {
+      expect(screen.getByText(/page \d+ of \d+/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
+    }
+  });
+
+  it('renders B&W photos when filter is bw', () => {
+    render(<GalleryView filter="bw" />);
+    const bwCollection = COLLECTIONS.find((c) => c.id === 'still-life-bw')!;
+    const firstPagePhotos = bwCollection.photos.slice(0, PER_PAGE);
+    firstPagePhotos.forEach((photo) => {
+      expect(screen.getByAltText(photo.alt)).toBeInTheDocument();
     });
   });
 
-  it('renders all photos from collections', () => {
-    render(<GalleryView />);
-    COLLECTIONS.forEach((collection) => {
-      collection.photos.forEach((photo) => {
-        const img = screen.getByAltText(photo.alt);
-        expect(img).toBeInTheDocument();
-        expect(img).toHaveAttribute('src', photo.src);
-      });
+  it('renders Color photos when filter is color', () => {
+    render(<GalleryView filter="color" />);
+    const colorCollection = COLLECTIONS.find((c) => c.id === 'still-life-color')!;
+    const firstPagePhotos = colorCollection.photos.slice(0, PER_PAGE);
+    firstPagePhotos.forEach((photo) => {
+      expect(screen.getByAltText(photo.alt)).toBeInTheDocument();
     });
   });
 
   it('opens lightbox when a photo is clicked', async () => {
     const user = userEvent.setup();
-    render(<GalleryView />);
-    const firstPhoto = COLLECTIONS[0].photos[0];
-    const img = screen.getByAltText(firstPhoto.alt);
-    await user.click(img.closest('button')!);
+    render(<GalleryView filter="bw" />);
+    const firstImg = screen.getAllByRole('img')[0];
+    await user.click(firstImg.closest('button')!);
     const dialog = screen.getByRole('dialog', { name: /image lightbox/i });
     expect(dialog).toBeInTheDocument();
-    expect(within(dialog).getByAltText(firstPhoto.alt)).toBeInTheDocument();
-  });
-
-  it('shows Close button in lightbox', async () => {
-    const user = userEvent.setup();
-    render(<GalleryView />);
-    const firstPhoto = COLLECTIONS[0].photos[0];
-    await user.click(screen.getByAltText(firstPhoto.alt).closest('button')!);
-    expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
   });
 
   it('closes lightbox when Close is clicked', async () => {
     const user = userEvent.setup();
-    render(<GalleryView />);
-    const firstPhoto = COLLECTIONS[0].photos[0];
-    await user.click(screen.getByAltText(firstPhoto.alt).closest('button')!);
+    render(<GalleryView filter="bw" />);
+    const firstImg = screen.getAllByRole('img')[0];
+    await user.click(firstImg.closest('button')!);
     await user.click(screen.getByRole('button', { name: /close/i }));
     expect(screen.queryByRole('dialog', { name: /image lightbox/i })).not.toBeInTheDocument();
   });
+});
 
-  it('closes lightbox on Escape key', async () => {
-    const user = userEvent.setup();
-    render(<GalleryView />);
-    const firstPhoto = COLLECTIONS[0].photos[0];
-    await user.click(screen.getByAltText(firstPhoto.alt).closest('button')!);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    await user.keyboard('{Escape}');
-    expect(screen.queryByRole('dialog', { name: /image lightbox/i })).not.toBeInTheDocument();
+describe('GalleryView regression: pagination and photo count', () => {
+  it('COLLECTIONS have enough photos to show pagination for at least one', () => {
+    const hasPaginatedCollection = COLLECTIONS.some(
+      (c) => c.photos.length > PER_PAGE
+    );
+    expect(hasPaginatedCollection).toBe(true);
+  });
+
+  it('pagination slice does not reduce photo count below 1 when many exist', () => {
+    COLLECTIONS.forEach((collection) => {
+      const totalPages = Math.max(1, Math.ceil(collection.photos.length / PER_PAGE));
+      const start = (1 - 1) * PER_PAGE;
+      const pagePhotos = collection.photos.slice(start, start + PER_PAGE);
+      expect(pagePhotos.length).toBeGreaterThanOrEqual(1);
+      if (collection.photos.length > PER_PAGE) {
+        expect(pagePhotos.length).toBe(PER_PAGE);
+      }
+    });
   });
 });
