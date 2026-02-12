@@ -64,11 +64,13 @@ export default function WatermarkedImage({
         draggable="false"
       />
 
-      {/* Huge subtle watermark overlay - top left */}
+      {/* Vertical watermark running down the left side */}
       {imageLoaded && (
         <div
-          className="absolute top-8 left-8 z-20"
+          className="absolute left-4 top-0 bottom-0 z-20 flex items-center"
           style={{
+            writingMode: 'vertical-rl',
+            textOrientation: 'mixed',
             opacity: watermarkOpacity,
             fontSize: '4rem', // Huge size (64px)
             fontWeight: '700',
