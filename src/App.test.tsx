@@ -21,7 +21,7 @@ describe('App', () => {
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about/i }));
     expect(screen.getByText(/film, rediscovered/i)).toBeInTheDocument();
-    expect(screen.getByText(/Alexander Ames/)).toBeInTheDocument();
+    expect(screen.getByText(/adubsqz/)).toBeInTheDocument();
   });
 
   it('switches back to Gallery when Gallery tab is clicked after viewing About', async () => {

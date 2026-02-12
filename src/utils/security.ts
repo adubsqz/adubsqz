@@ -85,7 +85,7 @@ export function detectDevTools() {
           'font-size: 16px; color: orange;'
         );
         console.log(
-          '%c© Alexander Ames. All rights reserved.',
+          '%c© adubsqz. All rights reserved.',
           'font-size: 14px; color: white;'
         );
       }
@@ -134,7 +134,7 @@ export function initializeSecurity() {
         font-size: 18px;
         display: none;
       `;
-      screenshotWarning.textContent = '© Alexander Ames - All Rights Reserved';
+      screenshotWarning.textContent = '© adubsqz - All Rights Reserved';
       document.body.appendChild(screenshotWarning);
     }
   });

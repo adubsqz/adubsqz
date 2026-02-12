@@ -1,19 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
 import WatermarkedImage from './WatermarkedImage';
 
-const PER_PAGE = 4;
+const PER_PAGE = 8;
+
+type PhotoWithOrientation = Photo & { orientation: 'horizontal' | 'vertical' | 'square' };
 
 function PhotoCard({
   photo,
   onClick,
   onFail,
+  className = '',
 }: {
-  photo: Photo;
+  photo: PhotoWithOrientation;
   onClick: () => void;
   onFail: () => void;
+  className?: string;
 }) {
   const [failed, setFailed] = useState(false);
 
@@ -25,7 +29,7 @@ function PhotoCard({
   if (failed) return null;
 
   return (
-    <div className="block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-fg focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg">
+    <div className={`block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-fg focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg ${className}`}>
       <WatermarkedImage
         src={photo.src}
         alt={photo.alt}
@@ -41,6 +45,52 @@ function PhotoCard({
       )}
     </div>
   );
+}
+
+// Hook to detect image orientation
+function useImageOrientation(photos: Photo[]): PhotoWithOrientation[] {
+  const [orientedPhotos, setOrientedPhotos] = useState<PhotoWithOrientation[]>(
+    photos.map(p => ({ ...p, orientation: p.orientation || 'square' as const }))
+  );
+
+  useEffect(() => {
+    const loadOrientations = async () => {
+      const results = await Promise.all(
+        photos.map(photo => {
+          if (photo.orientation) {
+            return Promise.resolve({ ...photo, orientation: photo.orientation });
+          }
+          
+          return new Promise<PhotoWithOrientation>((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              const ratio = img.width / img.height;
+              let orientation: 'horizontal' | 'vertical' | 'square';
+              
+              if (ratio > 1.2) {
+                orientation = 'horizontal';
+              } else if (ratio < 0.8) {
+                orientation = 'vertical';
+              } else {
+                orientation = 'square';
+              }
+              
+              resolve({ ...photo, orientation });
+            };
+            img.onerror = () => {
+              resolve({ ...photo, orientation: 'square' });
+            };
+            img.src = photo.src;
+          });
+        })
+      );
+      setOrientedPhotos(results);
+    };
+
+    loadOrientations();
+  }, [photos]);
+
+  return orientedPhotos;
 }
 
 function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
@@ -80,6 +130,145 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
   );
 }
 
+// Smart layout grouping algorithm
+type PhotoGroup = {
+  photos: PhotoWithOrientation[];
+  layout: 'two-horizontal' | 'vertical-plus-two' | 'three-horizontal' | 'single';
+};
+
+function createPhotoGroups(photos: PhotoWithOrientation[]): PhotoGroup[] {
+  const groups: PhotoGroup[] = [];
+  let i = 0;
+
+  while (i < photos.length) {
+    const current = photos[i];
+    const next = photos[i + 1];
+    const third = photos[i + 2];
+
+    // Pattern 1: Vertical photo + 2 horizontals beside it
+    if (
+      current.orientation === 'vertical' &&
+      next?.orientation === 'horizontal' &&
+      third?.orientation === 'horizontal'
+    ) {
+      groups.push({
+        photos: [current, next, third],
+        layout: 'vertical-plus-two',
+      });
+      i += 3;
+    }
+    // Pattern 2: Two horizontal photos side by side
+    else if (
+      current.orientation === 'horizontal' &&
+      next?.orientation === 'horizontal'
+    ) {
+      groups.push({
+        photos: [current, next],
+        layout: 'two-horizontal',
+      });
+      i += 2;
+    }
+    // Pattern 3: Three horizontal photos in a row (only on wider screens)
+    else if (
+      current.orientation === 'horizontal' &&
+      next?.orientation === 'horizontal' &&
+      third?.orientation === 'horizontal'
+    ) {
+      groups.push({
+        photos: [current, next, third],
+        layout: 'three-horizontal',
+      });
+      i += 3;
+    }
+    // Pattern 4: Single photo (fallback)
+    else {
+      groups.push({
+        photos: [current],
+        layout: 'single',
+      });
+      i += 1;
+    }
+  }
+
+  return groups;
+}
+
+function PhotoGroup({
+  group,
+  onPhotoClick,
+  onFail,
+}: {
+  group: PhotoGroup;
+  onPhotoClick: (photo: Photo) => void;
+  onFail: (id: string) => void;
+}) {
+  if (group.layout === 'vertical-plus-two') {
+    // 1 vertical on left, 2 horizontals stacked on right
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <PhotoCard
+          photo={group.photos[0]}
+          onClick={() => onPhotoClick(group.photos[0])}
+          onFail={() => onFail(group.photos[0].id)}
+        />
+        <div className="grid grid-rows-2 gap-4 sm:gap-6">
+          <PhotoCard
+            photo={group.photos[1]}
+            onClick={() => onPhotoClick(group.photos[1])}
+            onFail={() => onFail(group.photos[1].id)}
+          />
+          <PhotoCard
+            photo={group.photos[2]}
+            onClick={() => onPhotoClick(group.photos[2])}
+            onFail={() => onFail(group.photos[2].id)}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (group.layout === 'two-horizontal') {
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        {group.photos.map(photo => (
+          <PhotoCard
+            key={photo.id}
+            photo={photo}
+            onClick={() => onPhotoClick(photo)}
+            onFail={() => onFail(photo.id)}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (group.layout === 'three-horizontal') {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        {group.photos.map(photo => (
+          <PhotoCard
+            key={photo.id}
+            photo={photo}
+            onClick={() => onPhotoClick(photo)}
+            onFail={() => onFail(photo.id)}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // Single photo
+  return (
+    <div className="max-w-3xl mx-auto">
+      <PhotoCard
+        photo={group.photos[0]}
+        onClick={() => onPhotoClick(group.photos[0])}
+        onFail={() => onFail(group.photos[0].id)}
+      />
+    </div>
+  );
+}
+
 function CollectionSection({
   collection,
   onPhotoClick,
@@ -90,29 +279,33 @@ function CollectionSection({
   const [page, setPage] = useState(1);
   const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
   const photos = collection.photos;
+  const orientedPhotos = useImageOrientation(photos);
+  
   const totalPages = Math.max(1, Math.ceil(photos.length / PER_PAGE));
   const start = (page - 1) * PER_PAGE;
-  const pagePhotos = photos.slice(start, start + PER_PAGE);
+  const pagePhotos = orientedPhotos.slice(start, start + PER_PAGE);
   const pagePhotosToShow = pagePhotos.filter((p) => !failedIds.has(p.id));
 
   const handleFail = (id: string) => setFailedIds((prev) => new Set(prev).add(id));
+
+  const photoGroups = createPhotoGroups(pagePhotosToShow);
 
   if (photos.length === 0) return null;
 
   return (
     <section>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-        {pagePhotosToShow.map((photo) => (
-          <PhotoCard
-            key={photo.id}
-            photo={photo}
-            onClick={() => onPhotoClick(photo)}
-            onFail={() => handleFail(photo.id)}
+      <div className="space-y-8">
+        {photoGroups.map((group, idx) => (
+          <PhotoGroup
+            key={`group-${idx}`}
+            group={group}
+            onPhotoClick={onPhotoClick}
+            onFail={handleFail}
           />
         ))}
       </div>
       {totalPages > 1 && (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
           <p className="text-photo-muted text-sm">
             Page {page} of {totalPages}
           </p>

@@ -9,7 +9,7 @@ export default function HomeView({ onNavigate }: HomeViewProps) {
     <div className="flex flex-col items-center text-center">
       <header className="mb-12 sm:mb-16">
         <h1 className="font-display text-4xl sm:text-5xl md:text-6xl text-photo-fg tracking-tight">
-          Alexander Ames
+          adubsqz
         </h1>
         <p className="font-sans text-photo-muted text-lg sm:text-xl mt-2">
           Photography

@@ -10,13 +10,13 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
       <div className="relative overflow-hidden rounded-3xl bg-black/45">
         <img
           src="/photos/still-life/kodak_200_c_41_ABOUTME.jpg"
-          alt="Portrait of Alexander Ames seated in a chair, photographed on film."
+          alt="Portrait of adubs seated in a chair, photographed on film."
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent" />
         <div className="absolute bottom-5 sm:bottom-7 left-5 sm:left-7 right-5 sm:right-7">
           <p className="text-[0.7rem] tracking-[0.25em] uppercase text-photo-muted mb-2">
-            Alexander Ames
+            adubsqz
           </p>
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl leading-tight mb-3">
             Film, rediscovered.

@@ -47,7 +47,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
         <div className="w-full max-w-md px-6">
           <div className="rounded-3xl bg-photo-panel/95 shadow-[0_26px_80px_rgba(0,0,0,0.9)] backdrop-blur-md p-8 sm:p-10">
             <h1 className="text-2xl font-medium tracking-tight mb-2">
-              Alexander Ames
+              adubsqz
             </h1>
             <p className="text-photo-muted text-sm mb-8">
               Enter password to view photography portfolio

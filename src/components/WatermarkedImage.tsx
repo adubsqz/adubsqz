@@ -25,7 +25,7 @@ export default function WatermarkedImage({
   decoding = 'async',
   onError,
   onClick,
-  watermarkText = 'adubsqz ltd.',
+  watermarkText = 'adubsqz',
   watermarkOpacity = 0.08, // Super subtle - can barely see it but it's there
 }: WatermarkedImageProps) {
   const [imageLoaded, setImageLoaded] = useState(false);

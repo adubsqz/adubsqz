@@ -1,3 +1,7 @@
 public/photos/
 node_modules/
 dist/
+*.md
+scripts/
+*.py
+README.md
