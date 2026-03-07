@@ -58,7 +58,6 @@ export default function WatermarkedImage({
         style={{
           userSelect: 'none',
           WebkitUserSelect: 'none',
-          WebkitUserDrag: 'none',
           pointerEvents: 'none',
         }}
         draggable="false"

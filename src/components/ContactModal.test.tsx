@@ -9,10 +9,13 @@ describe('ContactModal', () => {
 
   beforeEach(() => {
     onClose.mockClear();
-    // Prevent actual navigation
+    // Prevent actual navigation in jsdom while keeping type-check happy.
     const location = window.location;
-    delete (window as { location?: Location }).location;
-    window.location = { ...location, href: '' } as Location;
+    delete (window as unknown as { location?: Location }).location;
+    (window as unknown as { location: Location }).location = {
+      ...location,
+      href: '',
+    } as Location;
   });
 
   afterEach(() => {

@@ -17,7 +17,7 @@ describe('AboutView', () => {
 
   it('renders portrait image with correct alt', () => {
     render(<AboutView />);
-    const img = screen.getByAltText(/portrait of adubsqz/i);
+    const img = screen.getByAltText(/portrait of adubs/i);
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute('src', '/photos/still-life/kodak_200_c_41_ABOUTME.jpg');
   });
