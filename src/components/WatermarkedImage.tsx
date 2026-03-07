@@ -26,14 +26,9 @@ export default function WatermarkedImage({
   onError,
   onClick,
   watermarkText = 'adubsqz',
-  watermarkOpacity = 0.14,
+  watermarkOpacity = 0.09,
 }: WatermarkedImageProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
-  const watermarkStamps = Array.from({ length: 12 }, (_, index) => ({
-    id: index,
-    left: `${8 + (index % 4) * 28}%`,
-    top: `${16 + Math.floor(index / 4) * 30}%`,
-  }));
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -68,32 +63,44 @@ export default function WatermarkedImage({
         draggable="false"
       />
 
-      {/* JS watermark pattern across the whole image */}
+      {/* One diagonal watermark plus one bottom-right signature */}
       {imageLoaded && (
         <div className="absolute inset-0 z-20 overflow-hidden pointer-events-none" aria-hidden="true">
-          {watermarkStamps.map((stamp) => (
-            <span
-              key={stamp.id}
-              className="absolute"
-              style={{
-                left: stamp.left,
-                top: stamp.top,
-                transform: 'rotate(-24deg)',
-                opacity: watermarkOpacity,
-                fontSize: 'clamp(0.95rem, 1.8vw, 1.55rem)',
-                fontWeight: 700,
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-                userSelect: 'none',
-                pointerEvents: 'none',
-                color: 'rgba(255, 255, 255, 0.92)',
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.42)',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {watermarkText}
-            </span>
-          ))}
+          <span
+            className="absolute left-1/2 top-1/2"
+            style={{
+              transform: 'translate(-50%, -50%) rotate(-24deg)',
+              opacity: watermarkOpacity,
+              fontSize: 'clamp(1rem, 2.2vw, 1.85rem)',
+              fontWeight: 700,
+              letterSpacing: '0.28em',
+              textTransform: 'uppercase',
+              userSelect: 'none',
+              pointerEvents: 'none',
+              color: 'rgba(255, 255, 255, 0.84)',
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.38)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {watermarkText}
+          </span>
+          <span
+            className="absolute right-3 bottom-2"
+            style={{
+              opacity: Math.min(watermarkOpacity + 0.04, 0.2),
+              fontSize: 'clamp(0.72rem, 1.1vw, 0.92rem)',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'lowercase',
+              userSelect: 'none',
+              pointerEvents: 'none',
+              color: 'rgba(255, 255, 255, 0.86)',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.45)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            © {watermarkText}
+          </span>
         </div>
       )}
     </div>
