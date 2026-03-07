@@ -26,9 +26,14 @@ export default function WatermarkedImage({
   onError,
   onClick,
   watermarkText = 'adubsqz',
-  watermarkOpacity = 0.08, // Super subtle - can barely see it but it's there
+  watermarkOpacity = 0.14,
 }: WatermarkedImageProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const watermarkStamps = Array.from({ length: 12 }, (_, index) => ({
+    id: index,
+    left: `${8 + (index % 4) * 28}%`,
+    top: `${16 + Math.floor(index / 4) * 30}%`,
+  }));
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -63,26 +68,32 @@ export default function WatermarkedImage({
         draggable="false"
       />
 
-      {/* Vertical watermark running down the left side */}
+      {/* JS watermark pattern across the whole image */}
       {imageLoaded && (
-        <div
-          className="absolute left-4 top-0 bottom-0 z-20 flex items-center"
-          style={{
-            writingMode: 'vertical-rl',
-            textOrientation: 'mixed',
-            opacity: watermarkOpacity,
-            fontSize: '4rem', // Huge size (64px)
-            fontWeight: '700',
-            letterSpacing: '0.1em',
-            textTransform: 'lowercase',
-            userSelect: 'none',
-            pointerEvents: 'none',
-            color: 'white',
-            textShadow: '0 0 8px rgba(0, 0, 0, 0.3)',
-            lineHeight: '1',
-          }}
-        >
-          {watermarkText}
+        <div className="absolute inset-0 z-20 overflow-hidden pointer-events-none" aria-hidden="true">
+          {watermarkStamps.map((stamp) => (
+            <span
+              key={stamp.id}
+              className="absolute"
+              style={{
+                left: stamp.left,
+                top: stamp.top,
+                transform: 'rotate(-24deg)',
+                opacity: watermarkOpacity,
+                fontSize: 'clamp(0.95rem, 1.8vw, 1.55rem)',
+                fontWeight: 700,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                userSelect: 'none',
+                pointerEvents: 'none',
+                color: 'rgba(255, 255, 255, 0.92)',
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.42)',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {watermarkText}
+            </span>
+          ))}
         </div>
       )}
     </div>

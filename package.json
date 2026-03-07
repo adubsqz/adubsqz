@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
-    "classify-photos": "node scripts/classify-still-life.mjs"
+    "sync:gallery-ignore": "node sync-gallery-ignore.mjs",
+    "classify-photos": "node scripts/classify-still-life.mjs && npm run sync:gallery-ignore"
   },
   "dependencies": {
     "react": "^19.2.3",

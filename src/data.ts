@@ -8,6 +8,8 @@ import galleryManifest from './gallery-manifest.json';
 
 const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/';
 const stillLifeBase = (base.endsWith('/') ? base.slice(0, -1) : base) + '/photos/still-life';
+const MAX_GALLERY_PHOTOS = 5;
+const SUPPORTED_IMAGE_FILE = /\.(jpe?g|png|webp)$/i;
 
 function photosFromFilenames(filenames: string[], subdir: 'bw' | 'color', prefix: string) {
   return filenames.map((filename, i) => {
@@ -21,9 +23,13 @@ function photosFromFilenames(filenames: string[], subdir: 'bw' | 'color', prefix
   });
 }
 
+function selectTopGalleryFilenames(filenames: string[]): string[] {
+  return filenames.filter((filename) => SUPPORTED_IMAGE_FILE.test(filename)).slice(0, MAX_GALLERY_PHOTOS);
+}
+
 const manifest = galleryManifest as { bw: string[]; color: string[] };
-const bwPhotos = photosFromFilenames(manifest.bw, 'bw', 'bw');
-const colorPhotos = photosFromFilenames(manifest.color, 'color', 'color');
+const bwPhotos = photosFromFilenames(selectTopGalleryFilenames(manifest.bw), 'bw', 'bw');
+const colorPhotos = photosFromFilenames(selectTopGalleryFilenames(manifest.color), 'color', 'color');
 
 export const COLLECTIONS: PhotoCollection[] = [
   { id: 'still-life-bw', title: 'Black & White', photos: bwPhotos },
