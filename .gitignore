@@ -22,4 +22,5 @@ public/photos/still-life/**
 node_modules/
 dist/
 .DS_Store
+.cursor-reference.md
 scripts/
