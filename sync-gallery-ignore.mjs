@@ -37,7 +37,18 @@ function collectManifestReferences(manifest) {
       if (typeof filename !== 'string') continue;
       const trimmed = filename.trim();
       if (!trimmed || !isSupportedImage(trimmed)) continue;
-      refs.add(`${gallery}/${trimmed}`);
+      const normalized = toPosixPath(trimmed).replace(/^\/+/, '');
+      if (normalized.includes('/')) {
+        refs.add(normalized);
+        continue;
+      }
+      if (gallery === 'bw' || gallery === 'color') {
+        refs.add(`${gallery}/${normalized}`);
+        continue;
+      }
+      if (gallery === 'still-life') {
+        refs.add(normalized);
+      }
     }
   }
   return refs;

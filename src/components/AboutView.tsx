@@ -1,4 +1,4 @@
-import { ABOUT } from '../data';
+import { ABOUT, ABOUT_IMAGE_SRC } from '../data';
 
 interface AboutViewProps {
   onContactClick?: () => void;
@@ -9,17 +9,17 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
     <div className="max-w-2xl space-y-6">
       <div className="relative overflow-hidden rounded-3xl bg-black/45">
         <img
-          src="/photos/still-life/kodak_200_c_41_ABOUTME.jpg"
+          src={ABOUT_IMAGE_SRC}
           alt="Portrait of adubs seated in a chair, photographed on film."
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent" />
         <div className="absolute bottom-5 sm:bottom-7 left-5 sm:left-7 right-5 sm:right-7">
           <p className="text-[0.7rem] tracking-[0.25em] uppercase text-photo-muted mb-2">
-            adubsqz
+            {ABOUT.name}
           </p>
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl leading-tight mb-3">
-            Film, rediscovered.
+            {ABOUT.tagline}
           </h2>
           <p className="text-xs sm:text-sm md:text-[0.9rem] leading-relaxed text-slate-100/90 max-w-xl">
             {ABOUT.bio}

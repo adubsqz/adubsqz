@@ -6,6 +6,7 @@ public/photos/still-life/**
 !public/photos/still-life/.gitkeep
 !public/photos/still-life/bw/
 !public/photos/still-life/color/
+!public/photos/still-life/about_me.jpg
 !public/photos/still-life/bw/000230040012.jpg
 !public/photos/still-life/bw/000230040014.jpg
 !public/photos/still-life/bw/000230040015.jpg
@@ -16,7 +17,6 @@ public/photos/still-life/**
 !public/photos/still-life/color/B96AA7C2-DC69-42C6-B5B3-87205F0BF3BF.jpg
 !public/photos/still-life/color/cheers.jpg
 !public/photos/still-life/color/ivy.jpg
-!public/photos/still-life/kodak_200_c_41_ABOUTME.jpg
 # END AUTO-GENERATED CURATED STILL-LIFE
 
 node_modules/

@@ -8,7 +8,6 @@ import galleryManifest from './gallery-manifest.json';
 
 const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/';
 const stillLifeBase = (base.endsWith('/') ? base.slice(0, -1) : base) + '/photos/still-life';
-const MAX_GALLERY_PHOTOS = 5;
 const SUPPORTED_IMAGE_FILE = /\.(jpe?g|png|webp)$/i;
 
 function photosFromFilenames(filenames: string[], subdir: 'bw' | 'color', prefix: string) {
@@ -23,13 +22,33 @@ function photosFromFilenames(filenames: string[], subdir: 'bw' | 'color', prefix
   });
 }
 
-function selectTopGalleryFilenames(filenames: string[]): string[] {
-  return filenames.filter((filename) => SUPPORTED_IMAGE_FILE.test(filename)).slice(0, MAX_GALLERY_PHOTOS);
+function selectGalleryFilenames(filenames: string[]): string[] {
+  return filenames.filter((filename) => SUPPORTED_IMAGE_FILE.test(filename));
 }
 
-const manifest = galleryManifest as { bw: string[]; color: string[] };
-const bwPhotos = photosFromFilenames(selectTopGalleryFilenames(manifest.bw), 'bw', 'bw');
-const colorPhotos = photosFromFilenames(selectTopGalleryFilenames(manifest.color), 'color', 'color');
+type GalleryManifest = {
+  bw?: string[];
+  color?: string[];
+  'still-life'?: string[];
+};
+
+const manifest = galleryManifest as GalleryManifest;
+const bwPhotos = photosFromFilenames(selectGalleryFilenames(manifest.bw ?? []), 'bw', 'bw');
+const colorPhotos = photosFromFilenames(selectGalleryFilenames(manifest.color ?? []), 'color', 'color');
+
+function resolveAboutImagePath(entry: string): string {
+  const normalized = entry.trim().replace(/^\/+/, '');
+  if (!normalized) return '';
+  if (normalized.startsWith('bw/') || normalized.startsWith('color/')) {
+    return `${stillLifeBase}/${normalized}`;
+  }
+  return `${stillLifeBase}/${normalized}`;
+}
+
+const aboutFilename = (manifest['still-life'] ?? []).find((filename) => SUPPORTED_IMAGE_FILE.test(filename));
+export const ABOUT_IMAGE_SRC = aboutFilename
+  ? resolveAboutImagePath(aboutFilename)
+  : `${stillLifeBase}/about_me.jpg`;
 
 export const COLLECTIONS: PhotoCollection[] = [
   { id: 'still-life-bw', title: 'Black & White', photos: bwPhotos },

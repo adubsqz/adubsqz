@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+import { ABOUT } from './data';
 
 describe('App', () => {
   it('renders navigation with Gallery and About tabs', () => {
@@ -20,8 +21,8 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about/i }));
-    expect(screen.getByText(/film, rediscovered/i)).toBeInTheDocument();
-    expect(screen.getByText(/adubsqz/)).toBeInTheDocument();
+    expect(screen.getByText(ABOUT.tagline)).toBeInTheDocument();
+    expect(screen.getByText(ABOUT.name)).toBeInTheDocument();
   });
 
   it('switches back to Gallery when Gallery tab is clicked after viewing About', async () => {

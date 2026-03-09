@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import AboutView from './AboutView';
-import { ABOUT } from '../data';
+import { ABOUT, ABOUT_IMAGE_SRC } from '../data';
 
 describe('AboutView', () => {
   it('renders about content with name and tagline', () => {
     render(<AboutView />);
-    expect(screen.getByText(/adubsqz/)).toBeInTheDocument();
-    expect(screen.getByText(/film, rediscovered/i)).toBeInTheDocument();
+    expect(screen.getByText(ABOUT.name)).toBeInTheDocument();
+    expect(screen.getByText(ABOUT.tagline)).toBeInTheDocument();
   });
 
   it('renders bio text', () => {
@@ -19,7 +19,7 @@ describe('AboutView', () => {
     render(<AboutView />);
     const img = screen.getByAltText(/portrait of adubs/i);
     expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute('src', '/photos/still-life/kodak_200_c_41_ABOUTME.jpg');
+    expect(img).toHaveAttribute('src', ABOUT_IMAGE_SRC);
   });
 
   it('renders social links', () => {
