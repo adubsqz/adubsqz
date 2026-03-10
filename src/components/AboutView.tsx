@@ -6,7 +6,7 @@ interface AboutViewProps {
 
 export default function AboutView({ onContactClick }: AboutViewProps) {
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-xl space-y-6">
       <div className="relative overflow-hidden rounded-3xl bg-black/45">
         <img
           src={ABOUT_IMAGE_SRC}

@@ -258,12 +258,16 @@ function PhotoGroup({
   }
 
   // Single photo
+  const singlePhoto = group.photos[0];
+  const singlePhotoWidthClass =
+    singlePhoto.orientation === 'vertical' ? 'max-w-xl' : 'max-w-3xl';
+
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className={`${singlePhotoWidthClass} mx-auto`}>
       <PhotoCard
-        photo={group.photos[0]}
-        onClick={() => onPhotoClick(group.photos[0])}
-        onFail={() => onFail(group.photos[0].id)}
+        photo={singlePhoto}
+        onClick={() => onPhotoClick(singlePhoto)}
+        onFail={() => onFail(singlePhoto.id)}
       />
     </div>
   );
