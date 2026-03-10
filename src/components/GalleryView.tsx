@@ -3,6 +3,7 @@ import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
 import WatermarkedImage from './WatermarkedImage';
+import InquiryModal from './InquiryModal';
 
 const PER_PAGE = 8;
 
@@ -29,21 +30,29 @@ function PhotoCard({
   if (failed) return null;
 
   return (
-    <div className={`block w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-fg focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg ${className}`}>
-      <WatermarkedImage
-        src={photo.src}
-        alt={photo.alt}
-        className="gallery-image w-full h-auto object-cover border border-photo-border hover:border-photo-muted transition-colors"
-        loading="lazy"
-        decoding="async"
-        onError={handleError}
-        onClick={onClick}
-        watermarkOpacity={0.3}
-      />
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`Open photo: ${photo.alt}`}
+      className={`block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-fg focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg group ${className}`}
+    >
+      <div className="relative overflow-hidden rounded-sm">
+        <WatermarkedImage
+          src={photo.src}
+          alt={photo.alt}
+          className="gallery-image w-full h-auto object-cover border border-photo-border/60 hover:border-photo-border transition-all duration-500 group-hover:scale-[1.02]"
+          loading="lazy"
+          decoding="async"
+          onError={handleError}
+          onClick={onClick}
+          watermarkOpacity={0.3}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      </div>
       {photo.caption && (
-        <p className="mt-2 text-photo-muted text-sm">{photo.caption}</p>
+        <p className="mt-3 text-photo-muted/80 text-xs italic leading-relaxed">{photo.caption}</p>
       )}
-    </div>
+    </button>
   );
 }
 
@@ -93,14 +102,28 @@ function useImageOrientation(photos: Photo[]): PhotoWithOrientation[] {
   return orientedPhotos;
 }
 
-function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
+function Lightbox({ 
+  photo, 
+  onClose, 
+  onInquire,
+  onPrevious,
+  onNext,
+}: { 
+  photo: Photo; 
+  onClose: () => void;
+  onInquire: () => void;
+  onPrevious: () => void;
+  onNext: () => void;
+}) {
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowLeft') onPrevious();
+      if (e.key === 'ArrowRight') onNext();
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [onClose]);
+  }, [onClose, onPrevious, onNext]);
 
   return (
     <div
@@ -110,13 +133,38 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
       aria-label="Image lightbox"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute top-4 right-4 text-photo-muted hover:text-photo-fg text-sm uppercase tracking-wider z-10"
-      >
-        Close
-      </button>
+      <div className="absolute top-4 right-4 flex gap-3 z-10">
+        <button
+          type="button"
+          onClick={onPrevious}
+          className="px-4 py-2 text-photo-muted hover:text-photo-fg text-xs uppercase tracking-wider bg-photo-panel/80 backdrop-blur-sm border border-photo-border rounded transition-colors focus-visible:ring-2 focus-visible:ring-photo-fg"
+          aria-label="View previous photo"
+        >
+          Prev
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          className="px-4 py-2 text-photo-muted hover:text-photo-fg text-xs uppercase tracking-wider bg-photo-panel/80 backdrop-blur-sm border border-photo-border rounded transition-colors focus-visible:ring-2 focus-visible:ring-photo-fg"
+          aria-label="View next photo"
+        >
+          Next
+        </button>
+        <button
+          type="button"
+          onClick={onInquire}
+          className="px-4 py-2 bg-photo-accent text-photo-bg text-xs uppercase tracking-wider font-medium rounded hover:opacity-90 transition-opacity shadow-lg focus-visible:ring-2 focus-visible:ring-photo-fg"
+        >
+          Request Invoice
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-4 py-2 text-photo-muted hover:text-photo-fg text-xs uppercase tracking-wider bg-photo-panel/80 backdrop-blur-sm border border-photo-border rounded transition-colors focus-visible:ring-2 focus-visible:ring-photo-fg"
+        >
+          Close
+        </button>
+      </div>
       <div className="lightbox-frame max-w-[calc(100vw-1rem)] max-h-[180vh] flex items-center justify-center">
         <WatermarkedImage
           src={photo.src}
@@ -126,6 +174,11 @@ function Lightbox({ photo, onClose }: { photo: Photo; onClose: () => void }) {
           loading="eager"
         />
       </div>
+      {photo.caption && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-photo-panel/90 backdrop-blur-sm border border-photo-border rounded-lg px-4 py-2 max-w-2xl">
+          <p className="text-xs text-photo-muted text-center italic">{photo.caption}</p>
+        </div>
+      )}
     </div>
   );
 }
@@ -205,13 +258,13 @@ function PhotoGroup({
   if (group.layout === 'vertical-plus-two') {
     // 1 vertical on left, 2 horizontals stacked on right
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         <PhotoCard
           photo={group.photos[0]}
           onClick={() => onPhotoClick(group.photos[0])}
           onFail={() => onFail(group.photos[0].id)}
         />
-        <div className="grid grid-rows-2 gap-4 sm:gap-6">
+        <div className="grid grid-rows-2 gap-6 sm:gap-8">
           <PhotoCard
             photo={group.photos[1]}
             onClick={() => onPhotoClick(group.photos[1])}
@@ -229,7 +282,7 @@ function PhotoGroup({
 
   if (group.layout === 'two-horizontal') {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {group.photos.map(photo => (
           <PhotoCard
             key={photo.id}
@@ -244,7 +297,7 @@ function PhotoGroup({
 
   if (group.layout === 'three-horizontal') {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
         {group.photos.map(photo => (
           <PhotoCard
             key={photo.id}
@@ -298,14 +351,15 @@ function CollectionSection({
 
   return (
     <section>
-      <div className="space-y-8">
+      <div className="space-y-12 sm:space-y-16">
         {photoGroups.map((group, idx) => (
-          <PhotoGroup
-            key={`group-${idx}`}
-            group={group}
-            onPhotoClick={onPhotoClick}
-            onFail={handleFail}
-          />
+          <div key={`group-${idx}`} role="group" aria-label={`Photo group ${idx + 1}`}>
+            <PhotoGroup
+              group={group}
+              onPhotoClick={onPhotoClick}
+              onFail={handleFail}
+            />
+          </div>
         ))}
       </div>
       {totalPages > 1 && (
@@ -343,14 +397,33 @@ interface GalleryViewProps {
 
 export default function GalleryView({ filter }: GalleryViewProps) {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
+  const [inquiryPhoto, setInquiryPhoto] = useState<Photo | null>(null);
   const collection = COLLECTIONS.find((c) => c.id === `still-life-${filter}`) ?? COLLECTIONS[0];
 
+  const handleInquire = () => {
+    if (lightboxPhoto) {
+      setInquiryPhoto(lightboxPhoto);
+      setLightboxPhoto(null);
+    }
+  };
+  
+  const handleLightboxMove = (direction: 'next' | 'previous') => {
+    if (!lightboxPhoto) return;
+    const currentIndex = collection.photos.findIndex((photo) => photo.id === lightboxPhoto.id);
+    if (currentIndex < 0) return;
+    const step = direction === 'next' ? 1 : -1;
+    const nextIndex = (currentIndex + step + collection.photos.length) % collection.photos.length;
+    setLightboxPhoto(collection.photos[nextIndex]);
+  };
+
   return (
-    <div>
-      <p className="text-[0.6rem] sm:text-xs italic text-photo-muted mb-8 max-w-xl">
-        *none of these photos have been altered and are shown exactly how they
-        were shot and thus developed
-      </p>
+    <div className="space-y-12">
+      <div className="max-w-3xl">
+        <p className="text-[0.65rem] sm:text-xs italic text-photo-muted/80 leading-relaxed">
+          *none of these photos have been altered and are shown exactly how they
+          were shot and thus developed
+        </p>
+      </div>
 
       <CollectionSection
         collection={collection}
@@ -361,6 +434,16 @@ export default function GalleryView({ filter }: GalleryViewProps) {
         <Lightbox
           photo={lightboxPhoto}
           onClose={() => setLightboxPhoto(null)}
+          onInquire={handleInquire}
+          onPrevious={() => handleLightboxMove('previous')}
+          onNext={() => handleLightboxMove('next')}
+        />
+      )}
+
+      {inquiryPhoto && (
+        <InquiryModal
+          photo={inquiryPhoto}
+          onClose={() => setInquiryPhoto(null)}
         />
       )}
     </div>
