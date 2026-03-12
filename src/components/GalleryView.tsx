@@ -40,7 +40,7 @@ function PhotoCard({
         <WatermarkedImage
           src={photo.src}
           alt={photo.alt}
-          className="gallery-image w-full h-auto object-cover border border-photo-border/60 hover:border-photo-border transition-all duration-500 group-hover:scale-[1.02]"
+          className="gallery-image w-full h-auto max-h-[70vh] mx-auto object-cover border border-photo-border/60 hover:border-photo-border transition-all duration-500 group-hover:scale-[1.02]"
           loading="lazy"
           decoding="async"
           onError={handleError}
@@ -189,7 +189,7 @@ type PhotoGroup = {
   layout: 'two-horizontal' | 'vertical-plus-two' | 'three-horizontal' | 'single';
 };
 
-function createPhotoGroups(photos: PhotoWithOrientation[]): PhotoGroup[] {
+function createPhotoGroups(photos: PhotoWithOrientation[], forcePairs = false): PhotoGroup[] {
   const groups: PhotoGroup[] = [];
   let i = 0;
 
@@ -197,6 +197,15 @@ function createPhotoGroups(photos: PhotoWithOrientation[]): PhotoGroup[] {
     const current = photos[i];
     const next = photos[i + 1];
     const third = photos[i + 2];
+
+    if (forcePairs && next) {
+      groups.push({
+        photos: [current, next],
+        layout: 'two-horizontal',
+      });
+      i += 2;
+      continue;
+    }
 
     // Pattern 1: Vertical photo + 2 horizontals beside it
     if (
@@ -250,10 +259,12 @@ function PhotoGroup({
   group,
   onPhotoClick,
   onFail,
+  preferSideBySide = false,
 }: {
   group: PhotoGroup;
   onPhotoClick: (photo: Photo) => void;
   onFail: (id: string) => void;
+  preferSideBySide?: boolean;
 }) {
   if (group.layout === 'vertical-plus-two') {
     // 1 vertical on left, 2 horizontals stacked on right
@@ -282,7 +293,7 @@ function PhotoGroup({
 
   if (group.layout === 'two-horizontal') {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+      <div className={`grid grid-cols-1 ${preferSideBySide ? 'sm:grid-cols-2' : 'lg:grid-cols-2'} gap-6 sm:gap-8`}>
         {group.photos.map(photo => (
           <PhotoCard
             key={photo.id}
@@ -329,9 +340,11 @@ function PhotoGroup({
 function CollectionSection({
   collection,
   onPhotoClick,
+  preferSideBySide = false,
 }: {
   collection: PhotoCollection;
   onPhotoClick: (photo: Photo) => void;
+  preferSideBySide?: boolean;
 }) {
   const [page, setPage] = useState(1);
   const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
@@ -345,7 +358,7 @@ function CollectionSection({
 
   const handleFail = (id: string) => setFailedIds((prev) => new Set(prev).add(id));
 
-  const photoGroups = createPhotoGroups(pagePhotosToShow);
+  const photoGroups = createPhotoGroups(pagePhotosToShow, preferSideBySide);
 
   if (photos.length === 0) return null;
 
@@ -358,6 +371,7 @@ function CollectionSection({
               group={group}
               onPhotoClick={onPhotoClick}
               onFail={handleFail}
+              preferSideBySide={preferSideBySide}
             />
           </div>
         ))}
@@ -399,6 +413,7 @@ export default function GalleryView({ filter }: GalleryViewProps) {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
   const [inquiryPhoto, setInquiryPhoto] = useState<Photo | null>(null);
   const collection = COLLECTIONS.find((c) => c.id === `still-life-${filter}`) ?? COLLECTIONS[0];
+  const preferSideBySide = filter === 'color';
 
   const handleInquire = () => {
     if (lightboxPhoto) {
@@ -428,6 +443,7 @@ export default function GalleryView({ filter }: GalleryViewProps) {
       <CollectionSection
         collection={collection}
         onPhotoClick={setLightboxPhoto}
+        preferSideBySide={preferSideBySide}
       />
 
       {lightboxPhoto && (
