@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
-import type { GalleryFilter } from '../types';
+import type { GalleryFilter, OrientationFilter } from '../types';
 import WatermarkedImage from './WatermarkedImage';
 import InquiryModal from './InquiryModal';
 
@@ -407,13 +407,31 @@ function CollectionSection({
 
 interface GalleryViewProps {
   filter: GalleryFilter;
+  orientationFilter?: OrientationFilter;
 }
 
-export default function GalleryView({ filter }: GalleryViewProps) {
+export default function GalleryView({ filter, orientationFilter = 'all' }: GalleryViewProps) {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
   const [inquiryPhoto, setInquiryPhoto] = useState<Photo | null>(null);
-  const collection = COLLECTIONS.find((c) => c.id === `still-life-${filter}`) ?? COLLECTIONS[0];
-  const preferSideBySide = filter === 'color';
+  const collection: PhotoCollection = COLLECTIONS.find((c) => c.id === filter)
+    ?? COLLECTIONS[0]
+    ?? { id: 'empty', title: 'Empty', photos: [] };
+  const orientedPhotos = useImageOrientation(collection.photos);
+  const filteredPhotos =
+    orientationFilter === 'all'
+      ? orientedPhotos
+      : orientedPhotos.filter((photo) => photo.orientation === orientationFilter);
+  const filteredCollection: PhotoCollection = {
+    ...collection,
+    photos: filteredPhotos,
+  };
+  const preferSideBySide = false;
+
+  useEffect(() => {
+    if (!lightboxPhoto) return;
+    const exists = filteredCollection.photos.some((photo) => photo.id === lightboxPhoto.id);
+    if (!exists) setLightboxPhoto(null);
+  }, [filteredCollection.photos, lightboxPhoto]);
 
   const handleInquire = () => {
     if (lightboxPhoto) {
@@ -424,15 +442,54 @@ export default function GalleryView({ filter }: GalleryViewProps) {
   
   const handleLightboxMove = (direction: 'next' | 'previous') => {
     if (!lightboxPhoto) return;
-    const currentIndex = collection.photos.findIndex((photo) => photo.id === lightboxPhoto.id);
+    if (filteredCollection.photos.length === 0) return;
+    const currentIndex = filteredCollection.photos.findIndex((photo) => photo.id === lightboxPhoto.id);
     if (currentIndex < 0) return;
     const step = direction === 'next' ? 1 : -1;
-    const nextIndex = (currentIndex + step + collection.photos.length) % collection.photos.length;
-    setLightboxPhoto(collection.photos[nextIndex]);
+    const nextIndex =
+      (currentIndex + step + filteredCollection.photos.length) % filteredCollection.photos.length;
+    setLightboxPhoto(filteredCollection.photos[nextIndex]);
   };
 
   return (
     <div className="space-y-12">
+      <div className="rounded-2xl border border-photo-accent/35 bg-photo-accent/10 p-4 sm:p-5 space-y-2">
+        <p className="text-[0.66rem] uppercase tracking-[0.2em] text-photo-accent">
+          Film + TV Clearance Guarantee
+        </p>
+        <p className="text-sm sm:text-base text-photo-fg leading-relaxed">
+          All photography is 100% owned, unencumbered, and pre-cleared for Film, Television, and
+          Commercial broadcast.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-xl border border-photo-border/60 bg-black/25 p-4 space-y-2">
+          <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Trade Portal + Tearsheet</p>
+          <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
+            Download the printable lookbook for 8.5x11 mood boards with image SKU/title under each frame.
+          </p>
+          <a
+            href="/lookbook.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex text-xs uppercase tracking-[0.14em] text-photo-accent hover:opacity-85 transition-opacity"
+          >
+            Download Tearsheet PDF
+          </a>
+        </div>
+        <div className="rounded-xl border border-photo-border/60 bg-black/25 p-4 space-y-2">
+          <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Fulfillment Options</p>
+          <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
+            Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang
+            NYC/NJ delivery: 5-7 business days.
+          </p>
+          <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
+            Short-term set rental is available at 20% of retail per 30-day term.
+          </p>
+        </div>
+      </div>
+
       <div className="max-w-3xl">
         <p className="text-[0.65rem] sm:text-xs italic text-photo-muted/80 leading-relaxed">
           *none of these photos have been altered and are shown exactly how they
@@ -440,8 +497,14 @@ export default function GalleryView({ filter }: GalleryViewProps) {
         </p>
       </div>
 
+      {filteredCollection.photos.length === 0 && (
+        <p className="text-sm text-photo-muted">
+          No photos matched this orientation in the selected category.
+        </p>
+      )}
+
       <CollectionSection
-        collection={collection}
+        collection={filteredCollection}
         onPhotoClick={setLightboxPhoto}
         preferSideBySide={preferSideBySide}
       />

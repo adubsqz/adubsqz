@@ -5,43 +5,42 @@ import GalleryView from './GalleryView';
 import { COLLECTIONS } from '../data';
 
 const PER_PAGE = 8;
+const DEFAULT_FILTER = COLLECTIONS[0]?.id ?? 'bw';
 
 describe('GalleryView', () => {
+  it('renders clearance guarantee content', () => {
+    render(<GalleryView filter={DEFAULT_FILTER} />);
+    expect(
+      screen.getByText(/100% owned, unencumbered, and pre-cleared for Film, Television, and Commercial broadcast/i)
+    ).toBeInTheDocument();
+  });
+
   it('renders the unaltered-photos disclaimer', () => {
-    render(<GalleryView filter="bw" />);
+    render(<GalleryView filter={DEFAULT_FILTER} />);
     expect(screen.getByText(/none of these photos have been altered/i)).toBeInTheDocument();
   });
 
   it('renders multiple photos when collection has many', () => {
-    render(<GalleryView filter="bw" />);
+    render(<GalleryView filter={DEFAULT_FILTER} />);
     const imgs = screen.getAllByRole('img');
     expect(imgs.length).toBeGreaterThan(1);
     expect(imgs.length).toBeLessThanOrEqual(PER_PAGE);
   });
 
   it('shows pagination when collection has more than PER_PAGE photos', () => {
-    render(<GalleryView filter="bw" />);
-    const bwCollection = COLLECTIONS.find((c) => c.id === 'still-life-bw')!;
-    if (bwCollection.photos.length > PER_PAGE) {
+    render(<GalleryView filter={DEFAULT_FILTER} />);
+    const collection = COLLECTIONS.find((c) => c.id === DEFAULT_FILTER);
+    if ((collection?.photos.length ?? 0) > PER_PAGE) {
       expect(screen.getByText(/page \d+ of \d+/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /previous/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument();
     }
   });
 
-  it('renders B&W photos when filter is bw', () => {
-    render(<GalleryView filter="bw" />);
-    const bwCollection = COLLECTIONS.find((c) => c.id === 'still-life-bw')!;
-    const firstPagePhotos = bwCollection.photos.slice(0, PER_PAGE);
-    firstPagePhotos.forEach((photo) => {
-      expect(screen.getByAltText(photo.alt)).toBeInTheDocument();
-    });
-  });
-
-  it('renders Color photos when filter is color', () => {
-    render(<GalleryView filter="color" />);
-    const colorCollection = COLLECTIONS.find((c) => c.id === 'still-life-color')!;
-    const firstPagePhotos = colorCollection.photos.slice(0, PER_PAGE);
+  it('renders photos from the selected category', () => {
+    render(<GalleryView filter={DEFAULT_FILTER} />);
+    const collection = COLLECTIONS.find((c) => c.id === DEFAULT_FILTER)!;
+    const firstPagePhotos = collection.photos.slice(0, PER_PAGE);
     firstPagePhotos.forEach((photo) => {
       expect(screen.getByAltText(photo.alt)).toBeInTheDocument();
     });
@@ -49,7 +48,7 @@ describe('GalleryView', () => {
 
   it('opens lightbox when a photo is clicked', async () => {
     const user = userEvent.setup();
-    const { container } = render(<GalleryView filter="bw" />);
+    const { container } = render(<GalleryView filter={DEFAULT_FILTER} />);
     const clickTarget = container.querySelector('.absolute.inset-0.z-10');
     if (!clickTarget) throw new Error('Click target not found');
     await user.click(clickTarget);
@@ -59,7 +58,7 @@ describe('GalleryView', () => {
 
   it('closes lightbox when Close is clicked', async () => {
     const user = userEvent.setup();
-    const { container } = render(<GalleryView filter="bw" />);
+    const { container } = render(<GalleryView filter={DEFAULT_FILTER} />);
     const clickTarget = container.querySelector('.absolute.inset-0.z-10');
     if (!clickTarget) throw new Error('Click target not found');
     await user.click(clickTarget);

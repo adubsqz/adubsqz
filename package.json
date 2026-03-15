@@ -12,7 +12,9 @@
     "sync:gallery-ignore": "node sync-gallery-ignore.mjs",
     "check:gallery-ignore": "npm run sync:gallery-ignore && git diff --quiet -- .gitignore || (echo \"Run npm run sync:gallery-ignore and commit .gitignore\" && exit 1)",
     "prepush": "npm run check:gallery-ignore",
-    "classify-photos": "node scripts/classify-still-life.mjs && npm run sync:gallery-ignore"
+    "classify-photos": "node scripts/classify-still-life.mjs && npm run sync:gallery-ignore",
+    "classify-photos:ollama": "ruby scripts/categorize_photos_ollama.rb && npm run sync:gallery-ignore",
+    "classify-photos:gemini": "ruby scripts/categorize_photos_gemini.rb && npm run sync:gallery-ignore"
   },
   "dependencies": {
     "react": "^19.2.3",
