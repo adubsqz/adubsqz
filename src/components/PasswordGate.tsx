@@ -49,9 +49,20 @@ export default function PasswordGate({ children }: PasswordGateProps) {
             <h1 className="text-2xl font-medium tracking-tight mb-2">
               adubsqz
             </h1>
-            <p className="text-photo-muted text-sm mb-8">
+            <p className="text-photo-muted text-sm mb-6">
               Enter password to view photography portfolio
             </p>
+            <div className="rounded-xl border border-white/20 bg-photo-bg/80 p-4 mb-6 text-center">
+              <p className="text-xs font-medium text-photo-muted uppercase tracking-wider mb-2">
+                Film + TV Clearance Guarantee
+              </p>
+              <p className="text-sm text-photo-fg/90 leading-relaxed">
+                All photography is 100% owned, unencumbered, and pre-cleared for Film, Television, and Commercial broadcast.
+              </p>
+              <p className="text-xs text-photo-muted mt-3">
+                By entering the password below, you acknowledge and consent to this guarantee.
+              </p>
+            </div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label

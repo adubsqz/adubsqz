@@ -165,20 +165,47 @@ function Lightbox({
           Close
         </button>
       </div>
-      <div className="lightbox-frame max-w-[calc(100vw-1rem)] max-h-[180vh] flex items-center justify-center">
-        <WatermarkedImage
-          src={photo.src}
-          alt={photo.alt}
-          className="max-w-full max-h-[calc(180vh-0.5rem)] w-auto h-auto object-contain block pointer-events-none"
-          watermarkOpacity={0.35}
-          loading="eager"
-        />
-      </div>
-      {photo.caption && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-photo-panel/90 backdrop-blur-sm border border-photo-border rounded-lg px-4 py-2 max-w-2xl">
-          <p className="text-xs text-photo-muted text-center italic">{photo.caption}</p>
+      <div className="flex flex-col items-center pt-14 pb-6 px-4 max-h-[100vh] overflow-y-auto">
+        <div className="lightbox-frame w-fit max-w-[calc(100vw-2rem)]">
+          <WatermarkedImage
+            src={photo.src}
+            alt={photo.alt}
+            className="max-w-full max-h-[calc(100vh-22rem)] w-auto h-auto object-contain block pointer-events-none"
+            watermarkOpacity={0.35}
+            loading="eager"
+          />
         </div>
-      )}
+        {photo.caption && (
+          <div className="mt-3 bg-photo-panel/90 backdrop-blur-sm border border-photo-border rounded-lg px-4 py-2 max-w-2xl">
+            <p className="text-xs text-photo-muted text-center italic">{photo.caption}</p>
+          </div>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl mt-4">
+          <div className="rounded-xl border border-photo-border/60 bg-photo-panel/90 p-3 space-y-1.5">
+            <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Trade Portal + Tearsheet</p>
+            <p className="text-xs text-photo-fg/90 leading-relaxed">
+              Download the printable lookbook for 8.5x11 mood boards with image SKU/title under each frame.
+            </p>
+            <a
+              href="/lookbook.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex text-xs uppercase tracking-[0.14em] text-photo-accent hover:opacity-85 transition-opacity"
+            >
+              Download Tearsheet PDF
+            </a>
+          </div>
+          <div className="rounded-xl border border-photo-border/60 bg-photo-panel/90 p-3 space-y-1.5">
+            <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Fulfillment Options</p>
+            <p className="text-xs text-photo-fg/90 leading-relaxed">
+              Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ delivery: 5-7 business days.
+            </p>
+            <p className="text-xs text-photo-fg/90 leading-relaxed">
+              Short-term set rental is available at 20% of retail per 30-day term.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
