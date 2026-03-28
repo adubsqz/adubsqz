@@ -1,5 +1,5 @@
 {
-  "name": "ames-photography",
+  "name": "adubsqz-photography",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -9,6 +9,10 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:e2e": "node playwright-cli.mjs test",
+    "test:e2e:ui": "node playwright-cli.mjs test --ui",
+    "test:e2e:headed": "node playwright-cli.mjs test --headed",
+    "playwright:install": "node playwright-cli.mjs install chromium",
     "sync:gallery-ignore": "node sync-gallery-ignore.mjs",
     "check:gallery-ignore": "npm run sync:gallery-ignore && git diff --quiet -- .gitignore || (echo \"Run npm run sync:gallery-ignore and commit .gitignore\" && exit 1)",
     "prepush": "npm run check:gallery-ignore",
@@ -22,6 +26,7 @@
     "resend": "^6.9.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

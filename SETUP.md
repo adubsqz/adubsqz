@@ -17,7 +17,7 @@ This guide explains how to set up the inquiry system for your photography portfo
 
    ```
    RESEND_API_KEY=re_your_api_key_here
-   INQUIRY_RECIPIENT_EMAIL=alexanderthomasames@gmail.com
+   INQUIRY_RECIPIENT_EMAIL=adubsqz@gmail.com
    RESEND_FROM_EMAIL=inquiries@yourdomain.com
    ```
 

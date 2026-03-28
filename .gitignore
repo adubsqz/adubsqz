@@ -21,6 +21,10 @@ public/photos/still-life/**
 
 node_modules/
 dist/
+playwright-report/
+test-results/
+blob-report/
+.pw-browsers/
 .DS_Store
 .cursor-reference.md
 .vscode/

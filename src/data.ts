@@ -78,8 +78,8 @@ export const DEFAULT_GALLERY_FILTER = GALLERY_FILTERS[0] ?? '';
 export const ABOUT = {
   name: 'adubsqz',
   tagline: 'Photography',
-  contactEmail: 'alexanderthomasames@gmail.com',
-  bio: 'Originally from the Southwest, Alexander moved to New York several years ago and rediscovered his love for film photography. He first learned the craft in high school, spending long hours in the darkroom developing film and printing on Ilford paper—a passion that stayed dormant until recently. By trade, Alexander works as a data scientist and software engineer at a biomolecular research company focused on fighting cancer.',
+  contactEmail: 'adubsqz@gmail.com',
+  bio: 'Originally from the Southwest, adubs moved to New York several years ago and rediscovered a love for film photography. adubs first learned the craft in high school, spending long hours in the darkroom developing film and printing on Ilford paper—a passion that stayed dormant until recently. By trade, adubs works as a data scientist and software engineer at a biomolecular research company focused on fighting cancer.',
   socials: [
     { name: 'Instagram', url: 'https://www.instagram.com/adubsqz/' },
     { name: 'GitHub', url: 'https://github.com' },

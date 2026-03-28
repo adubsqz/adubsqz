@@ -6,13 +6,16 @@ interface PasswordGateProps {
 
 const CORRECT_PASSWORD = 'film2024'; // Change this to your desired password
 
+const e2eBypass = import.meta.env.VITE_E2E === '1';
+
 export default function PasswordGate({ children }: PasswordGateProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(e2eBypass);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!e2eBypass);
 
   useEffect(() => {
+    if (e2eBypass) return;
     // Check if already authenticated (stored in sessionStorage)
     const auth = sessionStorage.getItem('photo_auth');
     if (auth === 'true') {
