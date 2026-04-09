@@ -6,7 +6,7 @@ import type { Photo } from '../types';
 
 describe('InquiryModal (unit)', () => {
   const onClose = vi.fn();
-  const photo: Photo = { id: 'bw-1', src: '/photos/still-life/bw/000220500001.jpg', alt: 'Still life 1' };
+  const photo: Photo = { id: 'bw-1', src: '/photos/still-life/bw/000230040034.jpg', alt: 'Still life 1' };
 
   const fetchMock = vi.fn();
 

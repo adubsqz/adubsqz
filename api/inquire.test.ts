@@ -91,7 +91,7 @@ describe('/api/inquire (unit)', () => {
       postJson({
         photoId: 'bw-1',
         photoAlt: 'Still life 1',
-        photoSrc: '/photos/still-life/bw/000220500001.jpg',
+        photoSrc: '/photos/still-life/bw/000230040034.jpg',
         name: 'Jane Doe',
         email: 'jane@example.com',
         shippingAddress: '123 Main St',
@@ -121,7 +121,7 @@ describe('/api/inquire (unit)', () => {
       postJson({
         photoId: 'bw-1',
         photoAlt: 'Still life 1',
-        photoSrc: '/photos/still-life/bw/000220500001.jpg',
+        photoSrc: '/photos/still-life/bw/000230040034.jpg',
         name: 'Jane Doe',
         email: 'jane@example.com',
         company: 'ACME',
@@ -156,7 +156,7 @@ describe('/api/inquire (unit)', () => {
       postJson({
         photoId: 'bw-1',
         photoAlt: 'Still life 1',
-        photoSrc: '/photos/still-life/bw/000220500001.jpg',
+        photoSrc: '/photos/still-life/bw/000230040034.jpg',
         name: 'Jane Doe',
         email: 'jane@example.com',
         shippingAddress: '123 Main St',

@@ -7,7 +7,6 @@ public/photos/still-life/**
 !public/photos/still-life/bw/
 !public/photos/still-life/color/
 !public/photos/still-life/about_me.jpg
-!public/photos/still-life/bw/000220500001.jpg
 !public/photos/still-life/bw/000230040012.jpg
 !public/photos/still-life/bw/000230040014.jpg
 !public/photos/still-life/bw/000230040015.jpg
@@ -27,9 +26,11 @@ test-results/
 blob-report/
 .pw-browsers/
 .DS_Store
+.cursor/
 .cursor-reference.md
 .vscode/
 personal_readme.md
 public/photos/README.md
 scripts/
 .vercel
+.env.local

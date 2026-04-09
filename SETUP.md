@@ -26,19 +26,14 @@ This guide explains how to set up the inquiry system for your photography portfo
    - You'll need to verify the domain in Resend first
    - Alternatively, use Resend's test domain (check Resend dashboard for available domains)
 
-3. **Configure the Same Variables for CI/CD**
-   - If you use GitHub Actions, add these repository secrets:
-     - `RESEND_API_KEY`
-     - `INQUIRY_RECIPIENT_EMAIL`
-     - `RESEND_FROM_EMAIL`
-   - This repository's CI workflow reads these values from `secrets.*`.
-
-4. **Verify Your Domain in Resend (Optional but Recommended)**
+3. **Verify Your Domain in Resend (Optional but Recommended)**
    - For production use, verify your domain in Resend
    - This allows you to send from your own domain
    - Follow Resend's domain verification guide
 
 ## Testing the Inquiry Flow
+
+GitHub Actions CI does not need Resend secrets: unit tests mock email sending.
 
 1. **Local Development**
    - Create a `.env.local` file in the project root

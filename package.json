@@ -14,11 +14,7 @@
     "test:e2e:headed": "node playwright-cli.mjs test --headed",
     "playwright:install": "node playwright-cli.mjs install chromium",
     "sync:gallery-ignore": "node sync-gallery-ignore.mjs",
-    "check:gallery-ignore": "npm run sync:gallery-ignore && git diff --quiet -- .gitignore || (echo \"Run npm run sync:gallery-ignore and commit .gitignore\" && exit 1)",
-    "prepush": "npm run check:gallery-ignore",
-    "classify-photos": "node scripts/classify-still-life.mjs && npm run sync:gallery-ignore",
-    "classify-photos:ollama": "ruby scripts/categorize_photos_ollama.rb && npm run sync:gallery-ignore",
-    "classify-photos:gemini": "ruby scripts/categorize_photos_gemini.rb && npm run sync:gallery-ignore"
+    "check:gallery-ignore": "npm run sync:gallery-ignore && git diff --quiet -- .gitignore || (echo \"Run npm run sync:gallery-ignore and commit .gitignore\" && exit 1)"
   },
   "dependencies": {
     "react": "^19.2.3",
@@ -36,7 +32,6 @@
     "@vitejs/plugin-react": "^5.1.2",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.6",
-    "sharp": "^0.33.5",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "vite": "^7.3.0",
