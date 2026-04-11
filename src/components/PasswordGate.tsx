@@ -4,29 +4,31 @@ interface PasswordGateProps {
   children: React.ReactNode;
 }
 
-const CORRECT_PASSWORD = 'film2024'; // Change this to your desired password
-
+/** When unset, the gallery is public (no password embedded in the client bundle). */
+const gatePassword = import.meta.env.VITE_GALLERY_PASSWORD?.trim() ?? '';
 const e2eBypass = import.meta.env.VITE_E2E === '1';
+const usePasswordGate = Boolean(gatePassword) && !e2eBypass;
 
 export default function PasswordGate({ children }: PasswordGateProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(e2eBypass);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => e2eBypass || !usePasswordGate
+  );
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(!e2eBypass);
+  const [loading, setLoading] = useState(usePasswordGate);
 
   useEffect(() => {
-    if (e2eBypass) return;
-    // Check if already authenticated (stored in sessionStorage)
+    if (!usePasswordGate) return;
     const auth = sessionStorage.getItem('photo_auth');
     if (auth === 'true') {
       setIsAuthenticated(true);
     }
     setLoading(false);
-  }, []);
+  }, [usePasswordGate]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (password === CORRECT_PASSWORD) {
+    if (password === gatePassword) {
       sessionStorage.setItem('photo_auth', 'true');
       setIsAuthenticated(true);
       setError('');
