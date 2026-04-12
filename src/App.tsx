@@ -70,18 +70,24 @@ export default function App() {
                     Orientation
                   </div>
                   <div className="flex flex-wrap gap-4 text-xs uppercase tracking-wider">
-                    {(['all', 'horizontal', 'vertical', 'square'] as const).map((option) => (
+                    {(
+                      [
+                        { id: 'all' as const, label: 'All' },
+                        { id: 'horizontal' as const, label: 'Landscape' },
+                        { id: 'vertical' as const, label: 'Portrait' },
+                      ] as const
+                    ).map(({ id, label }) => (
                       <button
-                        key={option}
+                        key={id}
                         type="button"
-                        onClick={() => setOrientationFilter(option)}
+                        onClick={() => setOrientationFilter(id)}
                         className={`transition-colors ${
-                          orientationFilter === option
+                          orientationFilter === id
                             ? 'text-photo-accent border-b-2 border-photo-accent -mb-px pb-1'
                             : 'text-photo-muted hover:text-photo-fg border-b-2 border-transparent pb-1'
                         }`}
                       >
-                        {option}
+                        {label}
                       </button>
                     ))}
                   </div>

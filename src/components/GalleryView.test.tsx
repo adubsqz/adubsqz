@@ -8,13 +8,6 @@ const PER_PAGE = 8;
 const DEFAULT_FILTER = COLLECTIONS[0]?.id ?? 'bw';
 
 describe('GalleryView', () => {
-  it('renders clearance guarantee content', () => {
-    render(<GalleryView filter={DEFAULT_FILTER} />);
-    expect(
-      screen.getByText(/100% owned, unencumbered, and pre-cleared for Film, Television, and Commercial broadcast/i)
-    ).toBeInTheDocument();
-  });
-
   it('renders the unaltered-photos disclaimer', () => {
     render(<GalleryView filter={DEFAULT_FILTER} />);
     expect(screen.getByText(/none of these photos have been altered/i)).toBeInTheDocument();

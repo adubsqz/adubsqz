@@ -1,0 +1,65 @@
+/**
+ * Shared licensing / fulfillment copy for inquiry and contact flows
+ * (gallery browsing stays minimal; details appear when someone initiates purchase or outreach).
+ */
+
+export function FilmTvClearanceBlock({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`rounded-2xl border border-photo-accent/35 bg-photo-accent/10 p-4 sm:p-5 space-y-2 ${className}`}
+    >
+      <p className="text-[0.66rem] uppercase tracking-[0.2em] text-photo-accent">
+        Film + TV Clearance Guarantee
+      </p>
+      <p className="text-sm sm:text-base text-photo-fg leading-relaxed">
+        All photography is 100% owned, unencumbered, and pre-cleared for Film, Television, and
+        Commercial broadcast.
+      </p>
+    </div>
+  );
+}
+
+type TearsheetSurface = 'modal' | 'default';
+
+export function TearsheetAndFulfillmentGrid({
+  surface = 'default',
+  className = '',
+}: {
+  surface?: TearsheetSurface;
+  className?: string;
+}) {
+  const card =
+    surface === 'modal'
+      ? 'rounded-xl border border-photo-border/60 bg-photo-bg/50 p-3 space-y-1.5'
+      : 'rounded-xl border border-photo-border/60 bg-black/25 p-4 space-y-2';
+
+  return (
+    <div className={`grid gap-4 md:grid-cols-2 ${className}`}>
+      <div className={card}>
+        <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Trade Portal + Tearsheet</p>
+        <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
+          Download the printable lookbook for 8.5x11 mood boards with image SKU/title under each frame.
+        </p>
+        <a
+          href="/lookbook.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex text-xs uppercase tracking-[0.14em] text-photo-accent hover:opacity-85 transition-opacity"
+        >
+          Download Tearsheet PDF
+        </a>
+      </div>
+      <div className={card}>
+        <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Fulfillment + licensing</p>
+        <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
+          Digital licensing: typically within 24 hours of cleared contract. Framed print production: 3-5 business
+          days. Ready-to-hang NYC/NJ delivery: 5-7 business days.
+        </p>
+        <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
+          Short-term set rental is available at 20% of retail per 30-day term. Final terms are set privately by
+          contract.
+        </p>
+      </div>
+    </div>
+  );
+}

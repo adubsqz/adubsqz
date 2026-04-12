@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ABOUT } from '../data';
+import { FilmTvClearanceBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
 
 interface ContactModalProps {
   onClose: () => void;
@@ -38,10 +39,10 @@ export default function ContactModal({ onClose }: ContactModalProps) {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="w-full max-w-md rounded-2xl border border-photo-border bg-photo-panel shadow-2xl"
+        className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-photo-border bg-photo-panel shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-photo-border px-5 py-4">
+        <div className="flex items-center justify-between border-b border-photo-border px-5 py-4 sticky top-0 bg-photo-panel z-10">
           <h2 id="contact-modal-title" className="font-display text-xl text-photo-fg">
             Contact
           </h2>
@@ -55,6 +56,12 @@ export default function ContactModal({ onClose }: ContactModalProps) {
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
+          <FilmTvClearanceBlock />
+          <p className="text-xs text-photo-muted leading-relaxed">
+            Licensing, syndication, and custom terms are handled privately by contract. Send a message to start that
+            conversation—no public checkout.
+          </p>
+          <TearsheetAndFulfillmentGrid surface="modal" />
           <div>
             <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-photo-muted mb-1">
               Name

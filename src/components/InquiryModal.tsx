@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Photo } from '../types';
+import { FilmTvClearanceBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
 
 interface InquiryModalProps {
   photo: Photo;
@@ -138,35 +139,16 @@ export default function InquiryModal({ photo, onClose }: InquiryModalProps) {
             {submitStatus === 'error' && 'There was an error submitting your inquiry.'}
           </div>
 
-          {/* Photo Preview */}
-          <div className="mb-4 pb-6 border-b border-photo-border">
+          <FilmTvClearanceBlock />
+          <p className="text-xs text-photo-muted leading-relaxed">
+            Quotes, rights, and delivery timelines are confirmed in writing before work proceeds—use the form below
+            to request an invoice for this print.
+          </p>
+          <TearsheetAndFulfillmentGrid surface="modal" />
+
+          <div className="pb-2 border-b border-photo-border">
             <p className="text-xs uppercase tracking-wider text-photo-muted mb-2">Selected Print</p>
             <p className="text-sm text-photo-fg italic">{photo.alt}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              <div className="rounded-xl border border-photo-border/60 bg-photo-bg/50 p-3 space-y-1.5">
-                <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Trade Portal + Tearsheet</p>
-                <p className="text-xs text-photo-fg/90 leading-relaxed">
-                  Download the printable lookbook for 8.5x11 mood boards with image SKU/title under each frame.
-                </p>
-                <a
-                  href="/lookbook.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex text-xs uppercase tracking-[0.14em] text-photo-accent hover:opacity-85 transition-opacity"
-                >
-                  Download Tearsheet PDF
-                </a>
-              </div>
-              <div className="rounded-xl border border-photo-border/60 bg-photo-bg/50 p-3 space-y-1.5">
-                <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Fulfillment Options</p>
-                <p className="text-xs text-photo-fg/90 leading-relaxed">
-                  Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ delivery: 5-7 business days.
-                </p>
-                <p className="text-xs text-photo-fg/90 leading-relaxed">
-                  Short-term set rental is available at 20% of retail per 30-day term.
-                </p>
-              </div>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
