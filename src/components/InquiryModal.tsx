@@ -4,6 +4,8 @@ import { FilmTvClearanceBlock, TearsheetAndFulfillmentGrid } from './LicensingDe
 
 interface InquiryModalProps {
   photo: Photo;
+  /** Seed the notes field (e.g. tearsheet inquiry from the lightbox) */
+  initialNotes?: string;
   onClose: () => void;
 }
 
@@ -11,7 +13,7 @@ type PrintSize = '8x10' | '11x14' | '16x20' | '20x24' | '24x30' | 'custom';
 type PrintMedium = 'fine-art-paper' | 'canvas' | 'metal' | 'acrylic';
 type PrintFinish = 'matte' | 'gloss' | 'lustre';
 
-export default function InquiryModal({ photo, onClose }: InquiryModalProps) {
+export default function InquiryModal({ photo, initialNotes, onClose }: InquiryModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
@@ -20,9 +22,13 @@ export default function InquiryModal({ photo, onClose }: InquiryModalProps) {
   const [customSize, setCustomSize] = useState('');
   const [printMedium, setPrintMedium] = useState<PrintMedium>('fine-art-paper');
   const [printFinish, setPrintFinish] = useState<PrintFinish>('matte');
-  const [notes, setNotes] = useState('');
+  const [notes, setNotes] = useState(initialNotes ?? '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  useEffect(() => {
+    setNotes(initialNotes ?? '');
+  }, [initialNotes, photo.id]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -78,14 +84,14 @@ export default function InquiryModal({ photo, onClose }: InquiryModalProps) {
   if (submitStatus === 'success') {
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+        className="fixed inset-0 z-[110] flex items-stretch justify-center bg-black/80 p-0 backdrop-blur-sm sm:items-center sm:p-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="inquiry-modal-title"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         <div
-          className="w-full max-w-lg rounded-2xl border border-photo-border bg-photo-panel shadow-2xl p-8"
+          className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col justify-center p-8 sm:min-h-0 sm:flex-none sm:rounded-2xl sm:border sm:border-photo-border"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="text-center space-y-4">
@@ -104,17 +110,17 @@ export default function InquiryModal({ photo, onClose }: InquiryModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-[110] flex items-stretch justify-center bg-black/80 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="inquiry-modal-title"
       onClick={(e) => e.target === e.currentTarget && !isSubmitting && onClose()}
     >
       <div
-        className="w-full max-w-2xl rounded-2xl border border-photo-border bg-photo-panel shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="mx-auto flex h-[100dvh] max-h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 border-photo-border bg-photo-panel shadow-2xl sm:max-h-[min(92dvh,44rem)] sm:max-w-2xl sm:rounded-2xl sm:border"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-photo-border px-6 py-5 sticky top-0 bg-photo-panel z-10">
+        <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-photo-border bg-photo-panel px-4 py-4 sm:px-6 sm:py-5">
           <div>
             <h2 id="inquiry-modal-title" className="font-display text-xl text-photo-fg mb-1">
               Request Invoice
@@ -134,7 +140,7 @@ export default function InquiryModal({ photo, onClose }: InquiryModalProps) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-y-contain p-4 sm:space-y-5 sm:p-6">
           <div className="sr-only" aria-live="polite" aria-atomic="true">
             {submitStatus === 'error' && 'There was an error submitting your inquiry.'}
           </div>

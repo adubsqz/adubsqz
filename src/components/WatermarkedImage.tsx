@@ -3,6 +3,8 @@ import { useState } from 'react';
 interface WatermarkedImageProps {
   src: string;
   alt: string;
+  /** Classes for the outer wrapper (default full-width; use `max-w-full w-fit` to hug image aspect ratio) */
+  wrapperClassName?: string;
   className?: string;
   loading?: 'lazy' | 'eager';
   decoding?: 'async' | 'sync' | 'auto';
@@ -20,6 +22,7 @@ interface WatermarkedImageProps {
 export default function WatermarkedImage({
   src,
   alt,
+  wrapperClassName = 'relative inline-block w-full',
   className = '',
   loading = 'lazy',
   decoding = 'async',
@@ -36,7 +39,7 @@ export default function WatermarkedImage({
 
   return (
     <div
-      className="relative inline-block w-full"
+      className={wrapperClassName}
       style={{ userSelect: 'none', WebkitUserSelect: 'none' }}
     >
       {/* Transparent overlay to prevent drag-and-drop */}

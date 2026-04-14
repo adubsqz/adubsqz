@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter, OrientationFilter } from '../types';
@@ -36,18 +36,19 @@ function PhotoCard({
       aria-label={`Open photo: ${photo.alt}`}
       className={`block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-fg focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg group ${className}`}
     >
-      <div className="relative overflow-hidden rounded-sm">
+      <div className="relative mx-auto w-fit max-w-full rounded-sm border-[6px] border-white/88 shadow-[0_12px_40px_rgba(0,0,0,0.55)] transition-all duration-500 group-hover:border-white group-hover:scale-[1.01]">
         <WatermarkedImage
           src={photo.src}
           alt={photo.alt}
-          className="gallery-image w-full h-auto max-h-[70vh] mx-auto object-cover border border-photo-border/60 hover:border-photo-border transition-all duration-500 group-hover:scale-[1.02]"
+          wrapperClassName="relative inline-block max-w-full w-fit"
+          className="gallery-image block h-auto max-h-[70vh] w-auto max-w-full object-contain"
           loading="lazy"
           decoding="async"
           onError={handleError}
           onClick={onClick}
           watermarkOpacity={0.3}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-sm" />
       </div>
       {photo.caption && (
         <p className="mt-3 text-photo-muted/80 text-xs italic leading-relaxed">{photo.caption}</p>
@@ -76,9 +77,10 @@ function useImageOrientation(photos: Photo[]): PhotoWithOrientation[] {
               const ratio = img.width / img.height;
               let orientation: 'horizontal' | 'vertical' | 'square';
               
-              if (ratio > 1.2) {
+              // Portrait formats like 4:5 (0.8) and 3:4 (0.75) must read as vertical, not square.
+              if (ratio > 1.05) {
                 orientation = 'horizontal';
-              } else if (ratio < 0.8) {
+              } else if (ratio < 0.95) {
                 orientation = 'vertical';
               } else {
                 orientation = 'square';
@@ -106,15 +108,19 @@ function Lightbox({
   photo, 
   onClose, 
   onInquire,
+  onInquireTearsheet,
   onPrevious,
   onNext,
 }: { 
   photo: Photo; 
   onClose: () => void;
   onInquire: () => void;
+  onInquireTearsheet: () => void;
   onPrevious: () => void;
   onNext: () => void;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -125,86 +131,117 @@ function Lightbox({
     return () => window.removeEventListener('keydown', handleKey);
   }, [onClose, onPrevious, onNext]);
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = 0;
+  }, [photo.id, photo.src]);
+
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+      ref={scrollRef}
+      className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden overscroll-contain bg-black"
       role="dialog"
       aria-modal="true"
       aria-label="Image lightbox"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="absolute top-4 right-4 flex gap-3 z-10">
-        <button
-          type="button"
-          onClick={onPrevious}
-          className="px-4 py-2 text-photo-muted hover:text-photo-fg text-xs uppercase tracking-wider bg-photo-panel/80 backdrop-blur-sm border border-photo-border rounded transition-colors focus-visible:ring-2 focus-visible:ring-photo-fg"
-          aria-label="View previous photo"
-        >
-          Prev
-        </button>
-        <button
-          type="button"
-          onClick={onNext}
-          className="px-4 py-2 text-photo-muted hover:text-photo-fg text-xs uppercase tracking-wider bg-photo-panel/80 backdrop-blur-sm border border-photo-border rounded transition-colors focus-visible:ring-2 focus-visible:ring-photo-fg"
-          aria-label="View next photo"
-        >
-          Next
-        </button>
-        <button
-          type="button"
-          onClick={onInquire}
-          className="px-4 py-2 bg-photo-accent text-photo-bg text-xs uppercase tracking-wider font-medium rounded hover:opacity-90 transition-opacity shadow-lg focus-visible:ring-2 focus-visible:ring-photo-fg"
-        >
-          Request Invoice
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 text-photo-muted hover:text-photo-fg text-xs uppercase tracking-wider bg-photo-panel/80 backdrop-blur-sm border border-photo-border rounded transition-colors focus-visible:ring-2 focus-visible:ring-photo-fg"
-        >
-          Close
-        </button>
-      </div>
-      <div className="flex flex-col items-center pt-14 pb-6 px-4 max-h-[100vh] overflow-y-auto">
-        <div className="lightbox-frame w-fit max-w-[calc(100vw-2rem)]">
-          <WatermarkedImage
-            src={photo.src}
-            alt={photo.alt}
-            className="max-w-full max-h-[calc(100vh-22rem)] w-auto h-auto object-contain block pointer-events-none"
-            watermarkOpacity={0.35}
-            loading="eager"
-          />
-        </div>
-        {photo.caption && (
-          <div className="mt-3 bg-photo-panel/90 backdrop-blur-sm border border-photo-border rounded-lg px-4 py-2 max-w-2xl">
-            <p className="text-xs text-photo-muted text-center italic">{photo.caption}</p>
+      <div className="mx-auto flex min-h-[100dvh] w-full max-w-[min(1200px,100vw)] flex-col px-6 pb-28 pt-8 sm:px-12 sm:pb-36 sm:pt-12">
+        <header className="flex shrink-0 flex-col gap-8 border-b border-white/[0.06] pb-10 sm:flex-row sm:items-center sm:justify-between sm:gap-12 sm:pb-12">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            <span className="text-[0.65rem] uppercase tracking-[0.22em] text-white/35">Navigate</span>
+            <div className="flex flex-wrap gap-3 sm:gap-4">
+              <button
+                type="button"
+                onClick={onPrevious}
+                className="rounded-md border border-white/20 bg-white/[0.06] px-5 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/80 transition-colors hover:border-white/35 hover:bg-white/[0.1] hover:text-white focus-visible:ring-2 focus-visible:ring-photo-accent"
+                aria-label="View previous photo"
+              >
+                Prev
+              </button>
+              <button
+                type="button"
+                onClick={onNext}
+                className="rounded-md border border-white/20 bg-white/[0.06] px-5 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/80 transition-colors hover:border-white/35 hover:bg-white/[0.1] hover:text-white focus-visible:ring-2 focus-visible:ring-photo-accent"
+                aria-label="View next photo"
+              >
+                Next
+              </button>
+            </div>
           </div>
-        )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl mt-4">
-          <div className="rounded-xl border border-photo-border/60 bg-photo-panel/90 p-3 space-y-1.5">
-            <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Trade Portal + Tearsheet</p>
-            <p className="text-xs text-photo-fg/90 leading-relaxed">
-              Download the printable lookbook for 8.5x11 mood boards with image SKU/title under each frame.
-            </p>
-            <a
-              href="/lookbook.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex text-xs uppercase tracking-[0.14em] text-photo-accent hover:opacity-85 transition-opacity"
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 sm:pl-4 sm:border-l sm:border-white/[0.08]">
+            <button
+              type="button"
+              onClick={onInquire}
+              className="rounded-md bg-photo-accent px-6 py-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-photo-bg shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all hover:brightness-110 focus-visible:ring-2 focus-visible:ring-white"
             >
-              Download Tearsheet PDF
-            </a>
+              Request Invoice
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-md border border-white/20 bg-white/[0.06] px-5 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/75 transition-colors hover:border-white/35 hover:text-white focus-visible:ring-2 focus-visible:ring-photo-accent"
+            >
+              Close
+            </button>
           </div>
-          <div className="rounded-xl border border-photo-border/60 bg-photo-panel/90 p-3 space-y-1.5">
-            <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Fulfillment Options</p>
-            <p className="text-xs text-photo-fg/90 leading-relaxed">
-              Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ delivery: 5-7 business days.
-            </p>
-            <p className="text-xs text-photo-fg/90 leading-relaxed">
-              Short-term set rental is available at 20% of retail per 30-day term.
-            </p>
+        </header>
+
+        <div className="h-12 shrink-0 sm:h-20" aria-hidden />
+
+        <figure className="flex w-full shrink-0 justify-center px-0">
+          <div className="lightbox-frame lightbox-frame--hero w-auto max-w-[calc(100vw-3rem)] sm:max-w-[min(1100px,calc(100vw-4rem))]">
+            <WatermarkedImage
+              src={photo.src}
+              alt={photo.alt}
+              wrapperClassName="relative flex w-full max-w-full items-center justify-center"
+              className="pointer-events-none block h-auto max-h-[min(78dvh,920px)] w-auto min-h-0 max-w-full object-contain sm:max-h-[min(80dvh,960px)]"
+              watermarkOpacity={0.35}
+              loading="eager"
+            />
           </div>
-        </div>
+        </figure>
+
+        <div className="h-14 shrink-0 sm:h-20" aria-hidden />
+
+        {photo.caption && (
+          <>
+            <div className="rounded-xl border border-white/10 bg-white/[0.04] px-5 py-4 backdrop-blur-sm sm:px-8">
+              <p className="text-center text-sm italic leading-relaxed text-white/65">{photo.caption}</p>
+            </div>
+            <div className="h-10 sm:h-14" aria-hidden />
+          </>
+        )}
+
+        <section className="space-y-12 border-t border-white/10 pt-16 sm:space-y-16 sm:pt-20">
+          <div className="text-[0.65rem] uppercase tracking-[0.28em] text-white/30">Licensing & fulfillment</div>
+          <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-14 lg:gap-20">
+            <div className="space-y-4 rounded-2xl border border-white/[0.12] bg-white/[0.04] p-6 sm:p-8">
+              <p className="text-[0.7rem] uppercase tracking-[0.2em] text-white/45">Trade Portal + Tearsheet</p>
+              <p className="text-sm leading-relaxed text-white/85">
+                Printable 8.5×11 lookbook pages with image SKU and title under each frame—available on request.
+              </p>
+              <button
+                type="button"
+                onClick={onInquireTearsheet}
+                className="pt-2 text-left text-[0.75rem] uppercase tracking-[0.18em] text-photo-accent transition-opacity hover:opacity-90"
+              >
+                Inquire about tearsheet…
+              </button>
+            </div>
+            <div className="space-y-4 rounded-2xl border border-white/[0.12] bg-white/[0.04] p-6 sm:p-8">
+              <p className="text-[0.7rem] uppercase tracking-[0.2em] text-white/45">Fulfillment Options</p>
+              <p className="text-sm leading-relaxed text-white/85">
+                Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ
+                delivery: 5-7 business days.
+              </p>
+              <p className="text-sm leading-relaxed text-white/85">
+                Short-term set rental is available at 20% of retail per 30-day term.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className="min-h-[15vh] shrink-0" aria-hidden />
       </div>
     </div>
   );
@@ -439,7 +476,7 @@ interface GalleryViewProps {
 
 export default function GalleryView({ filter, orientationFilter = 'all' }: GalleryViewProps) {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
-  const [inquiryPhoto, setInquiryPhoto] = useState<Photo | null>(null);
+  const [inquiry, setInquiry] = useState<{ photo: Photo; initialNotes?: string } | null>(null);
   const collection: PhotoCollection = COLLECTIONS.find((c) => c.id === filter)
     ?? COLLECTIONS[0]
     ?? { id: 'empty', title: 'Empty', photos: [] };
@@ -464,10 +501,19 @@ export default function GalleryView({ filter, orientationFilter = 'all' }: Galle
   }, [filteredCollection.photos, lightboxPhoto]);
 
   const handleInquire = () => {
-    if (lightboxPhoto) {
-      setInquiryPhoto(lightboxPhoto);
-      setLightboxPhoto(null);
-    }
+    if (!lightboxPhoto) return;
+    setInquiry({ photo: lightboxPhoto });
+    setLightboxPhoto(null);
+  };
+
+  const handleInquireTearsheet = () => {
+    if (!lightboxPhoto) return;
+    setInquiry({
+      photo: lightboxPhoto,
+      initialNotes:
+        "I'm interested in the printable tearsheet / lookbook for this image (8.5×11 mood board with SKU and title under each frame). Please share availability and next steps.",
+    });
+    setLightboxPhoto(null);
   };
   
   const handleLightboxMove = (direction: 'next' | 'previous') => {
@@ -483,12 +529,6 @@ export default function GalleryView({ filter, orientationFilter = 'all' }: Galle
 
   return (
     <div className="space-y-12">
-      <div className="max-w-3xl">
-        <p className="text-[0.65rem] sm:text-xs italic text-photo-muted/80 leading-relaxed">
-          *none of these photos have been altered and are shown exactly how they
-          were shot and thus developed
-        </p>
-      </div>
 
       {filteredCollection.photos.length === 0 && (
         <p className="text-sm text-photo-muted">
@@ -507,15 +547,17 @@ export default function GalleryView({ filter, orientationFilter = 'all' }: Galle
           photo={lightboxPhoto}
           onClose={() => setLightboxPhoto(null)}
           onInquire={handleInquire}
+          onInquireTearsheet={handleInquireTearsheet}
           onPrevious={() => handleLightboxMove('previous')}
           onNext={() => handleLightboxMove('next')}
         />
       )}
 
-      {inquiryPhoto && (
+      {inquiry && (
         <InquiryModal
-          photo={inquiryPhoto}
-          onClose={() => setInquiryPhoto(null)}
+          photo={inquiry.photo}
+          initialNotes={inquiry.initialNotes}
+          onClose={() => setInquiry(null)}
         />
       )}
     </div>

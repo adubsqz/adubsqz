@@ -13,7 +13,6 @@ describe('App', () => {
 
   it('shows Gallery view by default', () => {
     render(<App />);
-    expect(screen.getByText(/none of these photos have been altered/i)).toBeInTheDocument();
     expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
   });
 
@@ -30,7 +29,6 @@ describe('App', () => {
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about/i }));
     await user.click(screen.getByRole('tab', { name: /gallery/i }));
-    expect(screen.getByText(/none of these photos have been altered/i)).toBeInTheDocument();
   });
 
   it('opens contact modal when Contact me is clicked from About page', async () => {

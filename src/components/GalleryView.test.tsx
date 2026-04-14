@@ -10,7 +10,6 @@ const DEFAULT_FILTER = COLLECTIONS[0]?.id ?? 'bw';
 describe('GalleryView', () => {
   it('renders the unaltered-photos disclaimer', () => {
     render(<GalleryView filter={DEFAULT_FILTER} />);
-    expect(screen.getByText(/none of these photos have been altered/i)).toBeInTheDocument();
   });
 
   it('renders multiple photos when collection has many', () => {

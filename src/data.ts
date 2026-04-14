@@ -79,7 +79,7 @@ export const ABOUT = {
   name: 'adubsqz',
   tagline: 'Photography',
   contactEmail: 'adubsqz@gmail.com',
-  bio: 'Originally from the Southwest, adubs moved to New York several years ago and rediscovered a love for film photography. adubs first learned the craft in high school, spending long hours in the darkroom developing film and printing on Ilford paper—a passion that stayed dormant until recently. By trade, adubs works as a data scientist and software engineer at a biomolecular research company focused on fighting cancer.',
+  bio: 'Originally from the Southwest, now residing in New York for several years, a rediscovered love for film photography, acting, and writing all came together, stars aligned, or dead weight dropped, either way. with film photography, first learning the craft in high school, spending long hours in the darkroom developing film and making silver prints—a passion that stayed dormant until recently. By trade, a data scientist and software engineer at a biomolecular research company focused on fighting cancer. At night, the world of cinema, art, and storytelling awaits. Bobs your uncle, adubs is your newphew rolling spliffs by the dumpster to make it through a dull family reunion.',
   socials: [
     { name: 'Instagram', url: 'https://www.instagram.com/adubsqz/' },
     { name: 'GitHub', url: 'https://github.com' },

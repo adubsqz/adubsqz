@@ -17,8 +17,8 @@ export default function App() {
   const [showContact, setShowContact] = useState(false);
 
   return (
-    <div className="min-h-screen text-photo-fg font-sans antialiased">
-      <div className="relative min-h-screen">
+    <div className="min-h-[100dvh] text-photo-fg font-sans antialiased pb-4 sm:pb-0">
+      <div className="relative min-h-[100dvh]">
         <main className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8">
           <div className="rounded-3xl bg-photo-panel/95 shadow-[0_26px_80px_rgba(0,0,0,0.9)] backdrop-blur-md overflow-hidden">
             <div className="pt-1">

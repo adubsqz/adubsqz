@@ -38,16 +38,9 @@ export function TearsheetAndFulfillmentGrid({
       <div className={card}>
         <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Trade Portal + Tearsheet</p>
         <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
-          Download the printable lookbook for 8.5x11 mood boards with image SKU/title under each frame.
+          Printable 8.5×11 lookbook pages with image SKU and title under each frame—available on request; say you’re
+          interested in the tearsheet when you reach out.
         </p>
-        <a
-          href="/lookbook.pdf"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex text-xs uppercase tracking-[0.14em] text-photo-accent hover:opacity-85 transition-opacity"
-        >
-          Download Tearsheet PDF
-        </a>
       </div>
       <div className={card}>
         <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Fulfillment + licensing</p>

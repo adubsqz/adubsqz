@@ -11,7 +11,7 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
         <div className="relative overflow-hidden rounded-3xl bg-black/45 aspect-[4/5] max-h-[32rem]">
           <img
             src={ABOUT_IMAGE_SRC}
-            alt="Portrait of adubs seated in a chair, photographed on film."
+            alt="Portrait, photographed on film."
             className="w-full h-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
@@ -44,22 +44,26 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
         ))}
       </div>
 
-      <div className="pt-4 border-t border-photo-border/50 flex flex-wrap items-center gap-3">
-        <p className="text-[0.65rem] sm:text-xs italic text-photo-muted">
-          I made this site and hosted it for free (and so could you).
+      <div className="space-y-5 pt-4 border-t border-photo-border/50">
+        <p className="max-w-prose text-[0.65rem] leading-relaxed text-photo-muted sm:text-xs">
+          I design and build lightweight portfolio sites for photographers, visual artists, musicians, and
+          filmmakers—gallery layouts, audio and video embeds, contact flows, and hosting handled end to end. If you
+          need a site for your own work, say what you have in mind and we can talk scope and budget.
         </p>
-        {onContactClick ? (
-          <button
-            type="button"
-            onClick={onContactClick}
-            className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-photo-accent text-photo-bg text-xs uppercase tracking-[0.16em] font-semibold shadow-lg shadow-photo-accent/20 hover:brightness-110 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-accent"
-          >
-            Contact me
-          </button>
-        ) : (
-          <span className="text-[0.68rem] sm:text-xs uppercase tracking-[0.12em] text-photo-accent">
-            Contact me if you&apos;re interested.
-          </span>
+        {onContactClick && (
+          <div className="flex flex-col gap-5 rounded-2xl border border-white/[0.14] bg-gradient-to-br from-white/[0.07] via-black/20 to-black/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6">
+            <p className="max-w-xl text-[0.8rem] leading-relaxed text-slate-200/90 sm:text-sm">
+              <span className="font-medium text-white/95">Licensing, prints, or a custom site?</span>{' '}
+              <span className="text-slate-300/88">Use the form for availability and terms—replies are direct.</span>
+            </p>
+            <button
+              type="button"
+              onClick={onContactClick}
+              className="inline-flex shrink-0 items-center justify-center rounded-lg border-2 border-photo-accent bg-photo-accent px-8 py-3.5 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-photo-bg shadow-[0_2px_0_rgba(0,0,0,0.35),0_12px_36px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.14)_inset] transition-[transform,filter,box-shadow] hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-accent focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg"
+            >
+              CONTACT ME
+            </button>
+          </div>
         )}
       </div>
     </div>
