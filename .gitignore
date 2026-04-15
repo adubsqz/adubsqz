@@ -33,5 +33,6 @@ personal_readme.md
 public/photos/README.md
 scripts/**
 !scripts/optimize-images-example.mjs
+!scripts/classify-still-life.mjs
 .vercel
 .env.local
