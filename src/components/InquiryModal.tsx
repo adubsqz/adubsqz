@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Photo } from '../types';
 import { FilmTvClearanceBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
+import WatermarkedImage from './WatermarkedImage';
 
 interface InquiryModalProps {
   photo: Photo;
@@ -84,16 +85,16 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
   if (submitStatus === 'success') {
     return (
       <div
-        className="fixed inset-0 z-[110] flex items-stretch justify-center bg-black/80 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+        className="fixed inset-0 z-[110] flex items-start justify-center bg-black/80 p-0 backdrop-blur-sm sm:p-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="inquiry-modal-title"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <div
-          className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col justify-center p-8 sm:min-h-0 sm:flex-none sm:rounded-2xl sm:border sm:border-photo-border"
-          onClick={(e) => e.stopPropagation()}
-        >
+      <div
+        className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col justify-center p-8 sm:min-h-0 sm:flex-none sm:rounded-2xl sm:border sm:border-photo-border"
+        onClick={(e) => e.stopPropagation()}
+      >
           <div className="text-center space-y-4">
             <div className="text-4xl mb-4">✓</div>
             <h2 id="inquiry-modal-title" className="font-display text-2xl text-photo-fg mb-2">
@@ -110,14 +111,14 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
 
   return (
     <div
-      className="fixed inset-0 z-[110] flex items-stretch justify-center bg-black/80 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+      className="fixed inset-0 z-[110] flex items-start justify-center bg-black/80 p-0 backdrop-blur-sm sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="inquiry-modal-title"
       onClick={(e) => e.target === e.currentTarget && !isSubmitting && onClose()}
     >
       <div
-        className="mx-auto flex h-[100dvh] max-h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 border-photo-border bg-photo-panel shadow-2xl sm:max-h-[min(92dvh,44rem)] sm:max-w-2xl sm:rounded-2xl sm:border"
+        className="mx-auto flex h-[100dvh] max-h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 border-photo-border bg-photo-panel shadow-2xl sm:max-h-[min(94dvh,56rem)] sm:max-w-5xl sm:rounded-2xl sm:border"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-photo-border bg-photo-panel px-4 py-4 sm:px-6 sm:py-5">
@@ -140,22 +141,38 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-y-contain p-4 sm:space-y-5 sm:p-6">
+        <form
+          onSubmit={handleSubmit}
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+            <aside className="order-2 flex min-h-0 w-full shrink-0 flex-col gap-4 overflow-y-auto overscroll-y-contain border-photo-border px-4 py-4 sm:px-6 lg:order-1 lg:w-[min(100%,26rem)] lg:border-r lg:py-5">
+              <WatermarkedImage
+                src={photo.src}
+                alt=""
+                loading="eager"
+                decoding="sync"
+                wrapperClassName="relative w-full overflow-hidden rounded-xl bg-black/35"
+                className="max-h-52 w-full object-contain sm:max-h-60"
+              />
+              <div className="border-b border-photo-border pb-3">
+                <p className="text-xs uppercase tracking-wider text-photo-muted mb-1">Selected print</p>
+                <p className="text-sm text-photo-fg italic leading-snug">{photo.alt}</p>
+              </div>
+              <FilmTvClearanceBlock />
+              <TearsheetAndFulfillmentGrid surface="modal" className="md:grid-cols-1" />
+            </aside>
+
+            <div className="order-1 flex min-h-0 min-w-0 flex-1 flex-col lg:order-2">
+              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-y-contain px-4 py-4 sm:space-y-5 sm:px-6 lg:py-5">
           <div className="sr-only" aria-live="polite" aria-atomic="true">
             {submitStatus === 'error' && 'There was an error submitting your inquiry.'}
           </div>
 
-          <FilmTvClearanceBlock />
           <p className="text-xs text-photo-muted leading-relaxed">
             Quotes, rights, and delivery timelines are confirmed in writing before work proceeds—use the form below
             to request an invoice for this print.
           </p>
-          <TearsheetAndFulfillmentGrid surface="modal" />
-
-          <div className="pb-2 border-b border-photo-border">
-            <p className="text-xs uppercase tracking-wider text-photo-muted mb-2">Selected Print</p>
-            <p className="text-sm text-photo-fg italic">{photo.alt}</p>
-          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
@@ -320,27 +337,32 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="flex-1 py-2.5 text-sm uppercase tracking-wider text-photo-muted hover:text-photo-fg transition-colors disabled:opacity-40"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1 py-2.5 text-sm uppercase tracking-wider bg-photo-accent text-photo-bg font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? 'Submitting...' : 'Request Invoice'}
-            </button>
+              </div>
+            </div>
           </div>
 
-          <p className="text-[0.65rem] text-photo-muted/80 text-center pt-2">
-            After submission, you&apos;ll receive an invoice via email for payment via Zelle or Venmo.
-          </p>
+          <div className="shrink-0 border-t border-photo-border bg-photo-panel px-4 py-4 sm:px-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="inline-flex flex-1 items-center justify-center rounded-lg border border-photo-border bg-photo-bg px-5 py-3 text-sm font-medium uppercase tracking-wider text-photo-fg shadow-sm transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="inline-flex flex-1 items-center justify-center rounded-lg bg-photo-accent px-5 py-3 text-sm font-medium uppercase tracking-wider text-photo-bg shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSubmitting ? 'Submitting...' : 'Request Invoice'}
+              </button>
+            </div>
+            <p className="mt-3 text-center text-[0.65rem] leading-snug text-photo-muted/80">
+              After submission, you&apos;ll receive an invoice via email for payment via Zelle or Venmo.
+            </p>
+          </div>
         </form>
       </div>
     </div>
