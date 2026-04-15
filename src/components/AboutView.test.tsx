@@ -17,7 +17,7 @@ describe('AboutView', () => {
 
   it('renders portrait image with correct alt', () => {
     render(<AboutView />);
-    const img = screen.getByAltText(/portrait of adubs/i);
+    const img = screen.getByAltText(/portrait, photographed on film/i);
     expect(img).toBeInTheDocument();
     expect(img).toHaveAttribute('src', ABOUT_IMAGE_SRC);
   });

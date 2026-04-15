@@ -31,6 +31,7 @@ blob-report/
 .vscode/
 personal_readme.md
 public/photos/README.md
-scripts/
+scripts/**
+!scripts/optimize-images-example.mjs
 .vercel
 .env.local
