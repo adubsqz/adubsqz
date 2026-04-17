@@ -20,24 +20,29 @@ const JPEG_QUALITY = 82;
 
 /** @type {{ src: string; dest: string; category: 'bw' | 'color' }[]} */
 const JOBS = [
+  // Color — distinct adults: night flash / wall, two portraits of same friend w/ dreads, DJ set
   {
-    src: join(ORIGINALS, '000220490001/kodak_400_c_41_40860_119374_268265_000008410005.jpg'),
-    dest: 'color-portrait-red-glasses.jpg',
+    src: join(
+      ORIGINALS,
+      '000220490001/kodak_400_c_41_40860_119374_268265_000008410025.jpg',
+    ),
+    dest: 'color-night-sunglasses-wall.jpg',
     category: 'color',
   },
   {
-    src: join(ORIGINALS, '000220490001/kodak_400_c_41_40860_119374_268265_000008410021.jpg'),
-    dest: 'color-portrait-reading.jpg',
+    src: join(
+      ORIGINALS,
+      '40860_119374_268264/kodak_200_c_41_40860_119374_268264_000008400001.jpg',
+    ),
+    dest: 'color-dreads-street-corner.jpg',
     category: 'color',
   },
   {
-    src: join(ORIGINALS, '000244380022.jpg'),
-    dest: 'color-portrait-window-light.jpg',
-    category: 'color',
-  },
-  {
-    src: join(ORIGINALS, '000244380029.jpg'),
-    dest: 'color-motion-portrait.jpg',
+    src: join(
+      ORIGINALS,
+      '40860_119374_268264/kodak_200_c_41_40860_119374_268264_000008400016.jpg',
+    ),
+    dest: 'color-dreads-car-portrait.jpg',
     category: 'color',
   },
   {
@@ -45,6 +50,24 @@ const JOBS = [
     dest: 'color-dj-portrait.jpg',
     category: 'color',
   },
+  // Kodak 200 — still life / motion (same roll as dreads street shots)
+  {
+    src: join(
+      ORIGINALS,
+      '40860_119374_268264/kodak_200_c_41_40860_119374_268264_000008400008.jpg',
+    ),
+    dest: 'color-toy-taxis.jpg',
+    category: 'color',
+  },
+  {
+    src: join(
+      ORIGINALS,
+      '40860_119374_268264/kodak_200_c_41_40860_119374_268264_000008400025.jpg',
+    ),
+    dest: 'color-blurred-ballerina-figures.jpg',
+    category: 'color',
+  },
+  // B&W — unchanged set
   {
     src: join(ORIGINALS, '000220500007.jpg'),
     dest: 'bw-blurred-ballerina.jpg',
