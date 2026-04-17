@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "lint": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.api.json",
+    "lint": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.api.json && node scripts/verify-gallery-manifest.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",

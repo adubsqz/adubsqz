@@ -44,5 +44,7 @@ public/photos/README.md
 scripts/**
 !scripts/optimize-images-example.mjs
 !scripts/classify-still-life.mjs
+!scripts/prepare-gallery-assets.mjs
+!scripts/verify-gallery-manifest.mjs
 .vercel
 .env.local
