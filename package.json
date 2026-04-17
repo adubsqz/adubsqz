@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "lint": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.api.json && node scripts/verify-gallery-manifest.mjs",
+    "lint": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.api.json",
+    "verify:gallery-manifest": "node scripts/verify-gallery-manifest.mjs",
+    "prepare:gallery": "node scripts/prepare-gallery-assets.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",

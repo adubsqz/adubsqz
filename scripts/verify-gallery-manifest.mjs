@@ -2,6 +2,10 @@
 /**
  * Ensures every image listed in src/gallery-manifest.json exists under public/photos/still-life/.
  * Path rules match src/data.ts and sync-gallery-ignore.mjs.
+ *
+ * Not run by default `npm run lint`: generated assets (e.g. from prepare-gallery-assets.mjs) may be
+ * absent in CI or fresh clones. Run manually or in pipelines after assets exist:
+ *   npm run verify:gallery-manifest
  */
 
 import { existsSync, readFileSync } from 'node:fs';
