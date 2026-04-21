@@ -16,16 +16,25 @@ npm run dev
 
 ### Password gate
 
-The gallery can require a password when **`VITE_GALLERY_PASSWORD`** is set at **build time** (the value is embedded in the client bundle—fine for casual gating, not for true secrecy).
+The gallery is gated by a **server-side** password check (`/api/auth`). The password is never shipped to the browser; the client only gets a signed, HttpOnly auth cookie after a successful submit.
 
-- **Local:** set it in `.env.local` (see [SETUP.md](./SETUP.md)).
-- **Production (e.g. Vercel):** add the same variable under Project → Settings → Environment Variables for **Production** (and Preview if you want), then **redeploy** so a new build picks it up.
+Required environment variables (server-only — **no `VITE_` prefix**):
 
-If you omit `VITE_GALLERY_PASSWORD` for a given environment, that build is **public** (no gate).
+- **`GALLERY_PASSWORD`** — the password visitors type into the gate. If unset, the site is public.
+- **`GALLERY_AUTH_SECRET`** — a long random string used to sign the auth cookie. Rotate it to invalidate all existing sessions. Generate one with:
+
+  ```bash
+  node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
+  ```
+
+- **Local:** set both in `.env.local` (see [SETUP.md](./SETUP.md)). Run the app with `vercel dev` so `/api/auth` is available.
+- **Production (Vercel):** add both under Project → Settings → Environment Variables for **Production** (and Preview if you want). Changing `GALLERY_PASSWORD` takes effect on the next request — **no rebuild required**.
+
+If you omit `GALLERY_PASSWORD` for a given environment, that environment is **public** (no gate).
 
 ### Playwright and the password gate
 
-Playwright starts the dev server with `VITE_E2E=1` so the password gate is skipped during e2e runs (even when `VITE_GALLERY_PASSWORD` is set).
+Playwright starts the dev server with `VITE_E2E=1`, which makes the client skip the `/api/auth` check entirely during e2e runs.
 
 **If `reuseExistingServer` reuses a `npm run dev` you started without `VITE_E2E=1`, you’ll still see the password screen when a gallery password is configured.** Stop that dev server so Playwright can start one with the right env, or run dev with `VITE_E2E=1` while debugging e2e.
 

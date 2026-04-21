@@ -4,37 +4,82 @@ interface PasswordGateProps {
   children: React.ReactNode;
 }
 
-/** When unset, the gallery is public (no password embedded in the client bundle). */
-const gatePassword = import.meta.env.VITE_GALLERY_PASSWORD?.trim() ?? '';
 const e2eBypass = import.meta.env.VITE_E2E === '1';
-const usePasswordGate = Boolean(gatePassword) && !e2eBypass;
 
 export default function PasswordGate({ children }: PasswordGateProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => e2eBypass || !usePasswordGate
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(e2eBypass);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(usePasswordGate);
+  const [loading, setLoading] = useState(!e2eBypass);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!usePasswordGate) return;
-    const auth = sessionStorage.getItem('photo_auth');
-    if (auth === 'true') {
-      setIsAuthenticated(true);
-    }
-    setLoading(false);
-  }, [usePasswordGate]);
+    if (e2eBypass) return;
 
-  const handleSubmit = (e: FormEvent) => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'GET',
+          credentials: 'same-origin',
+        });
+        if (!res.ok) {
+          // Treat any non-2xx as "show the gate" rather than crashing the app.
+          if (!cancelled) setLoading(false);
+          return;
+        }
+        const data = (await res.json()) as {
+          authenticated?: boolean;
+          required?: boolean;
+        };
+        if (cancelled) return;
+        if (data.authenticated) {
+          setIsAuthenticated(true);
+        }
+      } catch {
+        // Network error: leave gate visible; user can retry by submitting.
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password === gatePassword) {
-      sessionStorage.setItem('photo_auth', 'true');
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Incorrect password');
+    if (submitting) return;
+
+    setSubmitting(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      if (res.ok) {
+        setIsAuthenticated(true);
+        setPassword('');
+        return;
+      }
+
+      if (res.status === 401) {
+        setError('Incorrect password');
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
       setPassword('');
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -84,6 +129,8 @@ export default function PasswordGate({ children }: PasswordGateProps) {
                   className="w-full px-4 py-3 bg-photo-bg border border-photo-border rounded-lg focus:outline-none focus:ring-2 focus:ring-photo-accent focus:border-transparent text-photo-fg"
                   placeholder="Enter password"
                   autoFocus
+                  autoComplete="current-password"
+                  disabled={submitting}
                 />
                 {error && (
                   <p className="mt-2 text-sm text-red-400">{error}</p>
@@ -91,9 +138,10 @@ export default function PasswordGate({ children }: PasswordGateProps) {
               </div>
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-photo-accent hover:bg-photo-accent/80 text-photo-bg font-medium rounded-lg uppercase tracking-wider text-sm transition-colors"
+                disabled={submitting || !password}
+                className="w-full px-6 py-3 bg-photo-accent hover:bg-photo-accent/80 disabled:opacity-60 disabled:cursor-not-allowed text-photo-bg font-medium rounded-lg uppercase tracking-wider text-sm transition-colors"
               >
-                Enter
+                {submitting ? 'Checking…' : 'Enter'}
               </button>
             </form>
           </div>

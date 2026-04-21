@@ -21,7 +21,14 @@ This guide explains how to set up the inquiry system for your photography portfo
    RESEND_FROM_EMAIL=inquiries@yourdomain.com
    ```
 
-   **Gallery password gate (optional):** To show the password gate on the deployed site, add **`VITE_GALLERY_PASSWORD`** here with the same value you use in `.env.local`. It must be present when Vercel runs `npm run build`, then redeploy. Leave it unset only if you want the live site fully public.
+   **Gallery password gate (optional):** To show the password gate on the deployed site, add these two **server-side** vars (no `VITE_` prefix):
+
+   ```
+   GALLERY_PASSWORD=your_password_here
+   GALLERY_AUTH_SECRET=<long_random_string>
+   ```
+
+   Generate `GALLERY_AUTH_SECRET` with `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`. The password is verified server-side by `/api/auth`, so **changing `GALLERY_PASSWORD` takes effect immediately — no redeploy required.** Leave `GALLERY_PASSWORD` unset to make the site fully public.
 
    **Note on RESEND_FROM_EMAIL:**
    - If you have a custom domain, use an email like `inquiries@yourdomain.com`
