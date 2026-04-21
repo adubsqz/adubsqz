@@ -866,3 +866,4 @@ scripts/**
 !scripts/process-originals-batch.mjs
 .vercel
 .env.local
+.env*.local
