@@ -8,6 +8,7 @@
     "verify:gallery-manifest": "node scripts/verify-gallery-manifest.mjs",
     "prepare:gallery": "node scripts/prepare-gallery-assets.mjs",
     "import:gallery": "node scripts/process-gallery-import.mjs",
+    "process:originals": "node scripts/process-originals-batch.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
