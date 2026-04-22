@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
-import type { GalleryFilter, OrientationFilter } from '../types';
+import type { GalleryFilter } from '../types';
 import WatermarkedImage from './WatermarkedImage';
 import InquiryModal from './InquiryModal';
 
@@ -471,26 +471,17 @@ function CollectionSection({
 
 interface GalleryViewProps {
   filter: GalleryFilter;
-  orientationFilter?: OrientationFilter;
 }
 
-export default function GalleryView({ filter, orientationFilter = 'all' }: GalleryViewProps) {
+export default function GalleryView({ filter }: GalleryViewProps) {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
   const [inquiry, setInquiry] = useState<{ photo: Photo; initialNotes?: string } | null>(null);
   const collection: PhotoCollection = COLLECTIONS.find((c) => c.id === filter)
     ?? COLLECTIONS[0]
     ?? { id: 'empty', title: 'Empty', photos: [] };
-  const orientedPhotos = useImageOrientation(collection.photos);
-  const filteredPhotos = orientedPhotos.filter((photo) => {
-    if (orientationFilter === 'all') return true;
-    if (orientationFilter === 'horizontal') {
-      return photo.orientation === 'horizontal' || photo.orientation === 'square';
-    }
-    return photo.orientation === 'vertical' || photo.orientation === 'square';
-  });
   const filteredCollection: PhotoCollection = {
     ...collection,
-    photos: filteredPhotos,
+    photos: collection.photos,
   };
   const preferSideBySide = false;
 
@@ -532,7 +523,7 @@ export default function GalleryView({ filter, orientationFilter = 'all' }: Galle
 
       {filteredCollection.photos.length === 0 && (
         <p className="text-sm text-photo-muted">
-          No photos matched this orientation in the selected category.
+          No photos found in this category.
         </p>
       )}
 

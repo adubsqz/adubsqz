@@ -1,6 +1,5 @@
 export type PageView = 'gallery' | 'about';
 export type GalleryFilter = string;
-export type OrientationFilter = 'all' | 'horizontal' | 'vertical';
 
 export interface Photo {
   id: string;
