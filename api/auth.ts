@@ -82,11 +82,48 @@ function json(body: unknown, init: ResponseInit = {}): Response {
   });
 }
 
+function explicitGalleryPublic(): boolean {
+  const v = process.env.GALLERY_PUBLIC?.trim().toLowerCase();
+  return v === '1' || v === 'true' || v === 'yes';
+}
+
+/** On Vercel, missing GALLERY_PASSWORD used to expose the gallery. Fail closed unless explicitly public. */
+function lockedBecausePasswordUnset(onVercel: boolean, configuredPassword: string): boolean {
+  return onVercel && !configuredPassword && !explicitGalleryPublic();
+}
+
 export default async function handler(req: Request): Promise<Response> {
   const configuredPassword = process.env.GALLERY_PASSWORD?.trim() ?? '';
   const secret = process.env.GALLERY_AUTH_SECRET?.trim() ?? '';
+  const onVercel = Boolean(process.env.VERCEL);
 
-  // No password configured → site is public.
+  if (lockedBecausePasswordUnset(onVercel, configuredPassword)) {
+    if (req.method === 'GET') {
+      return json({
+        authenticated: false,
+        required: true,
+        misconfigured: true,
+      });
+    }
+    if (req.method === 'POST') {
+      return json(
+        {
+          error:
+            'Gallery password is not configured. In Vercel → Settings → Environment Variables, set GALLERY_PASSWORD and GALLERY_AUTH_SECRET. To intentionally ship a public gallery from Vercel, set GALLERY_PUBLIC=1.',
+        },
+        { status: 503 }
+      );
+    }
+    if (req.method === 'DELETE') {
+      return json(
+        { authenticated: false, required: true, misconfigured: true },
+        { status: 200, headers: { 'Set-Cookie': buildCookie('', 0) } }
+      );
+    }
+    return json({ error: 'Method not allowed.' }, { status: 405, headers: { Allow: 'GET, POST, DELETE' } });
+  }
+
+  // No password configured (local dev or non-Vercel) → site is public.
   if (!configuredPassword) {
     return json({ authenticated: true, required: false });
   }

@@ -12,6 +12,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(!e2eBypass);
   const [submitting, setSubmitting] = useState(false);
+  const [misconfigured, setMisconfigured] = useState(false);
 
   useEffect(() => {
     if (e2eBypass) return;
@@ -32,8 +33,10 @@ export default function PasswordGate({ children }: PasswordGateProps) {
         const data = (await res.json()) as {
           authenticated?: boolean;
           required?: boolean;
+          misconfigured?: boolean;
         };
         if (cancelled) return;
+        if (data.misconfigured) setMisconfigured(true);
         if (data.authenticated) {
           setIsAuthenticated(true);
         }
@@ -70,7 +73,9 @@ export default function PasswordGate({ children }: PasswordGateProps) {
         return;
       }
 
-      if (res.status === 401) {
+      if (res.status === 503) {
+        setError('Gallery is temporarily locked (server configuration).');
+      } else if (res.status === 401) {
         setError('Incorrect password');
       } else {
         setError('Something went wrong. Please try again.');
@@ -102,6 +107,18 @@ export default function PasswordGate({ children }: PasswordGateProps) {
             <p className="text-photo-muted text-sm mb-6">
               Enter password to view photography portfolio
             </p>
+            {misconfigured && (
+              <div
+                className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/95"
+                role="status"
+              >
+                This deployment is missing{' '}
+                <span className="font-mono text-xs">GALLERY_PASSWORD</span> on Vercel, so the gallery
+                stays locked. Add that variable (and <span className="font-mono text-xs">GALLERY_AUTH_SECRET</span>
+                ), redeploy if needed, or set <span className="font-mono text-xs">GALLERY_PUBLIC=1</span> only if
+                you truly want a public site.
+              </div>
+            )}
             <div className="rounded-xl border border-white/20 bg-photo-bg/80 p-4 mb-6 text-center">
               <p className="text-xs font-medium text-photo-muted uppercase tracking-wider mb-2">
                 Film + TV Clearance Guarantee
@@ -130,7 +147,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
                   placeholder="Enter password"
                   autoFocus
                   autoComplete="current-password"
-                  disabled={submitting}
+                  disabled={submitting || misconfigured}
                 />
                 {error && (
                   <p className="mt-2 text-sm text-red-400">{error}</p>
@@ -138,7 +155,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
               </div>
               <button
                 type="submit"
-                disabled={submitting || !password}
+                disabled={submitting || !password || misconfigured}
                 className="w-full px-6 py-3 bg-photo-accent hover:bg-photo-accent/80 disabled:opacity-60 disabled:cursor-not-allowed text-photo-bg font-medium rounded-lg uppercase tracking-wider text-sm transition-colors"
               >
                 {submitting ? 'Checking…' : 'Enter'}

@@ -413,12 +413,18 @@ function CollectionSection({
   const [page, setPage] = useState(1);
   const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
   const photos = collection.photos;
-  const orientedPhotos = useImageOrientation(photos);
-  
+
   const totalPages = Math.max(1, Math.ceil(photos.length / PER_PAGE));
   const start = (page - 1) * PER_PAGE;
-  const pagePhotos = orientedPhotos.slice(start, start + PER_PAGE);
-  const pagePhotosToShow = pagePhotos.filter((p) => !failedIds.has(p.id));
+  const pageSlice = photos.slice(start, start + PER_PAGE);
+  const orientedPhotos = useImageOrientation(pageSlice);
+
+  useEffect(() => {
+    setPage(1);
+    setFailedIds(new Set());
+  }, [collection.id]);
+
+  const pagePhotosToShow = orientedPhotos.filter((p) => !failedIds.has(p.id));
 
   const handleFail = (id: string) => setFailedIds((prev) => new Set(prev).add(id));
 

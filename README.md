@@ -20,17 +20,17 @@ The gallery is gated by a **server-side** password check (`/api/auth`). The pass
 
 Required environment variables (server-only — **no `VITE_` prefix**):
 
-- **`GALLERY_PASSWORD`** — the password visitors type into the gate. If unset, the site is public.
-- **`GALLERY_AUTH_SECRET`** — a long random string used to sign the auth cookie. Rotate it to invalidate all existing sessions. Generate one with:
-
+- `**GALLERY_PASSWORD`** — the password visitors type into the gate. If unset, the site is public.
+- `**GALLERY_AUTH_SECRET**` — a long random string used to sign the auth cookie. Rotate it to invalidate all existing sessions. Generate one with:
   ```bash
   node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
   ```
-
 - **Local:** set both in `.env.local` (see [SETUP.md](./SETUP.md)). Run the app with `vercel dev` so `/api/auth` is available.
 - **Production (Vercel):** add both under Project → Settings → Environment Variables for **Production** (and Preview if you want). Changing `GALLERY_PASSWORD` takes effect on the next request — **no rebuild required**.
 
-If you omit `GALLERY_PASSWORD` for a given environment, that environment is **public** (no gate).
+If you omit `GALLERY_PASSWORD` on **Vercel**, the gallery **stays locked** (fail-safe) until you set a password or set `GALLERY_PUBLIC=1` to intentionally ship a public build. Local `npm run dev` without a password remains public for convenience.
+
+Manual gallery layout: edit `src/gallery-placement.json` (`moves` to change which manifest category a file appears under, `order` to set display order per category). Paths match the strings in `gallery-manifest.json`.
 
 ### Playwright and the password gate
 

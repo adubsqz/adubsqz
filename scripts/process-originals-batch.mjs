@@ -3,7 +3,7 @@
  * Batch-process every top-level image in ~/originals/ that hasn't already been
  * "magicked" into the gallery:
  *   - resize to MAX_EDGE (inside-fit, EXIF rotate)
- *   - auto-categorize as bw or color by sampling chroma
+ *   - auto-categorize as bw or color by sampling chroma (folders only; no greyscale export)
  *   - embed a double ADUBSQZ watermark
  *   - write to public/photos/still-life/{bw|color}/import-{slug}.jpg
  *   - append to src/gallery-manifest.json under exactly one category
@@ -40,9 +40,9 @@ const JPEG_QUALITY = 82;
 const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
 
 // Auto-categorization threshold: average per-pixel chroma (max-min of RGB, in 0..255)
-// below this is considered B&W. Lets through mildly-tinted scans of film negatives
-// without mislabeling actual color photographs. Tuned empirically for this library.
-const BW_CHROMA_THRESHOLD = 8;
+// below this is considered B&W for folder placement only. Output is never forced to
+// greyscale so mis-tagged color film keeps its color in the exported JPEG.
+const BW_CHROMA_THRESHOLD = 12;
 
 // -------------------- CLI --------------------
 
@@ -128,13 +128,12 @@ async function processOne({ src, dest, category }) {
   const outPath = join(outDir, dest);
   await mkdir(outDir, { recursive: true });
 
-  let pipeline = sharp(src).rotate().resize({
+  const pipeline = sharp(src).rotate().resize({
     width: MAX_EDGE,
     height: MAX_EDGE,
     fit: 'inside',
     withoutEnlargement: true,
   });
-  if (category === 'bw') pipeline = pipeline.greyscale();
   const resizedBuf = await pipeline.toBuffer();
 
   const meta = await sharp(resizedBuf).metadata();

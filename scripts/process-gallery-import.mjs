@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Batch-import images: resize, apply watermark twice (subtle overlay), write JPEGs to
- * public/photos/still-life/color/ and public/photos/still-life/bw/ (grayscale).
+ * public/photos/still-life/color/ and public/photos/still-life/bw/ (same color pipeline; folder is semantic).
  * Skips UI screenshots unless --include-screenshots.
  *
  * Usage:
@@ -45,17 +45,16 @@ function slugFromFilename(name) {
   return s.slice(0, 80);
 }
 
-async function resizedBuffer(srcPath, isBw) {
-  let pipeline = sharp(srcPath)
+async function resizedBuffer(srcPath) {
+  return sharp(srcPath)
     .rotate()
     .resize({
       width: MAX_EDGE,
       height: MAX_EDGE,
       fit: 'inside',
       withoutEnlargement: true,
-    });
-  if (isBw) pipeline = pipeline.greyscale();
-  return pipeline.toBuffer();
+    })
+    .toBuffer();
 }
 
 async function applyDoubleWatermark(imageBuffer) {
@@ -142,12 +141,12 @@ async function main() {
     }
     used.add(dest);
 
+    const raw = await resizedBuffer(srcPath);
+    const finalBuf = await applyDoubleWatermark(raw);
     for (const isBw of [false, true]) {
       const category = isBw ? 'bw' : 'color';
       const outDir = join(ROOT, 'public', 'photos', 'still-life', category);
       const outPath = join(outDir, dest);
-      const raw = await resizedBuffer(srcPath, isBw);
-      const finalBuf = await applyDoubleWatermark(raw);
       await writeJpeg(finalBuf, outPath);
       console.log('wrote', outPath);
     }
