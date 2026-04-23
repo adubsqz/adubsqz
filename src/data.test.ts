@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { COLLECTIONS, ABOUT } from './data';
+import { COLLECTIONS, ABOUT, GALLERY_HIDDEN_REGISTRY } from './data';
 import type { Photo, PhotoCollection } from './types';
 
 describe('data', () => {
@@ -40,6 +40,22 @@ describe('data', () => {
           expect(photo.src).toMatch(/^\/photos\//);
         });
       });
+    });
+
+    it('uses Greyscale and Full Spectrum buckets only', () => {
+      const ids = COLLECTIONS.map((c) => c.id).sort();
+      expect(ids).toEqual(['full-spectrum', 'greyscale'].sort());
+    });
+
+    it('does not surface import-########.jpg filenames in public collections', () => {
+      const allSrc = COLLECTIONS.flatMap((c) => c.photos.map((p) => p.src));
+      for (const src of allSrc) {
+        expect(src).not.toMatch(/\/import-\d+\.jpe?g$/i);
+      }
+    });
+
+    it('exposes a hidden-registry structure', () => {
+      expect(Array.isArray(GALLERY_HIDDEN_REGISTRY)).toBe(true);
     });
   });
 
