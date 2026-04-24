@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ABOUT } from '../data';
-import { FilmTvClearanceBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
+import { FilmTvClearanceBlock, RightsReservedBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
 
 interface ContactModalProps {
   onClose: () => void;
@@ -62,6 +62,7 @@ export default function ContactModal({ onClose }: ContactModalProps) {
             conversation—no public checkout.
           </p>
           <TearsheetAndFulfillmentGrid surface="modal" />
+          <RightsReservedBlock className="bg-photo-bg/50" />
           <div>
             <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-photo-muted mb-1">
               Name

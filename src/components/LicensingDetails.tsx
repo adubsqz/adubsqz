@@ -19,6 +19,21 @@ export function FilmTvClearanceBlock({ className = '' }: { className?: string })
   );
 }
 
+export function RightsReservedBlock({ className = '' }: { className?: string }) {
+  return (
+    <div className={`rounded-2xl border border-photo-border/60 bg-black/25 p-4 space-y-2 ${className}`}>
+      <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">
+        Rights Reserved
+      </p>
+      <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
+        All photographs, site design, source code, written content, and metadata are copyright © 2026 Alexander Ames.
+        No copying, redistribution, scraping, dataset inclusion, AI/ML training, indexing, embedding, or derivative use
+        is permitted without prior written permission.
+      </p>
+    </div>
+  );
+}
+
 type TearsheetSurface = 'modal' | 'default';
 
 export function TearsheetAndFulfillmentGrid({

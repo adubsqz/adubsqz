@@ -2,6 +2,20 @@
 
 Live site: [adubsqz on Vercel](https://adubsqz.vercel.app/) (update the project domain in Vercel if yours differs).
 
+## License and use restrictions
+
+Copyright © 2026 Alexander Ames. All rights reserved.
+
+This repository, the adubsqz photography portfolio, all photographs, image files, source code, visual design, written
+content, metadata, and build outputs are proprietary. No copying, redistribution, modification, publication, scraping,
+dataset inclusion, model training, AI/ML ingestion, embedding generation, indexing, benchmarking, or derivative use is
+permitted without prior written permission.
+
+Any print sale, image license, film/TV clearance, syndication, rental, or commercial use must be confirmed in a separate
+written agreement. See [LICENSE](./LICENSE) for the full terms.
+
+The deployed portfolio also publishes photo-specific terms at `/PHOTO_TERMS.md`.
+
 ## Development
 
 ```bash

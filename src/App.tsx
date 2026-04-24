@@ -4,6 +4,7 @@ import GalleryView from './components/GalleryView';
 import AboutView from './components/AboutView';
 import ContactModal from './components/ContactModal';
 import { COLLECTIONS, DEFAULT_GALLERY_FILTER } from './data';
+import { RightsReservedBlock } from './components/LicensingDetails';
 
 const TABS: { id: PageView; label: string }[] = [
   { id: 'gallery', label: 'Gallery' },
@@ -84,6 +85,9 @@ export default function App() {
               )}
               {view === 'about' && <AboutView onContactClick={() => setShowContact(true)} />}
             </div>
+            <footer className="border-t border-photo-border/50 px-5 py-5 sm:px-7 md:px-8 lg:px-10">
+              <RightsReservedBlock />
+            </footer>
           </div>
         </main>
         {showContact && <ContactModal onClose={() => setShowContact(false)} />}

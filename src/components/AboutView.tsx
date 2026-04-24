@@ -1,4 +1,5 @@
 import { ABOUT, ABOUT_IMAGE_SRC } from '../data';
+import { RightsReservedBlock } from './LicensingDetails';
 
 interface AboutViewProps {
   onContactClick?: () => void;
@@ -29,6 +30,8 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
           </p>
         </div>
       </div>
+
+      <RightsReservedBlock />
 
       <div className="flex flex-wrap gap-4">
         {ABOUT.socials.map((social) => (

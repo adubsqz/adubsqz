@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Photo } from '../types';
-import { FilmTvClearanceBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
+import { FilmTvClearanceBlock, RightsReservedBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
 import WatermarkedImage from './WatermarkedImage';
 
 interface InquiryModalProps {
@@ -161,6 +161,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
               </div>
               <FilmTvClearanceBlock />
               <TearsheetAndFulfillmentGrid surface="modal" className="md:grid-cols-1" />
+              <RightsReservedBlock className="bg-photo-bg/50" />
             </aside>
 
             <div className="order-1 flex min-h-0 min-w-0 flex-1 flex-col lg:order-2">
