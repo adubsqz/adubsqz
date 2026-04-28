@@ -1,0 +1,16 @@
+{
+  "edits": {
+    "contrast": 0.0,
+    "highlights": -8.0,
+    "saturation": 8.0,
+    "shadows": 10.0,
+    "temperature": 220.0,
+    "vibrance": 8.0
+  },
+  "intent": "urban candid portrait for stock/corporate/residential staging; keep natural look; exposure +0.15, contrast +8, highlights -18, shadows +14, temperature +2, tint +1, saturation +4, vibrance +10, gamma 0.98",
+  "meta": {
+    "engine": "rule-fallback",
+    "mode": "deterministic"
+  },
+  "version": 1
+}

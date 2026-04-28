@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-04-28T11:03:21.578929+00:00",
+  "generative_edits_used": false,
+  "non_destructive": true,
+  "output_image": "/Users/alexanderames/adubsqz/.tmp/edited/she-gettin-it.jpg",
+  "recipe": {
+    "edits": {
+      "contrast": 0.0,
+      "highlights": -8.0,
+      "saturation": 8.0,
+      "shadows": 10.0,
+      "temperature": 220.0,
+      "vibrance": 8.0
+    },
+    "intent": "urban candid portrait for stock/corporate/residential staging; keep natural look; exposure +0.15, contrast +8, highlights -18, shadows +14, temperature +2, tint +1, saturation +4, vibrance +10, gamma 0.98",
+    "meta": {
+      "engine": "rule-fallback",
+      "mode": "deterministic"
+    },
+    "version": 1
+  },
+  "source_image": "/Users/alexanderames/originals/shegettinit.JPG",
+  "source_sha256": "35a9ce155888e0331b2b567cff8311137f1ccfe46f2f30add4f0499c6b0d6ae6",
+  "version": 1
+}

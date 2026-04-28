@@ -57,6 +57,49 @@ npm run build
 npm run preview
 ```
 
+## Photo curation workflow
+
+`npm run curate` wraps the review/import flow with subcommands:
+
+```bash
+npm run curate -- link --map .tmp/recipes/curation-map.json
+npm run curate -- apply --map .tmp/recipes/curation-map.json
+npm run curate -- run --map .tmp/recipes/curation-map.json
+```
+
+`run` executes:
+1. symlink selected originals into `.tmp/review`
+2. apply `photo-prompt` recipes into `.tmp/edited`
+3. `node scripts/process-gallery-import.mjs --input .tmp/edited --update-manifest`
+4. `npm run sync:gallery-ignore`
+5. `npm run verify:gallery-manifest`
+
+Common options:
+
+```bash
+npm run curate -- run --map .tmp/recipes/curation-map.json --dry-run --limit 10
+npm run curate -- run --map .tmp/recipes/curation-map.json --git-add
+```
+
+Mapping file supports either shape:
+
+```json
+{
+  "entries": [
+    {
+      "source": "balconysunset.jpg",
+      "recipe": ".tmp/recipes/balconysunset.recipe.json"
+    }
+  ]
+}
+```
+
+```json
+{
+  "balconysunset.jpg": ".tmp/recipes/balconysunset.recipe.json"
+}
+```
+
 ## More
 
 See [SETUP.md](./SETUP.md) for the inquiry-to-email (Resend) workflow and environment variables.

@@ -8,6 +8,7 @@
     "verify:gallery-manifest": "node scripts/verify-gallery-manifest.mjs",
     "prepare:gallery": "node scripts/prepare-gallery-assets.mjs",
     "import:gallery": "node scripts/process-gallery-import.mjs",
+    "curate": "node scripts/curate.mjs",
     "process:originals": "node scripts/process-originals-batch.mjs",
     "review:semantic-categories": "node scripts/review-semantic-categories.mjs",
     "build": "vite build",
