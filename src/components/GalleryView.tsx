@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
@@ -65,7 +65,12 @@ function useImageOrientation(photos: Photo[]): PhotoWithOrientation[] {
     photos.map(p => ({ ...p, orientation: p.orientation || 'square' as const }))
   );
 
+  // Key off stable photo identity (id+src) instead of array reference so callers
+  // that build a fresh array each render don't retrigger the effect in a loop.
+  const photosKey = photos.map((p) => `${p.id}|${p.src}`).join('\n');
+
   useEffect(() => {
+    let cancelled = false;
     const loadOrientations = async () => {
       const results = await Promise.all(
         photos.map(photo => {
@@ -97,11 +102,18 @@ function useImageOrientation(photos: Photo[]): PhotoWithOrientation[] {
           });
         })
       );
-      setOrientedPhotos(results);
+      if (!cancelled) setOrientedPhotos(results);
     };
 
     loadOrientations();
-  }, [photos]);
+    return () => {
+      cancelled = true;
+    };
+    // photosKey captures the only inputs that should retrigger detection; using
+    // `photos` directly would re-run on every render when callers pass a fresh
+    // array (e.g. result of Array#slice).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [photosKey]);
 
   return orientedPhotos;
 }
@@ -425,7 +437,10 @@ function CollectionSection({
 
   const totalPages = Math.max(1, Math.ceil(photos.length / PER_PAGE));
   const start = (page - 1) * PER_PAGE;
-  const pageSlice = photos.slice(start, start + PER_PAGE);
+  const pageSlice = useMemo(
+    () => photos.slice(start, start + PER_PAGE),
+    [photos, start],
+  );
   const orientedPhotos = useImageOrientation(pageSlice);
 
   useEffect(() => {

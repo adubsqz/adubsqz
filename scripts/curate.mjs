@@ -98,6 +98,21 @@ function resolveMaybe(baseDir, p) {
   return resolve(baseDir, p);
 }
 
+function resolveMappingPath(mapDir, p) {
+  if (isAbsolute(p)) return p;
+  const value = String(p).trim();
+  const hasDirectory = value.includes('/') || value.includes('\\');
+
+  // Preserve existing behavior for bare filenames in maps located under .tmp/recipes.
+  if (!hasDirectory) return resolve(mapDir, value);
+
+  // Explicit relative paths remain map-relative.
+  if (value.startsWith('./') || value.startsWith('../')) return resolve(mapDir, value);
+
+  // Paths with directories are treated as repo-root relative.
+  return resolveFromRoot(value);
+}
+
 function parseReviewScore(value) {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value !== 'string') return null;
@@ -136,7 +151,7 @@ async function loadEntries(opts) {
     const reviewPath = resolveMaybe(resolveFromRoot(opts.reviewDir), reviewName);
 
     const recipeValue = typeof entry.recipe === 'string' ? entry.recipe : '';
-    const recipePath = recipeValue ? resolveMaybe(mapDir, recipeValue) : '';
+    const recipePath = recipeValue ? resolveMappingPath(mapDir, recipeValue) : '';
 
     const ext = extname(source);
     const sourceStem = basename(source, ext);
@@ -148,7 +163,7 @@ async function loadEntries(opts) {
 
     let sidecarPath = '';
     if (typeof entry.sidecar === 'string' && entry.sidecar.trim() !== '') {
-      sidecarPath = resolveMaybe(mapDir, entry.sidecar);
+      sidecarPath = resolveMappingPath(mapDir, entry.sidecar);
     } else if (recipePath.endsWith('.recipe.json')) {
       sidecarPath = recipePath.replace(/\.recipe\.json$/i, '.sidecar.json');
     } else if (recipePath.endsWith('.json')) {

@@ -1,7 +1,7 @@
 # BEGIN AUTO-GENERATED CURATED STILL-LIFE
 # Run: npm run sync:gallery-ignore
 # Generated from src/gallery-manifest.json and /photos/still-life/* references in src/
-public/photos/still-life/**
+public/photos/
 !public/photos/still-life/
 !public/photos/still-life/.gitkeep
 !public/photos/still-life/bw/
@@ -22,7 +22,6 @@ public/photos/still-life/**
 !public/photos/still-life/color/color-blurred-ballerina-figures.jpg
 !public/photos/still-life/color/color-dj-portrait.jpg
 !public/photos/still-life/color/color-toy-taxis.jpg
-!public/photos/still-life/color/import-20251231-140854-collage.jpg
 !public/photos/still-life/color/import-about-adubsqz.jpg
 !public/photos/still-life/color/import-all-good.jpg
 !public/photos/still-life/color/import-balconysunset-edited.jpg
@@ -77,6 +76,7 @@ scripts/**
 !scripts/process-gallery-import.mjs
 !scripts/process-originals-batch.mjs
 !scripts/curate.mjs
+!scripts/run-sellable-pipeline.sh
 !scripts/README.md
 .vercel
 .env.local

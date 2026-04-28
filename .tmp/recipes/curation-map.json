@@ -8,14 +8,14 @@
     },
     {
       "source": "catcage.JPG",
-      "marketScore": null,
-      "recipe": null,
+      "marketScore": 5.0,
+      "recipe": "catcage.recipe.json",
       "outputName": "cat-cage.jpg"
     },
     {
       "source": "dogstage.JPG",
-      "marketScore": null,
-      "recipe": null,
+      "marketScore": 5.0,
+      "recipe": "dogstage.recipe.json",
       "outputName": "dog-stage.jpg"
     },
     {

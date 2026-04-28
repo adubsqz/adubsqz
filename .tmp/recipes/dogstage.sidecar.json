@@ -1,0 +1,25 @@
+{
+  "created_at": "2026-04-28T18:59:36.793215+00:00",
+  "generative_edits_used": false,
+  "non_destructive": true,
+  "output_image": "/Users/alexanderames/adubsqz/.tmp/edited/dog-stage.jpg",
+  "recipe": {
+    "edits": {
+      "contrast": 6.0,
+      "highlights": -6.0,
+      "shadows": 12.0,
+      "temperature": 80.0,
+      "tint": 4.0,
+      "vibrance": 5.0
+    },
+    "intent": "gentle dusk recovery: open shadows for dog/pavement detail, reduce green cast with slight warmth/magenta, add modest contrast while keeping the low-light mood",
+    "meta": {
+      "engine": "manual-tuned",
+      "mode": "deterministic"
+    },
+    "version": 1
+  },
+  "source_image": "/Users/alexanderames/originals/dogstage.JPG",
+  "source_sha256": "603d49e4a0cc96a5c863dcbe9bd1fac653c1852459ad6dc4666c6e52f02f9f98",
+  "version": 1
+}
