@@ -112,11 +112,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
                 className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/95"
                 role="status"
               >
-                This deployment is missing{' '}
-                <span className="font-mono text-xs">GALLERY_PASSWORD</span> on Vercel, so the gallery
-                stays locked. Add that variable (and <span className="font-mono text-xs">GALLERY_AUTH_SECRET</span>
-                ), redeploy if needed, or set <span className="font-mono text-xs">GALLERY_PUBLIC=1</span> only if
-                you truly want a public site.
+                Gallery access is temporarily unavailable. Please try again later or contact the site owner.
               </div>
             )}
             <div className="rounded-xl border border-white/20 bg-photo-bg/80 p-4 mb-6 text-center">

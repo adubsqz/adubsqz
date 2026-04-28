@@ -2,6 +2,7 @@
  * Shared licensing / fulfillment copy for inquiry and contact flows
  * (gallery browsing stays minimal; details appear when someone initiates purchase or outreach).
  */
+import { Card } from './ui/card';
 
 export function FilmTvClearanceBlock({ className = '' }: { className?: string }) {
   return (
@@ -21,7 +22,7 @@ export function FilmTvClearanceBlock({ className = '' }: { className?: string })
 
 export function RightsReservedBlock({ className = '' }: { className?: string }) {
   return (
-    <div className={`rounded-2xl border border-photo-border/60 bg-black/25 p-4 space-y-2 ${className}`}>
+    <Card className={`p-4 space-y-2 ${className}`}>
       <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">
         Rights Reserved
       </p>
@@ -30,7 +31,7 @@ export function RightsReservedBlock({ className = '' }: { className?: string }) 
         No copying, redistribution, scraping, dataset inclusion, AI/ML training, indexing, embedding, or derivative use
         is permitted without prior written permission.
       </p>
-    </div>
+    </Card>
   );
 }
 
@@ -45,19 +46,19 @@ export function TearsheetAndFulfillmentGrid({
 }) {
   const card =
     surface === 'modal'
-      ? 'rounded-xl border border-photo-border/60 bg-photo-bg/50 p-3 space-y-1.5'
-      : 'rounded-xl border border-photo-border/60 bg-black/25 p-4 space-y-2';
+      ? 'rounded-xl bg-photo-bg/50 p-3 space-y-1.5'
+      : 'rounded-xl p-4 space-y-2';
 
   return (
     <div className={`grid gap-4 md:grid-cols-2 ${className}`}>
-      <div className={card}>
+      <Card className={card}>
         <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Trade Portal + Tearsheet</p>
         <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
           Printable 8.5×11 lookbook pages with image SKU and title under each frame—available on request; say you’re
           interested in the tearsheet when you reach out.
         </p>
-      </div>
-      <div className={card}>
+      </Card>
+      <Card className={card}>
         <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">Fulfillment + licensing</p>
         <p className="text-xs sm:text-sm text-photo-fg/90 leading-relaxed">
           Digital licensing: typically within 24 hours of cleared contract. Framed print production: 3-5 business
@@ -67,7 +68,7 @@ export function TearsheetAndFulfillmentGrid({
           Short-term set rental is available at 20% of retail per 30-day term. Final terms are set privately by
           contract.
         </p>
-      </div>
+      </Card>
     </div>
   );
 }

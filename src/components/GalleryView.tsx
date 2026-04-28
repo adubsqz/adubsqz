@@ -4,6 +4,8 @@ import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
 import WatermarkedImage from './WatermarkedImage';
 import InquiryModal from './InquiryModal';
+import { Button } from './ui/button';
+import { Card, CardContent } from './ui/card';
 
 const PER_PAGE = 8;
 
@@ -150,39 +152,43 @@ function Lightbox({
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <span className="text-[0.65rem] uppercase tracking-[0.22em] text-white/35">Navigate</span>
             <div className="flex flex-wrap gap-3 sm:gap-4">
-              <button
+              <Button
                 type="button"
                 onClick={onPrevious}
-                className="rounded-md border border-white/20 bg-white/[0.06] px-5 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/80 transition-colors hover:border-white/35 hover:bg-white/[0.1] hover:text-white focus-visible:ring-2 focus-visible:ring-photo-accent"
+                variant="lightbox"
+                className="rounded-md px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
                 aria-label="View previous photo"
               >
                 Prev
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={onNext}
-                className="rounded-md border border-white/20 bg-white/[0.06] px-5 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/80 transition-colors hover:border-white/35 hover:bg-white/[0.1] hover:text-white focus-visible:ring-2 focus-visible:ring-photo-accent"
+                variant="lightbox"
+                className="rounded-md px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
                 aria-label="View next photo"
               >
                 Next
-              </button>
+              </Button>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 sm:pl-4 sm:border-l sm:border-white/[0.08]">
-            <button
+            <Button
               type="button"
               onClick={onInquire}
-              className="rounded-md bg-photo-accent px-6 py-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-photo-bg shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all hover:brightness-110 focus-visible:ring-2 focus-visible:ring-white"
+              variant="lightboxPrimary"
+              className="rounded-md px-6 py-2.5 text-[0.7rem] tracking-[0.16em] focus-visible:ring-white"
             >
               Request Invoice
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={onClose}
-              className="rounded-md border border-white/20 bg-white/[0.06] px-5 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-white/75 transition-colors hover:border-white/35 hover:text-white focus-visible:ring-2 focus-visible:ring-photo-accent"
+              variant="lightbox"
+              className="rounded-md px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
             >
               Close
-            </button>
+            </Button>
           </div>
         </header>
 
@@ -205,9 +211,11 @@ function Lightbox({
 
         {photo.caption && (
           <>
-            <div className="rounded-xl border border-white/10 bg-white/[0.04] px-5 py-4 backdrop-blur-sm sm:px-8">
-              <p className="text-center text-sm italic leading-relaxed text-white/65">{photo.caption}</p>
-            </div>
+            <Card className="rounded-xl border-white/10 bg-white/[0.04] backdrop-blur-sm">
+              <CardContent className="px-5 py-4 sm:px-8">
+                <p className="text-center text-sm italic leading-relaxed text-white/65">{photo.caption}</p>
+              </CardContent>
+            </Card>
             <div className="h-10 sm:h-14" aria-hidden />
           </>
         )}
@@ -215,20 +223,21 @@ function Lightbox({
         <section className="space-y-12 border-t border-white/10 pt-16 sm:space-y-16 sm:pt-20">
           <div className="text-[0.65rem] uppercase tracking-[0.28em] text-white/30">Licensing & fulfillment</div>
           <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-14 lg:gap-20">
-            <div className="space-y-4 rounded-2xl border border-white/[0.12] bg-white/[0.04] p-6 sm:p-8">
+            <Card className="space-y-4 border-white/[0.12] bg-white/[0.04] p-6 sm:p-8">
               <p className="text-[0.7rem] uppercase tracking-[0.2em] text-white/45">Trade Portal + Tearsheet</p>
               <p className="text-sm leading-relaxed text-white/85">
                 Printable 8.5×11 lookbook pages with image SKU and title under each frame—available on request.
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={onInquireTearsheet}
-                className="pt-2 text-left text-[0.75rem] uppercase tracking-[0.18em] text-photo-accent transition-opacity hover:opacity-90"
+                variant="ghost"
+                className="h-auto justify-start px-0 pt-2 text-left text-[0.75rem] tracking-[0.18em] text-photo-accent hover:text-photo-accent/90"
               >
                 Inquire about tearsheet…
-              </button>
-            </div>
-            <div className="space-y-4 rounded-2xl border border-white/[0.12] bg-white/[0.04] p-6 sm:p-8">
+              </Button>
+            </Card>
+            <Card className="space-y-4 border-white/[0.12] bg-white/[0.04] p-6 sm:p-8">
               <p className="text-[0.7rem] uppercase tracking-[0.2em] text-white/45">Fulfillment Options</p>
               <p className="text-sm leading-relaxed text-white/85">
                 Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ
@@ -237,7 +246,7 @@ function Lightbox({
               <p className="text-sm leading-relaxed text-white/85">
                 Short-term set rental is available at 20% of retail per 30-day term.
               </p>
-            </div>
+            </Card>
           </div>
         </section>
 

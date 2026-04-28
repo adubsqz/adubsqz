@@ -5,6 +5,7 @@ import AboutView from './components/AboutView';
 import ContactModal from './components/ContactModal';
 import { COLLECTIONS, DEFAULT_GALLERY_FILTER } from './data';
 import { RightsReservedBlock } from './components/LicensingDetails';
+import { Card } from './components/ui/card';
 
 const TABS: { id: PageView; label: string }[] = [
   { id: 'gallery', label: 'Gallery' },
@@ -20,7 +21,7 @@ export default function App() {
     <div className="min-h-[100dvh] text-photo-fg font-sans antialiased pb-4 sm:pb-0">
       <div className="relative min-h-[100dvh]">
         <main className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8">
-          <div className="rounded-3xl bg-photo-panel/95 shadow-[0_26px_80px_rgba(0,0,0,0.9)] backdrop-blur-md overflow-hidden">
+          <Card className="overflow-hidden rounded-3xl border-photo-border/40 bg-photo-panel/95 shadow-[0_26px_80px_rgba(0,0,0,0.9)] backdrop-blur-md">
             <div className="pt-1">
               <nav className="flex" role="tablist" aria-label="Main">
                 {TABS.map((tab) => {
@@ -88,7 +89,7 @@ export default function App() {
             <footer className="border-t border-photo-border/50 px-5 py-5 sm:px-7 md:px-8 lg:px-10">
               <RightsReservedBlock />
             </footer>
-          </div>
+          </Card>
         </main>
         {showContact && <ContactModal onClose={() => setShowContact(false)} />}
       </div>

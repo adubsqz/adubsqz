@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import type { Photo } from '../types';
 import { FilmTvClearanceBlock, RightsReservedBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
 import WatermarkedImage from './WatermarkedImage';
+import { Button } from './ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
+import { Input } from './ui/input';
+import { Select } from './ui/select';
+import { Textarea } from './ui/textarea';
 
 interface InquiryModalProps {
   photo: Photo;
@@ -30,14 +35,6 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
   useEffect(() => {
     setNotes(initialNotes ?? '');
   }, [initialNotes, photo.id]);
-
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isSubmitting) onClose();
-    };
-    window.addEventListener('keydown', handleKey);
-    return () => window.removeEventListener('keydown', handleKey);
-  }, [onClose, isSubmitting]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,61 +81,43 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
 
   if (submitStatus === 'success') {
     return (
-      <div
-        className="fixed inset-0 z-[110] flex items-start justify-center bg-black/80 p-0 backdrop-blur-sm sm:p-4"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="inquiry-modal-title"
-        onClick={(e) => e.target === e.currentTarget && onClose()}
-      >
-      <div
-        className="mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col justify-center p-8 sm:min-h-0 sm:flex-none sm:rounded-2xl sm:border sm:border-photo-border"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <Dialog open onOpenChange={(open) => !open && onClose()}>
+        <DialogContent className="max-w-xl p-8">
           <div className="text-center space-y-4">
             <div className="text-4xl mb-4">✓</div>
-            <h2 id="inquiry-modal-title" className="font-display text-2xl text-photo-fg mb-2">
+            <DialogTitle className="font-display text-2xl mb-2">
               Inquiry Submitted
-            </h2>
+            </DialogTitle>
             <p className="text-photo-muted text-sm">
               Thank you for your interest. I&apos;ll review your request and send an invoice via email shortly.
             </p>
           </div>
-        </div>
-      </div>
+        </DialogContent>
+      </Dialog>
     );
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[110] flex items-start justify-center bg-black/80 p-0 backdrop-blur-sm sm:p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="inquiry-modal-title"
-      onClick={(e) => e.target === e.currentTarget && !isSubmitting && onClose()}
-    >
-      <div
-        className="mx-auto flex h-[100dvh] max-h-[100dvh] w-full max-w-none flex-col overflow-hidden rounded-none border-0 border-photo-border bg-photo-panel shadow-2xl sm:max-h-[min(94dvh,56rem)] sm:max-w-5xl sm:rounded-2xl sm:border"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Dialog open onOpenChange={(open) => !open && !isSubmitting && onClose()}>
+      <DialogContent className="h-[100dvh] max-h-[100dvh] max-w-none rounded-none border-0 p-0 sm:max-h-[min(94dvh,56rem)] sm:max-w-5xl sm:rounded-2xl sm:border">
         <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-photo-border bg-photo-panel px-4 py-4 sm:px-6 sm:py-5">
-          <div>
-            <h2 id="inquiry-modal-title" className="font-display text-xl text-photo-fg mb-1">
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="font-display mb-1">
               Request Invoice
-            </h2>
-            <p className="text-xs text-photo-muted uppercase tracking-wider">
+            </DialogTitle>
+            <DialogDescription className="text-xs uppercase tracking-wider">
               Print-on-Demand Inquiry
-            </p>
-          </div>
-          <button
-            type="button"
+            </DialogDescription>
+          </DialogHeader>
+          <Button
             onClick={onClose}
             disabled={isSubmitting}
-            className="text-photo-muted hover:text-photo-fg transition-colors p-1 disabled:opacity-40"
+            className="h-8 px-2 text-lg leading-none"
+            variant="ghost"
             aria-label="Close"
           >
-            <span className="text-lg leading-none">×</span>
-          </button>
+            ×
+          </Button>
         </div>
 
         <form
@@ -180,12 +159,12 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
               <label htmlFor="inquiry-name" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
                 Full Name <span className="text-red-400">*</span>
               </label>
-              <input
+              <Input
                 id="inquiry-name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg placeholder-photo-muted/60 focus:outline-none focus:ring-2 focus:ring-photo-accent"
+                className="px-4 py-2.5"
                 placeholder="John Doe"
                 required
                 disabled={isSubmitting}
@@ -196,12 +175,12 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
               <label htmlFor="inquiry-email" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
                 Email <span className="text-red-400">*</span>
               </label>
-              <input
+              <Input
                 id="inquiry-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg placeholder-photo-muted/60 focus:outline-none focus:ring-2 focus:ring-photo-accent"
+                className="px-4 py-2.5"
                 placeholder="john@example.com"
                 required
                 disabled={isSubmitting}
@@ -213,12 +192,12 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
             <label htmlFor="inquiry-company" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
               Company / Organization
             </label>
-            <input
+            <Input
               id="inquiry-company"
               type="text"
               value={company}
               onChange={(e) => setCompany(e.target.value)}
-              className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg placeholder-photo-muted/60 focus:outline-none focus:ring-2 focus:ring-photo-accent"
+              className="px-4 py-2.5"
               placeholder="Interior Design Studio"
               disabled={isSubmitting}
             />
@@ -228,12 +207,12 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
             <label htmlFor="inquiry-address" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
               Shipping Address <span className="text-red-400">*</span>
             </label>
-            <textarea
+            <Textarea
               id="inquiry-address"
               value={shippingAddress}
               onChange={(e) => setShippingAddress(e.target.value)}
               rows={3}
-              className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg placeholder-photo-muted/60 focus:outline-none focus:ring-2 focus:ring-photo-accent resize-y"
+              className="resize-y px-4 py-2.5"
               placeholder="123 Main St, Suite 100&#10;New York, NY 10001"
               required
               disabled={isSubmitting}
@@ -244,11 +223,11 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
             <label htmlFor="inquiry-size" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
               Print Size <span className="text-red-400">*</span>
             </label>
-            <select
+            <Select
               id="inquiry-size"
               value={printSize}
               onChange={(e) => setPrintSize(e.target.value as PrintSize)}
-              className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg focus:outline-none focus:ring-2 focus:ring-photo-accent"
+              className="px-4 py-2.5"
               required
               disabled={isSubmitting}
             >
@@ -258,7 +237,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
               <option value="20x24">20&quot; × 24&quot;</option>
               <option value="24x30">24&quot; × 30&quot;</option>
               <option value="custom">Custom Size</option>
-            </select>
+            </Select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -266,34 +245,34 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
               <label htmlFor="inquiry-medium" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
                 Print Medium
               </label>
-              <select
+              <Select
                 id="inquiry-medium"
                 value={printMedium}
                 onChange={(e) => setPrintMedium(e.target.value as PrintMedium)}
-                className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg focus:outline-none focus:ring-2 focus:ring-photo-accent"
+                className="px-4 py-2.5"
                 disabled={isSubmitting}
               >
                 <option value="fine-art-paper">Fine Art Paper</option>
                 <option value="canvas">Canvas</option>
                 <option value="metal">Metal</option>
                 <option value="acrylic">Acrylic</option>
-              </select>
+              </Select>
             </div>
             <div>
               <label htmlFor="inquiry-finish" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
                 Finish
               </label>
-              <select
+              <Select
                 id="inquiry-finish"
                 value={printFinish}
                 onChange={(e) => setPrintFinish(e.target.value as PrintFinish)}
-                className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg focus:outline-none focus:ring-2 focus:ring-photo-accent"
+                className="px-4 py-2.5"
                 disabled={isSubmitting}
               >
                 <option value="matte">Matte</option>
                 <option value="gloss">Gloss</option>
                 <option value="lustre">Lustre</option>
-              </select>
+              </Select>
             </div>
           </div>
 
@@ -302,12 +281,12 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
               <label htmlFor="inquiry-custom-size" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
                 Custom Dimensions <span className="text-red-400">*</span>
               </label>
-              <input
+              <Input
                 id="inquiry-custom-size"
                 type="text"
                 value={customSize}
                 onChange={(e) => setCustomSize(e.target.value)}
-                className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg placeholder-photo-muted/60 focus:outline-none focus:ring-2 focus:ring-photo-accent"
+                className="px-4 py-2.5"
                 placeholder="e.g., 30x40 inches"
                 required={printSize === 'custom'}
                 disabled={isSubmitting}
@@ -319,12 +298,12 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
             <label htmlFor="inquiry-notes" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
               Additional Notes
             </label>
-            <textarea
+            <Textarea
               id="inquiry-notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              className="w-full bg-photo-bg border border-photo-border rounded-lg px-4 py-2.5 text-photo-fg placeholder-photo-muted/60 focus:outline-none focus:ring-2 focus:ring-photo-accent resize-y"
+              className="resize-y px-4 py-2.5"
               placeholder="Special instructions, framing preferences, quantity, etc."
               disabled={isSubmitting}
             />
@@ -344,28 +323,29 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
 
           <div className="shrink-0 border-t border-photo-border bg-photo-panel px-4 py-4 sm:px-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <button
+              <Button
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="inline-flex flex-1 items-center justify-center rounded-lg border border-photo-border bg-photo-bg px-5 py-3 text-sm font-medium uppercase tracking-wider text-photo-fg shadow-sm transition-colors hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex-1 px-5 py-3"
+                variant="outline"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex flex-1 items-center justify-center rounded-lg bg-photo-accent px-5 py-3 text-sm font-medium uppercase tracking-wider text-photo-bg shadow-sm transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex-1 px-5 py-3"
               >
                 {isSubmitting ? 'Submitting...' : 'Request Invoice'}
-              </button>
+              </Button>
             </div>
             <p className="mt-3 text-center text-[0.65rem] leading-snug text-photo-muted/80">
               After submission, you&apos;ll receive an invoice via email for payment via Zelle or Venmo.
             </p>
           </div>
         </form>
-      </div>
-    </div>
+    </DialogContent>
+    </Dialog>
   );
 }

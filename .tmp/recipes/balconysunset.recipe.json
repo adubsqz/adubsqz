@@ -1,0 +1,12 @@
+{
+  "edits": {
+    "contrast": 0.0,
+    "vibrance": 8.0
+  },
+  "intent": "slight highlight recovery, gentle contrast, subtle vibrance, keep natural dusk mood",
+  "meta": {
+    "engine": "rule-fallback",
+    "mode": "deterministic"
+  },
+  "version": 1
+}

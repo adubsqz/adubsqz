@@ -1,5 +1,7 @@
 import { ABOUT, ABOUT_IMAGE_SRC } from '../data';
 import { RightsReservedBlock } from './LicensingDetails';
+import { Button } from './ui/button';
+import { Card, CardContent } from './ui/card';
 
 interface AboutViewProps {
   onContactClick?: () => void;
@@ -18,7 +20,8 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
         </div>
 
-        <div className="rounded-2xl border border-photo-border/60 bg-black/35 p-5 sm:p-7 space-y-4">
+        <Card className="bg-black/35">
+          <CardContent className="space-y-4 p-5 sm:p-7">
           <p className="text-[0.7rem] tracking-[0.25em] uppercase text-photo-muted">
             {ABOUT.name}
           </p>
@@ -28,7 +31,8 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
           <p className="text-xs sm:text-sm md:text-[0.92rem] leading-relaxed text-slate-100/90">
             {ABOUT.bio}
           </p>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       <RightsReservedBlock />
@@ -54,19 +58,19 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
           need a site for your own work, say what you have in mind and we can talk scope and budget.
         </p>
         {onContactClick && (
-          <div className="flex flex-col gap-5 rounded-2xl border border-white/[0.14] bg-gradient-to-br from-white/[0.07] via-black/20 to-black/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6">
+          <Card className="flex flex-col gap-5 border-white/[0.14] bg-gradient-to-br from-white/[0.07] via-black/20 to-black/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6">
             <p className="max-w-xl text-[0.8rem] leading-relaxed text-slate-200/90 sm:text-sm">
               <span className="font-medium text-white/95">Licensing, prints, or a custom site?</span>{' '}
               <span className="text-slate-300/88">Use the form for availability and terms—replies are direct.</span>
             </p>
-            <button
+            <Button
               type="button"
               onClick={onContactClick}
-              className="inline-flex shrink-0 items-center justify-center rounded-lg border-2 border-photo-accent bg-photo-accent px-8 py-3.5 text-[0.72rem] font-bold uppercase tracking-[0.24em] text-photo-bg shadow-[0_2px_0_rgba(0,0,0,0.35),0_12px_36px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.14)_inset] transition-[transform,filter,box-shadow] hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-accent focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg"
+              className="shrink-0 border-2 border-photo-accent px-8 py-3.5 text-[0.72rem] font-bold tracking-[0.24em] shadow-[0_2px_0_rgba(0,0,0,0.35),0_12px_36px_rgba(0,0,0,0.55),0_0_0_1px_rgba(255,255,255,0.14)_inset] transition-[transform,filter,box-shadow] hover:-translate-y-0.5 active:translate-y-0"
             >
               CONTACT ME
-            </button>
-          </div>
+            </Button>
+          </Card>
         )}
       </div>
     </div>

@@ -15,11 +15,6 @@ body {
   /* fixed attachment often leaves huge empty bands on mobile; scroll paints edge-to-edge */
   background-attachment: scroll;
   background-repeat: no-repeat;
-  /* Security: Disable text selection globally */
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
 }
 
 html {
@@ -32,14 +27,6 @@ html {
   body {
     background-attachment: fixed;
   }
-}
-
-/* Allow selection only for specific interactive elements */
-input,
-textarea,
-button {
-  user-select: text;
-  -webkit-user-select: text;
 }
 
 ::selection {
@@ -68,6 +55,26 @@ img {
   -moz-user-drag: none;
   -o-user-drag: none;
   user-drag: none;
+}
+
+/* Keep visual effects lighter on small touch devices. */
+@media (max-width: 640px) {
+  .backdrop-blur-sm,
+  .backdrop-blur-md {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Lightbox mat: centers img; flex parent supplies height so object-contain can scale up */
