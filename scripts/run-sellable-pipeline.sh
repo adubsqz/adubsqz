@@ -5,7 +5,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 DEFAULT_MAP_PRIMARY="curation-map.json"
-DEFAULT_MAP_FALLBACK=".tmp/recipes/curation-map.json"
 
 MAP_PATH=""
 ORIGINALS_DIR="${HOME}/originals"
@@ -25,8 +24,7 @@ Usage:
   scripts/run-sellable-pipeline.sh [options]
 
 Options:
-  --map <path>              Mapping JSON path.
-                            Default: curation-map.json, fallback .tmp/recipes/curation-map.json
+  --map <path>              Mapping JSON path (default: curation-map.json)
   --originals-dir <path>    Originals directory (default: ~/originals)
   --review-dir <path>       Review directory (default: .tmp/review)
   --edited-dir <path>       Edited directory (default: .tmp/edited)
@@ -40,7 +38,7 @@ Options:
 Examples:
   scripts/run-sellable-pipeline.sh --dry-run
   scripts/run-sellable-pipeline.sh --limit 25 --git-add
-  scripts/run-sellable-pipeline.sh --map .tmp/recipes/curation-map.json --min-edit-score 5
+  scripts/run-sellable-pipeline.sh --map curation-map.json --min-edit-score 5
 EOF
 }
 
@@ -98,11 +96,9 @@ done
 if [[ -z "$MAP_PATH" ]]; then
   if [[ -f "$DEFAULT_MAP_PRIMARY" ]]; then
     MAP_PATH="$DEFAULT_MAP_PRIMARY"
-  elif [[ -f "$DEFAULT_MAP_FALLBACK" ]]; then
-    MAP_PATH="$DEFAULT_MAP_FALLBACK"
   else
     echo "No mapping file found." >&2
-    echo "Looked for '$DEFAULT_MAP_PRIMARY' and '$DEFAULT_MAP_FALLBACK'." >&2
+    echo "Looked for '$DEFAULT_MAP_PRIMARY'." >&2
     echo "Pass --map <path> to specify one." >&2
     exit 1
   fi

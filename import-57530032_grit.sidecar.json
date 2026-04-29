@@ -1,0 +1,26 @@
+{
+  "created_at": "2026-04-28T19:59:11.945419+00:00",
+  "generative_edits_used": false,
+  "non_destructive": true,
+  "output_image": "/Users/alexanderames/adubsqz/public/photos/still-life/bw/import-57530032_grit.jpg",
+  "recipe": {
+    "edits": {
+      "brightness": -3.0,
+      "contrast": 24.0,
+      "exposure_ev": -0.15,
+      "gamma": 0.94,
+      "highlights": -34.0,
+      "shadows": 12.0
+    },
+    "intent": "Grittier contrast-forward base for abstract black-and-white double-exposure scans.",
+    "meta": {
+      "mode": "deterministic",
+      "notes": "Pushes structure and mood while still protecting hot overlap highlights.",
+      "variant": "bw-double-exposure-grit-v1"
+    },
+    "version": 1
+  },
+  "source_image": "/Users/alexanderames/adubsqz/public/photos/still-life/bw/import-57530032.jpg",
+  "source_sha256": "38ba3d88e0760124e7b5d79f839f8e0f4725110c3df5da5e93892e3ef632152d",
+  "version": 1
+}

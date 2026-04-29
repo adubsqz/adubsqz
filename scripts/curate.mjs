@@ -19,7 +19,7 @@ import { spawn } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const DEFAULT_MAP = '.tmp/recipes/curation-map.json';
+const DEFAULT_MAP = 'curation-map.json';
 const DEFAULT_REVIEW_DIR = '.tmp/review';
 const DEFAULT_EDITED_DIR = '.tmp/edited';
 const DEFAULT_ORIGINALS_DIR = join(process.env.HOME || '', 'originals');
