@@ -1,0 +1,9 @@
+api/**/*.test.ts
+api/**/*.spec.ts
+tests/**
+playwright-report/**
+test-results/**
+.cursor/**
+.git/**
+.github/**
+node_modules/**

@@ -29,7 +29,7 @@ describe('/api/inquire (unit)', () => {
 
   it('returns 405 for non-POST requests', async () => {
     vi.resetModules();
-    const { default: handler } = await import('./inquire');
+    const { default: handler } = await import('../api/inquire.js');
 
     const res = await handler(new Request('http://localhost/api/inquire', { method: 'GET' }));
     expect(res.status).toBe(405);
@@ -43,7 +43,7 @@ describe('/api/inquire (unit)', () => {
     delete process.env.INQUIRY_RECIPIENT_EMAIL;
     delete process.env.RESEND_FROM_EMAIL;
 
-    const { default: handler } = await import('./inquire');
+    const { default: handler } = await import('../api/inquire.js');
 
     const res = await handler(
       postJson({
@@ -65,7 +65,7 @@ describe('/api/inquire (unit)', () => {
     process.env.INQUIRY_RECIPIENT_EMAIL = 'to@example.com';
     process.env.RESEND_FROM_EMAIL = 'from@example.com';
 
-    const { default: handler } = await import('./inquire');
+    const { default: handler } = await import('../api/inquire.js');
 
     const res = await handler(
       postJson({
@@ -85,7 +85,7 @@ describe('/api/inquire (unit)', () => {
     delete process.env.INQUIRY_RECIPIENT_EMAIL;
     delete process.env.RESEND_FROM_EMAIL;
 
-    const { default: handler } = await import('./inquire');
+    const { default: handler } = await import('../api/inquire.js');
 
     const res = await handler(
       postJson({
@@ -115,7 +115,7 @@ describe('/api/inquire (unit)', () => {
       error: null,
     });
 
-    const { default: handler } = await import('./inquire');
+    const { default: handler } = await import('../api/inquire.js');
 
     const res = await handler(
       postJson({
@@ -150,7 +150,7 @@ describe('/api/inquire (unit)', () => {
       error: { message: 'resend failed' },
     });
 
-    const { default: handler } = await import('./inquire');
+    const { default: handler } = await import('../api/inquire.js');
 
     const res = await handler(
       postJson({
@@ -169,4 +169,3 @@ describe('/api/inquire (unit)', () => {
     expect(json.error).toMatch(/failed to send email/i);
   });
 });
-
