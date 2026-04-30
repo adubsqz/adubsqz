@@ -75,6 +75,12 @@ function manifestAssetGuardPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), manifestAssetGuardPlugin()],
+  // Avoid ELOOP from FSWatcher when .tmp contains symlink cycles (e.g. review tooling).
+  server: {
+    watch: {
+      ignored: ['**/.tmp/**', '**/.tmp'],
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',

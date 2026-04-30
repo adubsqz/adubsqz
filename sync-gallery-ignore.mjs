@@ -144,7 +144,13 @@ function upsertManagedBlock(existing, block) {
   return `${block}\n${existing}`.trimEnd() + '\n';
 }
 
+function normalizeGitignoreFile(content) {
+  return `${content.trimEnd()}\n`;
+}
+
 function main() {
+  const checkOnly = process.argv.includes('--check');
+
   const manifestRaw = readFileSync(manifestPath, 'utf8');
   const manifest = JSON.parse(manifestRaw);
   const manifestRefs = collectManifestReferences(manifest);
@@ -154,8 +160,22 @@ function main() {
 
   const existingGitignore = readGitignoreContents();
   const updated = upsertManagedBlock(existingGitignore, managedBlock);
-  writeFileSync(gitignorePath, updated, 'utf8');
+  const desired = normalizeGitignoreFile(updated);
+  const actual = normalizeGitignoreFile(existingGitignore);
 
+  if (checkOnly) {
+    if (actual !== desired) {
+      console.error(
+        '.gitignore still-life block is out of sync with src/gallery-manifest.json and src/ references.\n' +
+          `Run: npm run sync:gallery-ignore\n (${allRefs.size} tracked image paths expected.)`,
+      );
+      process.exit(1);
+    }
+    console.log(`check-gallery-ignore: OK (${allRefs.size} paths).`);
+    return;
+  }
+
+  writeFileSync(gitignorePath, desired, 'utf8');
   console.log(`Updated .gitignore from references (${allRefs.size} files).`);
 }
 

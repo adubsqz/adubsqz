@@ -26,7 +26,7 @@
     "test:e2e:headed": "node playwright-cli.mjs test --headed",
     "playwright:install": "node playwright-cli.mjs install chromium",
     "sync:gallery-ignore": "node sync-gallery-ignore.mjs",
-    "check:gallery-ignore": "npm run sync:gallery-ignore && git diff --quiet -- .gitignore || (echo \"Run npm run sync:gallery-ignore and commit .gitignore\" && exit 1)",
+    "check:gallery-ignore": "node sync-gallery-ignore.mjs --check",
     "optimize:images": "node scripts/optimize-images-example.mjs"
   },
   "dependencies": {
