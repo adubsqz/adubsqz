@@ -191,6 +191,7 @@ scripts/**
 !scripts/process-originals-batch.mjs
 !scripts/curate.mjs
 !scripts/score-sellable.mjs
+!scripts/prune-dist-gallery.mjs
 !scripts/run-sellable-pipeline.sh
 !scripts/orchestrate-sellable.sh
 !scripts/README.md
