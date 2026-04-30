@@ -8,6 +8,7 @@
     "lint:md": "npx markdownlint-cli2 \"**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}\" \"!**/*.code-search\" \"!**/bower_components\" \"!**/node_modules\" \"!**/.git\" \"!**/vendor\"",
     "lint:md:docs": "npx markdownlint-cli2 --config .markdownlint-docs.jsonc \"README.md\" \"SETUP.md\" \"scripts/**/*.md\" \".cursor/docs/**/*.md\"",
     "verify:gallery-manifest": "node scripts/verify-gallery-manifest.mjs",
+    "gallery:classify": "node scripts/classify-still-life.mjs",
     "prepare:gallery": "node scripts/prepare-gallery-assets.mjs",
     "import:gallery": "node scripts/process-gallery-import.mjs",
     "curate": "node scripts/curate.mjs",
