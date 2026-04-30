@@ -1,6 +1,24 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+vi.mock('../data', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../data')>();
+  const fixture = {
+    id: 'fixture-1',
+    src: '/photos/still-life/bw/fixture-inquiry.jpg',
+    alt: 'Photograph fixture_inquiry',
+    caption: '',
+  };
+  return {
+    ...actual,
+    COLLECTIONS: [
+      { ...actual.COLLECTIONS[0], photos: [fixture] },
+      { ...actual.COLLECTIONS[1], photos: [] },
+    ],
+  };
+});
+
 import App from '../App';
 
 describe('Inquiry flow (functional)', () => {

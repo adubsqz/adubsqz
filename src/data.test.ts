@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { COLLECTIONS, ABOUT, GALLERY_HIDDEN_REGISTRY } from './data';
+import { COLLECTIONS, ABOUT } from './data';
 import type { Photo, PhotoCollection } from './types';
 
 describe('data', () => {
@@ -54,9 +54,6 @@ describe('data', () => {
       }
     });
 
-    it('exposes a hidden-registry structure', () => {
-      expect(Array.isArray(GALLERY_HIDDEN_REGISTRY)).toBe(true);
-    });
   });
 
   describe('ABOUT', () => {

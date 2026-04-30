@@ -3,10 +3,9 @@ import galleryManifest from './gallery-manifest.json';
 
 /**
  * Gallery layout is derived from gallery-manifest.json:
- * - Named files (not import-########.jpg / not digits-only names) under bw/ → Greyscale
- * - Same under color/ → Full Spectrum
+ * - Entries under bw/ → Greyscale; under color/ → Full Spectrum
  * - Legacy bw/color arrays with bare filenames are normalized to bw/<name> and color/<name>
- * - Everything else is excluded from the UI and listed in GALLERY_HIDDEN_REGISTRY
+ * - Rows that fail path/filename guards are skipped (they should not appear once the Python pipeline is authoritative)
  */
 
 const base = (import.meta as { env?: { BASE_URL?: string } }).env?.BASE_URL ?? '/';
@@ -22,12 +21,6 @@ type GalleryManifest = {
   'still-life'?: string[];
 };
 
-export type HiddenGalleryEntry = {
-  path: string;
-  manifestCategory: string;
-  reason: 'import_numeric' | 'numeric_only_filename' | 'unsupported_path' | 'unsupported_mime';
-};
-
 /** import-12345.jpg — back-burner batch filenames */
 const IMPORT_NUMERIC_ONLY = /^import-\d+\.(jpe?g|webp)$/i;
 /** 000230040012.jpg — frame roll numbers without a slug */
@@ -35,7 +28,10 @@ const DIGITS_ONLY_FILENAME = /^\d+\.(jpe?g|webp)$/i;
 
 type ClassifyResult =
   | { kind: 'public'; bucket: typeof GREYSCALE_ID | typeof FULL_SPECTRUM_ID }
-  | { kind: 'hidden'; reason: HiddenGalleryEntry['reason'] };
+  | {
+      kind: 'hidden';
+      reason: 'import_numeric' | 'numeric_only_filename' | 'unsupported_path' | 'unsupported_mime';
+    };
 
 function entryBasename(entry: string): string {
   return (entry.split('/').pop() ?? '').trim();
@@ -99,38 +95,6 @@ function manifestGalleryCategories(manifest: GalleryManifest): string[] {
     .sort();
 }
 
-function buildHiddenRegistry(): HiddenGalleryEntry[] {
-  const raw = galleryManifest as GalleryManifest;
-  const hidden: HiddenGalleryEntry[] = [];
-  const seenHidden = new Set<string>();
-
-  for (const manifestCategory of manifestGalleryCategories(raw)) {
-    const arr = raw[manifestCategory] ?? [];
-    for (const rawEntry of arr) {
-      if (typeof rawEntry !== 'string') continue;
-      const normalizedEntry = normalizeManifestEntry(manifestCategory, rawEntry);
-      if (!normalizedEntry) continue;
-
-      const ok = selectGalleryEntries([normalizedEntry]);
-      if (ok.length === 0) {
-        if (!seenHidden.has(normalizedEntry)) {
-          seenHidden.add(normalizedEntry);
-          hidden.push({ path: normalizedEntry, manifestCategory, reason: 'unsupported_mime' });
-        }
-        continue;
-      }
-
-      const entry = ok[0]!;
-      const result = classifyEntry(entry);
-      if (result.kind === 'hidden' && !seenHidden.has(entry)) {
-        seenHidden.add(entry);
-        hidden.push({ path: entry, manifestCategory, reason: result.reason });
-      }
-    }
-  }
-  return hidden;
-}
-
 function buildPublicCollections(): PhotoCollection[] {
   const raw = galleryManifest as GalleryManifest;
   const greyscalePaths: string[] = [];
@@ -185,9 +149,6 @@ export const COLLECTIONS: PhotoCollection[] = buildPublicCollections();
 
 export const GALLERY_FILTERS = COLLECTIONS.map((collection) => collection.id);
 export const DEFAULT_GALLERY_FILTER = GALLERY_FILTERS[0] ?? '';
-
-/** Entries excluded from the live gallery (review before re-enabling). */
-export const GALLERY_HIDDEN_REGISTRY: readonly HiddenGalleryEntry[] = buildHiddenRegistry();
 
 export const ABOUT = {
   name: 'adubsqz',

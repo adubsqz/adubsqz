@@ -59,46 +59,15 @@ npm run preview
 
 ## Photo curation workflow
 
-`npm run curate` wraps the review/import flow with subcommands:
+**Status:** Previous Node `.mjs` tooling was removed intentionally. Replacements are tracked in **`docs/superpowers/specs/2026-04-30-gallery-pipeline-design.md`**.
 
-```bash
-npm run curate -- link --map .tmp/recipes/curation-map.json
-npm run curate -- apply --map .tmp/recipes/curation-map.json
-npm run curate -- run --map .tmp/recipes/curation-map.json
-```
+Rough contract (implementing shortly in Python):
 
-`run` executes:
-1. symlink selected originals into `.tmp/review`
-2. apply `photo-prompt` recipes into `.tmp/edited`
-3. `node scripts/process-gallery-import.mjs --input .tmp/edited --update-manifest`
-4. `npm run sync:gallery-ignore`
-5. `npm run verify:gallery-manifest`
+- You specify **bw / color / still-life**, **symlink or copy**, and optional **`photo-prompt`** wording per asset in a map file — no heuristic “is this monochrome?” branching.
+- Only **finished** work gets rows in **`src/gallery-manifest.json`**.
+- Thin **`npm run …`** wrappers will call **`python`** for verify/import/ignore-sync when those scripts land.
 
-Common options:
-
-```bash
-npm run curate -- run --map .tmp/recipes/curation-map.json --dry-run --limit 10
-npm run curate -- run --map .tmp/recipes/curation-map.json --git-add
-```
-
-Mapping file supports either shape:
-
-```json
-{
-  "entries": [
-    {
-      "source": "balconysunset.jpg",
-      "recipe": ".tmp/recipes/balconysunset.recipe.json"
-    }
-  ]
-}
-```
-
-```json
-{
-  "balconysunset.jpg": ".tmp/recipes/balconysunset.recipe.json"
-}
-```
+Gallery assets publish under **`public/photos/still-life/`** (for example **`bw/`** and **`color/`**) so URLs continue to resolve as **`/photos/still-life/bw/...`** via the manifest.
 
 ## More
 

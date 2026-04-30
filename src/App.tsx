@@ -7,6 +7,8 @@ import { COLLECTIONS, DEFAULT_GALLERY_FILTER } from './data';
 import { RightsReservedBlock } from './components/LicensingDetails';
 import { Card } from './components/ui/card';
 
+const totalGalleryPhotos = COLLECTIONS.reduce((n, c) => n + c.photos.length, 0);
+
 const TABS: { id: PageView; label: string }[] = [
   { id: 'gallery', label: 'Gallery' },
   { id: 'about', label: 'About' },
@@ -76,12 +78,15 @@ export default function App() {
               id={`panel-${view}`}
               aria-labelledby={`tab-${view}`}
             >
-              {view === 'gallery' && COLLECTIONS.length > 0 && (
+              {view === 'gallery' && (
                 <GalleryView filter={galleryFilter} />
               )}
-              {view === 'gallery' && COLLECTIONS.length === 0 && (
-                <p className="text-sm text-photo-muted">
-                  No gallery categories found yet. Run the photo categorization script first.
+              {view === 'gallery' && totalGalleryPhotos === 0 && (
+                <p className="mt-4 text-sm text-photo-muted">
+                  Gallery is empty. After you finish an import, finalized entries live in{' '}
+                  <code className="text-photo-muted/90">src/gallery-manifest.json</code> and ship from{' '}
+                  <code className="text-photo-muted/90">public/photos/still-life/</code> (see repo design spec for the
+                  Python tool path).
                 </p>
               )}
               {view === 'about' && <AboutView onContactClick={() => setShowContact(true)} />}

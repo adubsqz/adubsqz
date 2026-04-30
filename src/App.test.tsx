@@ -13,7 +13,7 @@ describe('App', () => {
 
   it('shows Gallery view by default', () => {
     render(<App />);
-    expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
+    expect(screen.getByText(/categories/i)).toBeInTheDocument();
   });
 
   it('switches to About view when About tab is clicked', async () => {
