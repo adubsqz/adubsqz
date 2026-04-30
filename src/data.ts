@@ -5,6 +5,7 @@ import galleryManifest from './gallery-manifest.json';
  * Gallery layout is derived from gallery-manifest.json:
  * - Named files (not import-########.jpg / not digits-only names) under bw/ → Greyscale
  * - Same under color/ → Full Spectrum
+ * - Legacy bw/color arrays with bare filenames are normalized to bw/<name> and color/<name>
  * - Everything else is excluded from the UI and listed in GALLERY_HIDDEN_REGISTRY
  */
 
@@ -38,6 +39,14 @@ type ClassifyResult =
 
 function entryBasename(entry: string): string {
   return (entry.split('/').pop() ?? '').trim();
+}
+
+function normalizeManifestEntry(manifestCategory: string, entry: string): string {
+  const normalized = entry.trim().replace(/^\/+/, '');
+  if (!normalized) return '';
+  if (normalized.includes('/')) return normalized;
+  if (manifestCategory === 'bw' || manifestCategory === 'color') return `${manifestCategory}/${normalized}`;
+  return normalized;
 }
 
 function selectGalleryEntries(entries: string[]): string[] {
@@ -99,14 +108,14 @@ function buildHiddenRegistry(): HiddenGalleryEntry[] {
     const arr = raw[manifestCategory] ?? [];
     for (const rawEntry of arr) {
       if (typeof rawEntry !== 'string') continue;
-      const trimmed = rawEntry.trim();
-      if (!trimmed) continue;
+      const normalizedEntry = normalizeManifestEntry(manifestCategory, rawEntry);
+      if (!normalizedEntry) continue;
 
-      const ok = selectGalleryEntries([trimmed]);
+      const ok = selectGalleryEntries([normalizedEntry]);
       if (ok.length === 0) {
-        if (!seenHidden.has(trimmed)) {
-          seenHidden.add(trimmed);
-          hidden.push({ path: trimmed, manifestCategory, reason: 'unsupported_mime' });
+        if (!seenHidden.has(normalizedEntry)) {
+          seenHidden.add(normalizedEntry);
+          hidden.push({ path: normalizedEntry, manifestCategory, reason: 'unsupported_mime' });
         }
         continue;
       }
@@ -133,9 +142,9 @@ function buildPublicCollections(): PhotoCollection[] {
     const arr = raw[manifestCategory] ?? [];
     for (const rawEntry of arr) {
       if (typeof rawEntry !== 'string') continue;
-      const trimmed = rawEntry.trim();
-      if (!trimmed) continue;
-      const ok = selectGalleryEntries([trimmed]);
+      const normalizedEntry = normalizeManifestEntry(manifestCategory, rawEntry);
+      if (!normalizedEntry) continue;
+      const ok = selectGalleryEntries([normalizedEntry]);
       if (ok.length === 0) continue;
       const entry = ok[0]!;
       const result = classifyEntry(entry);

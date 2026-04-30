@@ -96,11 +96,12 @@ async function mergeManifest(newFiles) {
   const manifest = JSON.parse(raw);
   const add = (key) => {
     const cur = Array.isArray(manifest[key]) ? manifest[key] : [];
-    const set = new Set(cur);
+    const set = new Set(cur.map((value) => String(value).trim()));
     for (const f of newFiles) {
-      if (!set.has(f)) {
-        cur.push(f);
-        set.add(f);
+      const canonical = `${key}/${f}`;
+      if (!set.has(canonical)) {
+        cur.push(canonical);
+        set.add(canonical);
       }
     }
     manifest[key] = cur;

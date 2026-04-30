@@ -193,7 +193,8 @@ async function saveManifest(manifest) {
 
 function appendToCategory(manifest, category, filename) {
   const cur = Array.isArray(manifest[category]) ? manifest[category] : [];
-  if (!cur.includes(filename)) cur.push(filename);
+  const canonical = `${category}/${filename}`;
+  if (!cur.includes(canonical)) cur.push(canonical);
   manifest[category] = cur;
 }
 
