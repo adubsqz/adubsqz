@@ -1,9 +1,80 @@
-import { defineConfig } from 'vite';
+import fs from 'node:fs';
+import path from 'node:path';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { configDefaults } from 'vitest/config';
 
+const STILL_LIFE_PREFIX = '/photos/still-life/';
+const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
+
+function normalizeManifestEntry(category: string, entry: unknown): string {
+  if (typeof entry !== 'string') return '';
+  const normalized = entry.trim().replace(/^\/+/, '');
+  if (!normalized) return '';
+  if (normalized.includes('/')) return normalized;
+  if (category === 'bw' || category === 'color') return `${category}/${normalized}`;
+  return normalized;
+}
+
+function loadManifestAllowlist(): Set<string> {
+  const manifestPath = path.resolve(process.cwd(), 'src', 'gallery-manifest.json');
+  const raw = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as Record<string, unknown>;
+  const allowed = new Set<string>();
+
+  for (const [category, entries] of Object.entries(raw)) {
+    if (!Array.isArray(entries)) continue;
+    for (const entry of entries) {
+      const normalized = normalizeManifestEntry(category, entry);
+      if (!normalized) continue;
+      const baseName = normalized.split('/').pop() ?? normalized;
+      if (!IMAGE_EXT.test(baseName)) continue;
+      allowed.add(normalized);
+    }
+  }
+  return allowed;
+}
+
+function manifestAssetGuardPlugin(): Plugin {
+  const allowed = loadManifestAllowlist();
+
+  const guard = (req: { url?: string }, res: { statusCode: number; end: (msg: string) => void }, next: () => void) => {
+    const url = req.url ?? '';
+    const pathname = decodeURIComponent(url.split('?')[0] ?? '');
+
+    if (!pathname.startsWith(STILL_LIFE_PREFIX)) {
+      next();
+      return;
+    }
+
+    const rel = pathname.slice(STILL_LIFE_PREFIX.length);
+    const baseName = rel.split('/').pop() ?? rel;
+    if (!IMAGE_EXT.test(baseName)) {
+      next();
+      return;
+    }
+
+    if (!allowed.has(rel)) {
+      res.statusCode = 404;
+      res.end('Not found');
+      return;
+    }
+
+    next();
+  };
+
+  return {
+    name: 'manifest-asset-guard',
+    configureServer(server) {
+      server.middlewares.use(guard);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(guard);
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), manifestAssetGuardPlugin()],
   test: {
     globals: true,
     environment: 'jsdom',
