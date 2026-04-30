@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "vite",
     "lint": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.api.json",
+    "lint:md": "npx markdownlint-cli2 \"**/*.{md,mkd,mdwn,mdown,markdown,markdn,mdtxt,mdtext,workbook}\" \"!**/*.code-search\" \"!**/bower_components\" \"!**/node_modules\" \"!**/.git\" \"!**/vendor\"",
+    "lint:md:docs": "npx markdownlint-cli2 --config .markdownlint-docs.jsonc \"README.md\" \"SETUP.md\" \"scripts/**/*.md\" \".cursor/docs/**/*.md\"",
     "verify:gallery-manifest": "node scripts/verify-gallery-manifest.mjs",
     "prepare:gallery": "node scripts/prepare-gallery-assets.mjs",
     "import:gallery": "node scripts/process-gallery-import.mjs",
