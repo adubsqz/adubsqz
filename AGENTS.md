@@ -1,11 +1,14 @@
 ## Learned User Preferences
+
 - Prefers clear runtime-path explanations when behavior is unexpected, especially whether execution is in local scripts versus Cursor tooling.
 - Uses `.env.local` for local script configuration and expects environment updates to apply cleanly to CLI workflows.
 - Expects gallery-related NPM scripts to stay thin wrappers over bash and Python helpers.
 - Before committing gallery photo imports (new binaries under `public/photos/still-life/` or `src/gallery-manifest.json` changes from `gallery:import`): ask for explicit confirmation; do not commit imported photos without approval.
 - For gallery `photo-prompt` / curation, words like "slightly" or similar minimal qualifiers mean very conservative corrections (user flagged `dusk1` when a subtle lift-shadows / warmth intent still came out overcooked under `photo_prompt`). Prefer narrower prompts, lower recipe strength when applicable, or dry-run / visual review before import.
+- For gallery curation maps: prefer one staging file — `.tmp/staged-curation.json` only; avoid ad-hoc map names (e.g. `curation-three.json`, `remap-dusk1.json`) and avoid extra map files unless necessary.
 
 ## Learned Workspace Facts
+
 - Gallery Python tooling lives under `tools/gallery/`; import as `gallery` with `PYTHONPATH=tools` (repo ignores `scripts/**`, so committed automation avoids `scripts/`).
 - Gallery NPM scripts: `gallery:test` (pytest via `tools/run_gallery_pytest.sh` and `.venv-gallery`), `gallery:import`, `gallery:verify`, `gallery:doctor`.
 - Gallery design spec: `docs/superpowers/specs/2026-04-30-gallery-pipeline-design.md`. Sample curation map: `tools/gallery/examples/curation-map.sample.json`.
