@@ -36,7 +36,9 @@ def _stage_for_edit(repo: Path, source_abs: Path, dest_basename: str) -> Path:
     return staged
 
 
-def _install_publish(repo: Path, work: Path, dest: Path, link_mode: str, dry_run: bool) -> None:
+def _install_publish(
+    repo: Path, work: Path, dest: Path, link_mode: str, dry_run: bool, *, replace: bool
+) -> None:
     link_mode = link_mode.strip().lower()
     if dry_run:
         return
@@ -44,7 +46,9 @@ def _install_publish(repo: Path, work: Path, dest: Path, link_mode: str, dry_run
         raise ValueError(f"invalid link_mode {link_mode!r}")
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists():
-        raise FileExistsError(str(dest))
+        if not replace:
+            raise FileExistsError(str(dest))
+        dest.unlink()
     tmp_root = (repo / ".tmp").resolve()
     try:
         work_res = work.resolve()
@@ -70,7 +74,7 @@ def _install_publish(repo: Path, work: Path, dest: Path, link_mode: str, dry_run
         dest.symlink_to(work.resolve(), target_is_directory=False)
 
 
-def process_entry(repo: Path, entry, dry_run: bool) -> str:
+def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool) -> str:
     if entry.bucket not in ("bw", "color", "still-life"):
         raise ValueError(f"invalid bucket {entry.bucket!r}")
     if entry.link_mode not in ALLOWED_LINK_MODES:
@@ -118,7 +122,7 @@ def process_entry(repo: Path, entry, dry_run: bool) -> str:
         opt_abs.unlink()
     burn_resize_watermark(work_abs, opt_abs)
 
-    _install_publish(repo, opt_abs, dest, entry.link_mode, dry_run=False)
+    _install_publish(repo, opt_abs, dest, entry.link_mode, dry_run=False, replace=replace)
     appended = append_if_absent(repo, entry.bucket, token)
     if not appended:
         return f"publisher: already in manifest ({token})"
@@ -130,6 +134,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--map", type=Path, required=True, help="path to gallery map JSON (entries)")
     parser.add_argument("--dry-run", action="store_true", help="validate and print intentions only")
     parser.add_argument("--limit", type=int, default=0, help="optional max rows processed (default 0 = all)")
+    parser.add_argument(
+        "--replace",
+        action="store_true",
+        help="overwrite existing publish targets (same dest_basename) instead of failing",
+    )
     args = parser.parse_args(argv)
 
     repo = repo_root()
@@ -140,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
     processed = 0
     try:
         for entry in rows[:lim]:
-            msg = process_entry(repo, entry, dry_run=args.dry_run)
+            msg = process_entry(repo, entry, dry_run=args.dry_run, replace=args.replace)
             print(msg)
             processed += 1
     except (OSError, ValueError, subprocess.CalledProcessError) as exc:

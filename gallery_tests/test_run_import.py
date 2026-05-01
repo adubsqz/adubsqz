@@ -116,3 +116,31 @@ def test_symlink_materializes_when_artifact_under_tmp(tmp_path, monkeypatch):
     pub = repo / "public/photos/still-life/bw/in.png"
     assert pub.is_file()
     assert not pub.is_symlink()
+
+
+def test_import_twice_fails_without_replace_then_replaces(tmp_path, monkeypatch):
+    repo = tmp_path / "r"
+    (repo / "src").mkdir(parents=True)
+    monkeypatch.chdir(repo)
+    monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
+    (repo / "src" / "gallery-manifest.json").write_text(
+        json.dumps({"still-life": [], "bw": [], "color": []}),
+        encoding="utf-8",
+    )
+    pix = repo / "in.png"
+    write_one_pixel_png(pix)
+    mfile = repo / "map.json"
+    mfile.write_text(
+        json.dumps(
+            {
+                "entries": [
+                    {"source": str(pix), "bucket": "bw", "link_mode": "copy"},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    assert main(["--map", str(mfile)]) == 0
+    assert main(["--map", str(mfile)]) == 1
+    assert main(["--map", str(mfile), "--replace"]) == 0
+    assert (repo / "public/photos/still-life/bw/in.png").is_file()
