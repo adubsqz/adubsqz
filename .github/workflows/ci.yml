@@ -31,5 +31,8 @@ jobs:
       - name: Run tests
         run: npm run test:run
 
+      - name: Gallery Python tooling (pytest)
+        run: bash tools/run_gallery_pytest.sh -q
+
       - name: Run production build
         run: npm run build

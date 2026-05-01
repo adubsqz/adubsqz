@@ -1,0 +1,23 @@
+{
+  "entries": [
+    {
+      "source": "path/to/original.jpg",
+      "bucket": "bw",
+      "link_mode": "copy",
+      "dest_basename": "balconysunset.jpg",
+      "photo_prompt": "Lift shadows slightly, add warmth without blowing highlights."
+    },
+    {
+      "source": "/absolute/path/color.jpg",
+      "bucket": "color",
+      "link_mode": "symlink",
+      "photo_prompt": ""
+    },
+    {
+      "source": "about_me.jpg",
+      "bucket": "still-life",
+      "link_mode": "copy",
+      "dest_basename": "about_me.jpg"
+    }
+  ]
+}

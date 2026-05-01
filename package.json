@@ -14,7 +14,11 @@
     "test:e2e": "node playwright-cli.mjs test",
     "test:e2e:ui": "node playwright-cli.mjs test --ui",
     "test:e2e:headed": "node playwright-cli.mjs test --headed",
-    "playwright:install": "node playwright-cli.mjs install chromium"
+    "playwright:install": "node playwright-cli.mjs install chromium",
+    "gallery:test": "bash tools/run_gallery_pytest.sh",
+    "gallery:import": "bash tools/run_gallery_module.sh gallery.run_import",
+    "gallery:verify": "bash tools/run_gallery_module.sh gallery.verify_manifest",
+    "gallery:doctor": "bash tools/run_gallery_module.sh gallery.doctor"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

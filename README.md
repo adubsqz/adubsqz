@@ -59,15 +59,29 @@ npm run preview
 
 ## Photo curation workflow
 
-**Status:** Previous Node `.mjs` tooling was removed intentionally. Replacements are tracked in **`docs/superpowers/specs/2026-04-30-gallery-pipeline-design.md`**.
+Python tooling lives under **`tools/gallery/`**. Design and contracts: **`docs/superpowers/specs/2026-04-30-gallery-pipeline-design.md`**.
 
-Rough contract (implementing shortly in Python):
+Requirements:
 
-- You specify **bw / color / still-life**, **symlink or copy**, and optional **`photo-prompt`** wording per asset in a map file — no heuristic “is this monochrome?” branching.
-- Only **finished** work gets rows in **`src/gallery-manifest.json`**.
-- Thin **`npm run …`** wrappers will call **`python`** for verify/import/ignore-sync when those scripts land.
+- **`python3`** on PATH (npm scripts create **`./.venv-gallery`** automatically via the shell wrappers).
+- **`bash`** (for **`tools/run_gallery_*.sh`**).
 
-Gallery assets publish under **`public/photos/still-life/`** (for example **`bw/`** and **`color/`**) so URLs continue to resolve as **`/photos/still-life/bw/...`** via the manifest.
+Commands:
+
+```bash
+npm run gallery:doctor                           # resolves repo paths + photo-prompt binary hint
+npm run gallery:test                             # pytest (gallery tooling)
+npm run gallery:verify                           # filesystem ↔ src/gallery-manifest.json parity
+npm run gallery:import -- --map YOUR_MAP.json   # optional: --dry-run, --limit N
+```
+
+Maps use **`{ "entries": [ { "source", "bucket", "link_mode", "dest_basename"?, "photo_prompt"? }, … ] }`**. Sample: **`tools/gallery/examples/curation-map.sample.json`**.
+
+- **`bucket`:** **`bw`** | **`color`** | **`still-life`**
+- **`link_mode`:** **`copy`** | **`symlink`** (POSIX symlinks — **symlink** publishes a symlink pointing at the final working bytes)
+- **`photo_prompt`:** optional string; invokes local **`photo-prompt`** (**`GALLERY_PHOTO_PROMPT`** env overrides default **`~/photo-prompt/.venv/bin/photo-prompt`** resolution)
+
+Only rows that publish successfully append to **`src/gallery-manifest.json`**. Assets land under **`public/photos/still-life/`**.
 
 ## More
 

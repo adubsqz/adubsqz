@@ -16,3 +16,7 @@ scripts/**
 .env*.local
 .claude/
 .tmp/
+.venv-gallery/
+__pycache__/
+*.pyc
+.pytest_cache/
