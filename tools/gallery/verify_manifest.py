@@ -50,6 +50,18 @@ def verify_manifest(repo: Path) -> list[str]:
             if rel not in allowed:
                 errors.append(f"orphan file not listed in manifest: {rel}")
 
+    if pub.is_dir():
+        for f in sorted(pub.iterdir()):
+            if not f.is_file():
+                continue
+            if f.name.startswith("."):
+                continue
+            if not _IMAGE_EXT.search(f.name):
+                continue
+            rel = f.relative_to(pub).as_posix()
+            if rel not in allowed:
+                errors.append(f"orphan file not listed in manifest: {rel}")
+
     return errors
 
 

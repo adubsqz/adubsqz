@@ -3,7 +3,7 @@ import galleryManifest from './gallery-manifest.json';
 
 /**
  * Gallery layout is derived from gallery-manifest.json:
- * - Entries under bw/ → Greyscale; under color/ → Full Spectrum
+ * - Entries under bw/ → Greyscale; color/ → Full Spectrum; bare filenames under still-life → Still life grid
  * - Legacy bw/color arrays with bare filenames are normalized to bw/<name> and color/<name>
  * - Rows that fail path/filename guards are skipped (they should not appear once the Python pipeline is authoritative)
  */
@@ -15,6 +15,10 @@ const ABOUT_KEY = 'still-life';
 
 const GREYSCALE_ID = 'greyscale';
 const FULL_SPECTRUM_ID = 'full-spectrum';
+/** Public gallery bucket for manifest key `still-life` (bare filenames → publish tree root next to bw/ color/) */
+const STILL_LIFE_COLLECTION_ID = 'still-life';
+
+const MANIFEST_BUCKET_KEYS = ['bw', 'color', 'still-life'] as const;
 
 type GalleryManifest = {
   [category: string]: string[] | undefined;
@@ -26,8 +30,13 @@ const IMPORT_NUMERIC_ONLY = /^import-\d+\.(jpe?g|webp)$/i;
 /** 000230040012.jpg — frame roll numbers without a slug */
 const DIGITS_ONLY_FILENAME = /^\d+\.(jpe?g|webp)$/i;
 
+type PublicBucket =
+  | typeof GREYSCALE_ID
+  | typeof FULL_SPECTRUM_ID
+  | typeof STILL_LIFE_COLLECTION_ID;
+
 type ClassifyResult =
-  | { kind: 'public'; bucket: typeof GREYSCALE_ID | typeof FULL_SPECTRUM_ID }
+  | { kind: 'public'; bucket: PublicBucket }
   | {
       kind: 'hidden';
       reason: 'import_numeric' | 'numeric_only_filename' | 'unsupported_path' | 'unsupported_mime';
@@ -52,7 +61,7 @@ function selectGalleryEntries(entries: string[]): string[] {
   });
 }
 
-function classifyEntry(entry: string): ClassifyResult {
+function classifyManifestEntry(manifestCategory: string, entry: string): ClassifyResult {
   const normalized = entry.trim().replace(/^\/+/, '');
   const baseName = entryBasename(normalized);
 
@@ -65,6 +74,14 @@ function classifyEntry(entry: string): ClassifyResult {
   if (DIGITS_ONLY_FILENAME.test(baseName)) {
     return { kind: 'hidden', reason: 'numeric_only_filename' };
   }
+
+  if (manifestCategory === 'still-life') {
+    // Importer publishes bare names at public/photos/still-life/<file>
+    if (!normalized.includes('/') && normalized.length > 0) {
+      return { kind: 'public', bucket: STILL_LIFE_COLLECTION_ID };
+    }
+    return { kind: 'hidden', reason: 'unsupported_path' };
+  }
   if (normalized.startsWith('bw/')) return { kind: 'public', bucket: GREYSCALE_ID };
   if (normalized.startsWith('color/')) return { kind: 'public', bucket: FULL_SPECTRUM_ID };
   return { kind: 'hidden', reason: 'unsupported_path' };
@@ -74,6 +91,7 @@ function resolveGalleryImagePath(collectionId: string, entry: string): string {
   const normalized = entry.trim().replace(/^\/+/, '');
   if (!normalized) return '';
   if (normalized.includes('/')) return `${stillLifeBase}/${normalized}`;
+  if (collectionId === STILL_LIFE_COLLECTION_ID) return `${stillLifeBase}/${normalized}`;
   return `${stillLifeBase}/${collectionId}/${normalized}`;
 }
 
@@ -89,18 +107,18 @@ function photosFromEntries(entries: string[], collectionId: string) {
   });
 }
 
-function manifestGalleryCategories(manifest: GalleryManifest): string[] {
-  return Object.keys(manifest)
-    .filter((k) => k !== ABOUT_KEY && Array.isArray(manifest[k]))
-    .sort();
+function manifestGalleryCategories(manifest: GalleryManifest): typeof MANIFEST_BUCKET_KEYS[number][] {
+  return MANIFEST_BUCKET_KEYS.filter((k) => Array.isArray(manifest[k]));
 }
 
 function buildPublicCollections(): PhotoCollection[] {
   const raw = galleryManifest as GalleryManifest;
   const greyscalePaths: string[] = [];
   const fullSpectrumPaths: string[] = [];
+  const stillLifePaths: string[] = [];
   const seenGrey = new Set<string>();
   const seenColor = new Set<string>();
+  const seenStill = new Set<string>();
 
   for (const manifestCategory of manifestGalleryCategories(raw)) {
     const arr = raw[manifestCategory] ?? [];
@@ -111,26 +129,46 @@ function buildPublicCollections(): PhotoCollection[] {
       const ok = selectGalleryEntries([normalizedEntry]);
       if (ok.length === 0) continue;
       const entry = ok[0]!;
-      const result = classifyEntry(entry);
+      const result = classifyManifestEntry(manifestCategory, entry);
       if (result.kind !== 'public') continue;
       if (result.bucket === GREYSCALE_ID) {
         if (!seenGrey.has(entry)) {
           seenGrey.add(entry);
           greyscalePaths.push(entry);
         }
-      } else {
+      } else if (result.bucket === FULL_SPECTRUM_ID) {
         if (!seenColor.has(entry)) {
           seenColor.add(entry);
           fullSpectrumPaths.push(entry);
+        }
+      } else if (result.bucket === STILL_LIFE_COLLECTION_ID) {
+        if (!seenStill.has(entry)) {
+          seenStill.add(entry);
+          stillLifePaths.push(entry);
         }
       }
     }
   }
 
-  return [
-    { id: GREYSCALE_ID, title: 'Greyscale', photos: photosFromEntries(greyscalePaths, GREYSCALE_ID) },
-    { id: FULL_SPECTRUM_ID, title: 'Full Spectrum', photos: photosFromEntries(fullSpectrumPaths, FULL_SPECTRUM_ID) },
-  ];
+  const out: PhotoCollection[] = [];
+  if (greyscalePaths.length > 0) {
+    out.push({ id: GREYSCALE_ID, title: 'Greyscale', photos: photosFromEntries(greyscalePaths, GREYSCALE_ID) });
+  }
+  if (fullSpectrumPaths.length > 0) {
+    out.push({
+      id: FULL_SPECTRUM_ID,
+      title: 'Full Spectrum',
+      photos: photosFromEntries(fullSpectrumPaths, FULL_SPECTRUM_ID),
+    });
+  }
+  if (stillLifePaths.length > 0) {
+    out.push({
+      id: STILL_LIFE_COLLECTION_ID,
+      title: 'Still life',
+      photos: photosFromEntries(stillLifePaths, STILL_LIFE_COLLECTION_ID),
+    });
+  }
+  return out;
 }
 
 function resolveAboutImagePath(entry: string): string {

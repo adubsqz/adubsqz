@@ -35,3 +35,14 @@ def test_verify_detects_orphan(tmp_path, monkeypatch):
     orphan.write_bytes(b"x")
     errs = verify_manifest(repo)
     assert any("orphan" in e for e in errs)
+
+
+def test_verify_detects_root_orphan(tmp_path, monkeypatch):
+    repo = _repo(tmp_path)
+    monkeypatch.chdir(repo)
+    monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
+    save_manifest(repo, {"still-life": [], "bw": [], "color": []})
+    loose = repo / "public/photos/still-life/loose.jpg"
+    loose.write_bytes(b"x")
+    errs = verify_manifest(repo)
+    assert any("orphan" in e and "loose.jpg" in e for e in errs)

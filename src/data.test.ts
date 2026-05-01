@@ -42,9 +42,14 @@ describe('data', () => {
       });
     });
 
-    it('uses Greyscale and Full Spectrum buckets only', () => {
+    it('Greyscale / Full Spectrum / Still life buckets match shipped manifest categories', () => {
       const ids = COLLECTIONS.map((c) => c.id).sort();
-      expect(ids).toEqual(['full-spectrum', 'greyscale'].sort());
+      expect(ids).toEqual(['full-spectrum', 'greyscale', 'still-life'].sort());
+    });
+
+    it('still-life manifest paths resolve at publish root (/photos/still-life/<file>)', () => {
+      const still = COLLECTIONS.find((c) => c.id === 'still-life');
+      expect(still?.photos.some((p) => p.src === '/photos/still-life/takingapicofmetakingapic.jpg')).toBe(true);
     });
 
     it('does not surface import-########.jpg filenames in public collections', () => {

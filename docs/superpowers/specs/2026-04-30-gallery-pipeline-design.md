@@ -12,7 +12,7 @@
 
 ## NPM surface
 
-Short `**npm run …`** commands remain as **thin wrappers** around Python (dispatch only). Logic lives under **`tools/gallery/`** (import package **`gallery`** with **`PYTHONPATH=tools`**).
+Short `**npm run …`** commands remain as **thin wrappers** around Python (dispatch only). Logic lives under `**tools/gallery/`** (import package `**gallery**` with `**PYTHONPATH=tools**`).
 
 **Build:** Production build is `**vite build` only**. Any future “prune shipped gallery” behaviour belongs in the Python publish/verify tooling or documented manual steps—not a separate Node build step unless required for unrelated reasons.
 
@@ -30,7 +30,7 @@ Execution order per row:
 1. Validate readable image input.
 2. Stage into authoring temp paths (e.g. `.tmp/review/`, optionally `.tmp/edited/`).
 3. If `photo_prompt` set: subprocess to `**photo-prompt`** → deterministic output path.
-4. Publish into `**public/photos/still-life/**` with relative paths that match the manifest (e.g. `bw/slug.jpg`, `color/slug.jpg`) so they align with existing `resolveGalleryImagePath` and the Vite manifest guard on `/photos/still-life/`.
+4. Publish into `**public/photos/still-life/`** with relative paths that match the manifest (e.g. `bw/slug.jpg`, `color/slug.jpg`) so they align with existing `resolveGalleryImagePath` and the Vite manifest guard on `/photos/still-life/`.
 5. Update `**gallery-manifest.json` only after** that row succeeds end-to-end.
 6. Optionally run **verify manifest** + **gallery ignore sync** (Python), exposed via npm wrappers for CI ergonomics.
 
@@ -38,7 +38,7 @@ Execution order per row:
 
 ## Frontend / runtime
 
-- `**src/data.ts`** continues to derive `**COLLECTIONS**` from `**gallery-manifest.json**`. Entries under `bw/` and `color/` map to Greyscale and Full Spectrum. Defensive guards (unsupported filenames / paths) may remain optional; malformed rows should preferably never reach manifest thanks to `**verify**` in Python.
+- `**src/data.ts`** continues to derive `**COLLECTIONS`** from `**gallery-manifest.json**`. Entries under `bw/` and `color/` map to Greyscale and Full Spectrum. Defensive guards (unsupported filenames / paths) may remain optional; malformed rows should preferably never reach manifest thanks to `**verify**` in Python.
 
 ## Verification
 

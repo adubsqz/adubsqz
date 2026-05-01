@@ -79,8 +79,8 @@ npm run gallery:import -- --map YOUR_MAP.json   # optional: --dry-run, --limit N
 
 Maps use **`{ "entries": [ { "source", "bucket", "link_mode", "dest_basename"?, "photo_prompt"? }, … ] }`**. Sample: **`tools/gallery/examples/curation-map.sample.json`**.
 
-- **`bucket`:** **`bw`** | **`color`** | **`still-life`**
-- **`link_mode`:** **`copy`** | **`symlink`** (POSIX symlinks — **symlink** publishes a symlink pointing at the final working bytes)
+- **`bucket`:** **`bw`** | **`color`** | **`still-life`**. Entries in **`still-life`** use **bare filenames** in the manifest; they publish as **`public/photos/still-life/<file>`** and appear in the **Still life** gallery bucket on the site.
+- **`link_mode`:** **`copy`** | **`symlink`**. Optimized bytes are produced under **`.tmp/optimized/`**; if **`symlink`** would point through **`.tmp`**, the importer **writes a `copy`** into **`public/`** instead and logs a short stderr note so deploys are not tied to ephemeral paths.
 - **`photo_prompt`:** optional string; invokes local **`photo-prompt`** (**`GALLERY_PHOTO_PROMPT`** env overrides default **`~/photo-prompt/.venv/bin/photo-prompt`** resolution)
 
 **Publish step:** Before writing **`public/`**, every row is **downscaled** (default max **1500×1500**, aspect preserved) and **burned-in watermark** (**`© adubsqz`** by default), matching **`scripts/optimize_images.py`** behavior. Overrides (optional env): **`GALLERY_MAX_WIDTH`**, **`GALLERY_MAX_HEIGHT`**, **`GALLERY_JPEG_QUALITY`**, **`GALLERY_WATERMARK_TEXT`**, **`GALLERY_WATERMARK_OPACITY`** (0–255), **`GALLERY_WATERMARK_POSITION`** (`bottom-right`, …), **`GALLERY_STRIP_EXIF=`** `1` to drop EXIF. Requires **Pillow** (installed via **`requirements-gallery.txt`** / gallery npm scripts).

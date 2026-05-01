@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 from gallery.basename_guard import assert_allowed_publish_basename
@@ -35,7 +36,7 @@ def _stage_for_edit(repo: Path, source_abs: Path, dest_basename: str) -> Path:
     return staged
 
 
-def _install_publish(work: Path, dest: Path, link_mode: str, dry_run: bool) -> None:
+def _install_publish(repo: Path, work: Path, dest: Path, link_mode: str, dry_run: bool) -> None:
     link_mode = link_mode.strip().lower()
     if dry_run:
         return
@@ -44,6 +45,25 @@ def _install_publish(work: Path, dest: Path, link_mode: str, dry_run: bool) -> N
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists():
         raise FileExistsError(str(dest))
+    tmp_root = (repo / ".tmp").resolve()
+    try:
+        work_res = work.resolve()
+    except OSError:
+        work_res = work
+    fragile_tmp = False
+    if link_mode == "symlink":
+        try:
+            fragile_tmp = work_res == tmp_root or work_res.is_relative_to(tmp_root)
+        except AttributeError:
+            fragile_tmp = str(work_res).startswith(str(tmp_root) + "/") or work_res == tmp_root
+        if fragile_tmp:
+            print(
+                "gallery-import: link_mode=symlink pointed at .tmp; materializing a copy under public/ "
+                "so the deployed file does not reference ephemeral paths.",
+                file=sys.stderr,
+            )
+            shutil.copy2(work, dest)
+            return
     if link_mode == "copy":
         shutil.copy2(work, dest)
     else:
@@ -98,7 +118,7 @@ def process_entry(repo: Path, entry, dry_run: bool) -> str:
         opt_abs.unlink()
     burn_resize_watermark(work_abs, opt_abs)
 
-    _install_publish(opt_abs, dest, entry.link_mode, dry_run=False)
+    _install_publish(repo, opt_abs, dest, entry.link_mode, dry_run=False)
     appended = append_if_absent(repo, entry.bucket, token)
     if not appended:
         return f"publisher: already in manifest ({token})"
@@ -123,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
             msg = process_entry(repo, entry, dry_run=args.dry_run)
             print(msg)
             processed += 1
-    except (OSError, ValueError, subprocess.CalledProcessError, ImportError) as exc:
+    except (OSError, ValueError, subprocess.CalledProcessError) as exc:
         print(f"gallery-import: stopped after {processed} row(s): {exc}")
         return 1
     return 0

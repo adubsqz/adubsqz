@@ -19,7 +19,10 @@ def _int_env(key: str, default: int) -> int:
     raw = os.environ.get(key, "").strip()
     if not raw:
         return default
-    return int(raw)
+    try:
+        return int(raw)
+    except ValueError as e:
+        raise ValueError(f"environment variable {key!r} must be an integer, got {raw!r}") from e
 
 
 def _publish_options() -> dict:
@@ -63,7 +66,8 @@ def _font_for_width(image_width: int, watermark_text: str):
         p = Path(font_path)
         if p.is_file():
             try:
-                return ImageFont.truetype(str(p), base), base
+                # .ttc collections need an explicit face index on some platforms
+                return ImageFont.truetype(str(p), base, index=0), base
             except OSError:
                 continue
     return ImageFont.load_default(), 10
@@ -99,9 +103,8 @@ def _watermark_overlay(
     draw.rectangle(bg, fill=(0, 0, 0, int(watermark_opacity * 0.5)))
     draw.text(pos, watermark_text, font=font, fill=(255, 255, 255, watermark_opacity))
 
-    if img.mode == "RGB":
-        img = img.convert("RGBA")
-    return Image.alpha_composite(img, layer)
+    img_rgba = img if img.mode == "RGBA" else img.convert("RGBA")
+    return Image.alpha_composite(img_rgba, layer)
 
 
 def burn_resize_watermark(src: Path, dest: Path) -> None:
