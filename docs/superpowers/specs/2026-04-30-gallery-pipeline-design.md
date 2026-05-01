@@ -12,9 +12,9 @@
 
 ## NPM surface
 
-Short **`npm run …`** commands remain as **thin wrappers** around Python (dispatch only). Logic lives in `scripts/` Python modules where applicable.
+Short `**npm run …`** commands remain as **thin wrappers** around Python (dispatch only). Logic lives in `scripts/` Python modules where applicable.
 
-**Build:** Production build is **`vite build` only**. Any future “prune shipped gallery” behaviour belongs in the Python publish/verify tooling or documented manual steps—not a separate Node build step unless required for unrelated reasons.
+**Build:** Production build is `**vite build` only**. Any future “prune shipped gallery” behaviour belongs in the Python publish/verify tooling or documented manual steps—not a separate Node build step unless required for unrelated reasons.
 
 ## Pipeline (map-driven orchestrator)
 
@@ -23,26 +23,26 @@ Preferred primary flow: **one Python entrypoint** reading a **curation map** (JS
 - `source` — path to the original asset (repo-relative or absolute).
 - `bucket` — `bw` | `color` | `still-life` (aligned with manifest categories).
 - `link_mode` — `symlink` | `copy`.
-- `photo_prompt` — optional string passed to **`photo-prompt`**; absent or empty means **no adjustment step**.
+- `photo_prompt` — optional string passed to `**photo-prompt`**; absent or empty means **no adjustment step**.
 
 Execution order per row:
 
 1. Validate readable image input.
 2. Stage into authoring temp paths (e.g. `.tmp/review/`, optionally `.tmp/edited/`).
-3. If `photo_prompt` set: subprocess to **`photo-prompt`** → deterministic output path.
-4. Publish into **`public/photos/still-life/`** with relative paths that match the manifest (e.g. `bw/slug.jpg`, `color/slug.jpg`) so they align with existing `resolveGalleryImagePath` and the Vite manifest guard on `/photos/still-life/`.
-5. Update **`gallery-manifest.json` only after** that row succeeds end-to-end.
+3. If `photo_prompt` set: subprocess to `**photo-prompt`** → deterministic output path.
+4. Publish into `**public/photos/still-life/**` with relative paths that match the manifest (e.g. `bw/slug.jpg`, `color/slug.jpg`) so they align with existing `resolveGalleryImagePath` and the Vite manifest guard on `/photos/still-life/`.
+5. Update `**gallery-manifest.json` only after** that row succeeds end-to-end.
 6. Optionally run **verify manifest** + **gallery ignore sync** (Python), exposed via npm wrappers for CI ergonomics.
 
 **Collision policy** — fail fast on basename conflicts unless the design phase picks a deterministic rename convention (document explicitly in implementation).
 
 ## Frontend / runtime
 
-- **`src/data.ts`** continues to derive **`COLLECTIONS`** from **`gallery-manifest.json`**. Entries under `bw/` and `color/` map to Greyscale and Full Spectrum. Defensive guards (unsupported filenames / paths) may remain optional; malformed rows should preferably never reach manifest thanks to **`verify`** in Python.
+- `**src/data.ts`** continues to derive `**COLLECTIONS**` from `**gallery-manifest.json**`. Entries under `bw/` and `color/` map to Greyscale and Full Spectrum. Defensive guards (unsupported filenames / paths) may remain optional; malformed rows should preferably never reach manifest thanks to `**verify**` in Python.
 
 ## Verification
 
-- **`verify`** checks filesystem ↔ manifest parity (no orphaned files beneath published roots; no manifest rows pointing at missing files).
+- `**verify**` checks filesystem ↔ manifest parity (no orphaned files beneath published roots; no manifest rows pointing at missing files).
 - Optionally enforce allowed filename patterns aligned with authoring rules.
 
 ## Maid service (this reset)
@@ -53,4 +53,4 @@ Delivered in the same hygiene pass as aligning `package.json` and README with **
 
 ## Next step
 
-Implementation plan via **`writing-plans`** skill (tasks, ordering, CI updates when Python wrappers land).
+Implementation plan via `**writing-plans`** skill (tasks, ordering, CI updates when Python wrappers land).
