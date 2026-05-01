@@ -42,10 +42,10 @@
       "photo_prompt": "Anything neon glows and surges with light. Shot on a Cinestill 800T film."
     },
     {
-      "source": "~/Downloads/AlexanderAmes-60389/00002907/SILVERCUPstudios.jpg",
+      "source": "~/Downloads/AlexanderAmes-60389/00002907/SILVERCUP.jpg",
       "bucket": "color",
       "link_mode": "copy",
-      "dest_basename": "SILVERCUPstudios.jpg"
+      "dest_basename": "SILVERCUP.jpg"
     },
     {
       "source": "~/Downloads/AlexanderAmes-60389/00002907/subtlestimprovement.jpg",
