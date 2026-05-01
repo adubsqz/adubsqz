@@ -12,7 +12,7 @@
 
 ## NPM surface
 
-Short `**npm run …`** commands remain as **thin wrappers** around Python (dispatch only). Logic lives in `scripts/` Python modules where applicable.
+Short `**npm run …`** commands remain as **thin wrappers** around Python (dispatch only). Logic lives under **`tools/gallery/`** (import package **`gallery`** with **`PYTHONPATH=tools`**).
 
 **Build:** Production build is `**vite build` only**. Any future “prune shipped gallery” behaviour belongs in the Python publish/verify tooling or documented manual steps—not a separate Node build step unless required for unrelated reasons.
 

@@ -66,6 +66,8 @@ Requirements:
 - **`python3`** on PATH (npm scripts create **`./.venv-gallery`** automatically via the shell wrappers).
 - **`bash`** (for **`tools/run_gallery_*.sh`**).
 
+**Environment:** Gallery commands load **`.env`** then **`.env.local`** from the repo root (and from **`GALLERY_REPO_ROOT`**, when set), without overriding variables already exported in your shell. Put paths like **`GALLERY_PHOTO_PROMPT`** in **`.env.local`** so `npm run gallery:import` and related scripts pick them up alongside Vite/`vercel dev`.
+
 Commands:
 
 ```bash
