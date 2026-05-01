@@ -10,13 +10,21 @@ from gallery.config import ALLOWED_LINK_MODES, repo_root
 from gallery.map_model import load_map
 from gallery.manifest_store import append_if_absent
 from gallery.paths_publish import manifest_token, publish_file_for
+from gallery.optimize_publish import burn_resize_watermark
 from gallery.photo_prompt import run_photo_prompt_edit
 
 
 def _resolve_source(repo: Path, source: Path) -> Path:
-    if source.is_absolute():
-        return source
-    return (repo / source).resolve()
+    s = source.expanduser()
+    if s.is_absolute():
+        return s.resolve()
+    return (repo / s).resolve()
+
+
+def _optimized_stage_path(repo: Path, dest_basename: str) -> Path:
+    d = repo / ".tmp" / "optimized"
+    d.mkdir(parents=True, exist_ok=True)
+    return d / dest_basename
 
 
 def _stage_for_edit(repo: Path, source_abs: Path, dest_basename: str) -> Path:
@@ -57,12 +65,13 @@ def process_entry(repo: Path, entry, dry_run: bool) -> str:
     dest = publish_file_for(repo, entry.bucket, entry.dest_basename)
 
     if dry_run:
-        verb = (
-            "photo-prompt + publish"
-            if entry.photo_prompt
-            else "publish"
-        )
-        return f"[dry-run] would {verb} ({entry.link_mode}) -> {dest} manifest={token!r}"
+        steps = []
+        if entry.photo_prompt:
+            steps.append("photo-prompt")
+        steps.append("resize+watermark")
+        steps.append(f"publish ({entry.link_mode})")
+        verb = " + ".join(steps)
+        return f"[dry-run] would {verb} -> {dest} manifest={token!r}"
 
     work_abs = source_abs
     if entry.photo_prompt:
@@ -84,7 +93,12 @@ def process_entry(repo: Path, entry, dry_run: bool) -> str:
         )
         work_abs = out_abs
 
-    _install_publish(work_abs, dest, entry.link_mode, dry_run=False)
+    opt_abs = _optimized_stage_path(repo, entry.dest_basename)
+    if opt_abs.exists():
+        opt_abs.unlink()
+    burn_resize_watermark(work_abs, opt_abs)
+
+    _install_publish(opt_abs, dest, entry.link_mode, dry_run=False)
     appended = append_if_absent(repo, entry.bucket, token)
     if not appended:
         return f"publisher: already in manifest ({token})"
@@ -109,7 +123,7 @@ def main(argv: list[str] | None = None) -> int:
             msg = process_entry(repo, entry, dry_run=args.dry_run)
             print(msg)
             processed += 1
-    except (OSError, ValueError, subprocess.CalledProcessError) as exc:
+    except (OSError, ValueError, subprocess.CalledProcessError, ImportError) as exc:
         print(f"gallery-import: stopped after {processed} row(s): {exc}")
         return 1
     return 0

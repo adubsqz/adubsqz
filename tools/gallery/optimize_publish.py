@@ -1,0 +1,154 @@
+"""Resize + burn-in text watermark before publishing (aligned with scripts/optimize_images.py defaults)."""
+
+from __future__ import annotations
+
+import os
+from pathlib import Path
+from typing import Tuple
+
+try:
+    from PIL import Image, ImageDraw, ImageFont
+except ImportError as e:  # pragma: no cover
+    raise ImportError(
+        "gallery-import requires Pillow for resize/watermark. "
+        'Install deps: pip install -r requirements-gallery.txt (or rerun any "npm run gallery:*").'
+    ) from e
+
+
+def _int_env(key: str, default: int) -> int:
+    raw = os.environ.get(key, "").strip()
+    if not raw:
+        return default
+    return int(raw)
+
+
+def _publish_options() -> dict:
+    wm_pos = os.environ.get("GALLERY_WATERMARK_POSITION", "bottom-right").strip() or "bottom-right"
+    return {
+        "max_width": _int_env("GALLERY_MAX_WIDTH", 1500),
+        "max_height": _int_env("GALLERY_MAX_HEIGHT", 1500),
+        "jpeg_quality": max(1, min(100, _int_env("GALLERY_JPEG_QUALITY", 85))),
+        "png_compression": max(0, min(9, _int_env("GALLERY_PNG_COMPRESSION", 6))),
+        "watermark_text": os.environ.get("GALLERY_WATERMARK_TEXT", "© adubsqz"),
+        "watermark_opacity": max(0, min(255, _int_env("GALLERY_WATERMARK_OPACITY", 180))),
+        "watermark_position": wm_pos,
+        "preserve_exif": os.environ.get("GALLERY_STRIP_EXIF", "").strip().lower() not in ("1", "true", "yes"),
+    }
+
+
+def _lanczos():
+    try:
+        return Image.Resampling.LANCZOS
+    except AttributeError:
+        return Image.LANCZOS  # Pillow <10
+
+
+def _calc_dims(w: int, h: int, max_w: int, max_h: int) -> Tuple[int, int]:
+    if w <= max_w and h <= max_h:
+        return w, h
+    wr = max_w / w
+    hr = max_h / h
+    ratio = min(wr, hr)
+    return int(w * ratio), int(h * ratio)
+
+
+def _font_for_width(image_width: int, watermark_text: str):
+    base = max(12, int(image_width * 0.02))
+    for font_path in (
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "C:\\Windows\\Fonts\\arial.ttf",
+    ):
+        p = Path(font_path)
+        if p.is_file():
+            try:
+                return ImageFont.truetype(str(p), base), base
+            except OSError:
+                continue
+    return ImageFont.load_default(), 10
+
+
+def _watermark_overlay(
+    img: Image.Image,
+    *,
+    watermark_text: str,
+    watermark_opacity: int,
+    watermark_position: str,
+) -> Image.Image:
+    if img.mode not in ("RGB", "RGBA"):
+        img = img.convert("RGBA")
+
+    layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(layer)
+    font, _ = _font_for_width(img.width, watermark_text)
+    bbox = draw.textbbox((0, 0), watermark_text, font=font)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    margin = int(img.width * 0.02)
+    pmap = {
+        "bottom-right": (img.width - tw - margin, img.height - th - margin),
+        "bottom-left": (margin, img.height - th - margin),
+        "top-right": (img.width - tw - margin, margin),
+        "top-left": (margin, margin),
+        "center": ((img.width - tw) // 2, (img.height - th) // 2),
+    }
+    pos = pmap.get(watermark_position, pmap["bottom-right"])
+    pad = 5
+    bg = [pos[0] - pad, pos[1] - pad, pos[0] + tw + pad, pos[1] + th + pad]
+    draw.rectangle(bg, fill=(0, 0, 0, int(watermark_opacity * 0.5)))
+    draw.text(pos, watermark_text, font=font, fill=(255, 255, 255, watermark_opacity))
+
+    if img.mode == "RGB":
+        img = img.convert("RGBA")
+    return Image.alpha_composite(img, layer)
+
+
+def burn_resize_watermark(src: Path, dest: Path) -> None:
+    """Read image from ``src``, resize (max dims), embed watermark, write ``dest`` (suffix controls format)."""
+    opts = _publish_options()
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    suffix = dest.suffix.lower()
+
+    with Image.open(src) as im:
+        exif_bytes = None
+        if opts["preserve_exif"]:
+            raw = im.info.get("exif")
+            if isinstance(raw, bytes):
+                exif_bytes = raw
+
+        ow, oh = im.size
+        nw, nh = _calc_dims(ow, oh, opts["max_width"], opts["max_height"])
+        if (nw, nh) != (ow, oh):
+            im = im.resize((nw, nh), _lanczos())
+
+        im = _watermark_overlay(
+            im,
+            watermark_text=opts["watermark_text"],
+            watermark_opacity=opts["watermark_opacity"],
+            watermark_position=opts["watermark_position"],
+        )
+
+        if im.mode == "RGBA" and suffix in (".jpg", ".jpeg"):
+            rgb = Image.new("RGB", im.size, (255, 255, 255))
+            rgb.paste(im, mask=im.split()[3])
+            im = rgb
+
+        save_kw: dict = {"optimize": True}
+        fmt = ""
+        if suffix in (".jpg", ".jpeg"):
+            save_kw["quality"] = opts["jpeg_quality"]
+            fmt = "JPEG"
+        elif suffix == ".png":
+            save_kw["compress_level"] = opts["png_compression"]
+            fmt = "PNG"
+        elif suffix == ".webp":
+            save_kw["quality"] = opts["jpeg_quality"]
+            fmt = "WEBP"
+        else:
+            raise ValueError(f"unsupported output suffix for burn-in publish: {dest.suffix!r}")
+
+        if exif_bytes and opts["preserve_exif"] and suffix in (".jpg", ".jpeg"):
+            save_kw["exif"] = exif_bytes
+
+        im.save(dest, format=fmt, **save_kw)

@@ -48,7 +48,7 @@ function PhotoCard({
           decoding="async"
           onError={handleError}
           onClick={onClick}
-          watermarkOpacity={0.3}
+          watermarkOpacity={0.1}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-sm" />
       </div>
@@ -213,7 +213,7 @@ function Lightbox({
               alt={photo.alt}
               wrapperClassName="relative flex w-full max-w-full items-center justify-center"
               className="pointer-events-none block h-auto max-h-[min(78dvh,920px)] w-auto min-h-0 max-w-full object-contain sm:max-h-[min(80dvh,960px)]"
-              watermarkOpacity={0.35}
+              watermarkOpacity={0.12}
               loading="eager"
             />
           </div>
