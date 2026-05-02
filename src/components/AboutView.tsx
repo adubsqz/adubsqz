@@ -11,13 +11,20 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
   return (
     <div className="max-w-5xl space-y-6">
       <div className="grid gap-6 md:grid-cols-[minmax(0,22rem)_1fr] md:items-start">
-        <div className="relative overflow-hidden rounded-3xl bg-black/45 aspect-[4/5] max-h-[32rem]">
-          <img
-            src={ABOUT_IMAGE_SRC}
-            alt="Portrait, photographed on film."
-            className="w-full h-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
+        <div className="flex flex-col gap-2">
+          <div className="relative overflow-hidden rounded-3xl bg-black/45 aspect-[4/5] max-h-[32rem]">
+            <img
+              src={ABOUT_IMAGE_SRC}
+              alt="Portrait, photographed on film."
+              className="w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
+          </div>
+          {ABOUT.photoCredit && (
+            <p className="text-center text-[0.65rem] italic leading-snug text-photo-muted sm:text-xs md:text-left">
+              {ABOUT.photoCredit}
+            </p>
+          )}
         </div>
 
         <Card className="bg-black/35">

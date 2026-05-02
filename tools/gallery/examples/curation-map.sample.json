@@ -94,7 +94,7 @@
     },
     {
       "source": "~/Downloads/175520/00025531/takingapicofmetakingapic.jpg",
-      "bucket": "still-life",
+      "bucket": "about",
       "link_mode": "copy",
       "dest_basename": "takingapicofmetakingapic.jpg"
     }

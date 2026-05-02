@@ -12,7 +12,7 @@ def test_import_resolves_tilde_home_in_source(tmp_path, monkeypatch):
     monkeypatch.chdir(repo)
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
     (repo / "src" / "gallery-manifest.json").write_text(
-        json.dumps({"still-life": [], "bw": [], "color": []}),
+        json.dumps({"about": [], "bw": [], "color": []}),
         encoding="utf-8",
     )
     inbox = tmp_path / "staging"
@@ -41,7 +41,7 @@ def test_dry_run_does_not_write(tmp_path, monkeypatch):
     monkeypatch.chdir(repo)
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
     (repo / "src" / "gallery-manifest.json").write_text(
-        json.dumps({"still-life": [], "bw": [], "color": []}),
+        json.dumps({"about": [], "bw": [], "color": []}),
         encoding="utf-8",
     )
     pix = repo / "in.png"
@@ -67,7 +67,7 @@ def test_import_copy_updates_manifest(tmp_path, monkeypatch):
     monkeypatch.chdir(repo)
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
     (repo / "src" / "gallery-manifest.json").write_text(
-        json.dumps({"still-life": [], "bw": [], "color": []}),
+        json.dumps({"about": [], "bw": [], "color": []}),
         encoding="utf-8",
     )
     pix = repo / "in.png"
@@ -96,7 +96,7 @@ def test_symlink_materializes_when_artifact_under_tmp(tmp_path, monkeypatch):
     monkeypatch.chdir(repo)
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
     (repo / "src" / "gallery-manifest.json").write_text(
-        json.dumps({"still-life": [], "bw": [], "color": []}),
+        json.dumps({"about": [], "bw": [], "color": []}),
         encoding="utf-8",
     )
     pix = repo / "in.png"
@@ -124,7 +124,7 @@ def test_import_twice_fails_without_replace_then_replaces(tmp_path, monkeypatch)
     monkeypatch.chdir(repo)
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
     (repo / "src" / "gallery-manifest.json").write_text(
-        json.dumps({"still-life": [], "bw": [], "color": []}),
+        json.dumps({"about": [], "bw": [], "color": []}),
         encoding="utf-8",
     )
     pix = repo / "in.png"

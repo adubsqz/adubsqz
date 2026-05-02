@@ -7,7 +7,16 @@ from typing import Any
 
 from gallery.config import MANIFEST_REL
 
-_KEYS = ("still-life", "bw", "color")
+_KEYS = ("about", "bw", "color")
+
+
+def _storage_manifest_key(import_bucket: str) -> str:
+    b = import_bucket.lower().strip()
+    if b in ("still-life", "about"):
+        return "about"
+    if b in ("bw", "color"):
+        return b
+    raise ValueError(f"unsupported manifest import bucket {import_bucket!r}")
 
 
 def load_manifest(repo: Path) -> dict[str, Any]:
@@ -21,6 +30,14 @@ def load_manifest(repo: Path) -> dict[str, Any]:
         if not isinstance(v, list):
             raise ValueError(f"gallery-manifest {k} must be a JSON array")
         out[k] = [str(item) for item in v]
+    legacy = raw.get("still-life", [])
+    if isinstance(legacy, list) and legacy:
+        migrate = [str(item) for item in legacy]
+        seen = set(out["about"])
+        for tok in migrate:
+            if tok not in seen:
+                out["about"].append(tok)
+                seen.add(tok)
     return out
 
 
@@ -33,13 +50,11 @@ def save_manifest(repo: Path, buckets: dict[str, list[str]]) -> None:
     path.write_text(txt + "\n", encoding="utf-8")
 
 
-def append_if_absent(repo: Path, bucket: str, token: str) -> bool:
-    bucket = bucket.lower().strip()
-    if bucket not in _KEYS:
-        raise ValueError(f"unsupported manifest bucket {bucket!r}")
+def append_if_absent(repo: Path, import_bucket: str, token: str) -> bool:
+    key = _storage_manifest_key(import_bucket)
     buckets = load_manifest(repo)
-    if token in buckets[bucket]:
+    if token in buckets[key]:
         return False
-    buckets[bucket] = [*buckets[bucket], token]
+    buckets[key] = [*buckets[key], token]
     save_manifest(repo, buckets)
     return True

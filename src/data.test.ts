@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import galleryManifest from './gallery-manifest.json';
 import { COLLECTIONS, ABOUT } from './data';
 import type { Photo, PhotoCollection } from './types';
 
@@ -42,14 +43,14 @@ describe('data', () => {
       });
     });
 
-    it('Greyscale / Full Spectrum / Still life buckets match shipped manifest categories', () => {
+    it('Greyscale / Full Spectrum only (About photo is manifest `about`, not a tab)', () => {
       const ids = COLLECTIONS.map((c) => c.id).sort();
-      expect(ids).toEqual(['full-spectrum', 'greyscale', 'still-life'].sort());
+      expect(ids).toEqual(['full-spectrum', 'greyscale']);
     });
 
-    it('still-life manifest paths resolve at publish root (/photos/still-life/<file>)', () => {
-      const still = COLLECTIONS.find((c) => c.id === 'still-life');
-      expect(still?.photos.some((p) => p.src === '/photos/still-life/takingapicofmetakingapic.jpg')).toBe(true);
+    it('about manifest entry resolves at gallery publish root (/photos/still-life/<file>)', () => {
+      const manifest = galleryManifest as { about?: string[] };
+      expect(manifest.about?.includes('takingapicofmetakingapic.jpg')).toBe(true);
     });
 
     it('does not surface import-########.jpg filenames in public collections', () => {
@@ -67,9 +68,11 @@ describe('data', () => {
       expect(ABOUT).toHaveProperty('tagline');
       expect(ABOUT).toHaveProperty('contactEmail');
       expect(ABOUT).toHaveProperty('bio');
+      expect(ABOUT).toHaveProperty('photoCredit');
       expect(ABOUT).toHaveProperty('socials');
       expect(typeof ABOUT.name).toBe('string');
       expect(typeof ABOUT.bio).toBe('string');
+      expect(typeof ABOUT.photoCredit).toBe('string');
       expect(Array.isArray(ABOUT.socials)).toBe(true);
     });
 

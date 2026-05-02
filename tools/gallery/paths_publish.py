@@ -10,13 +10,13 @@ def publish_file_for(repo: Path, bucket: str, dest_basename: str) -> Path:
     if bucket not in ALLOWED_BUCKETS:
         raise ValueError(f"invalid bucket {bucket!r}; expected one of {sorted(ALLOWED_BUCKETS)}")
     pub = repo / PUBLISH_STILL_LIFE_REL
-    if bucket == "still-life":
+    if bucket in ("still-life", "about"):
         return pub / dest_basename
     return pub / bucket / dest_basename
 
 
 def manifest_token(bucket: str, dest_basename: str) -> str:
     bucket = bucket.lower().strip()
-    if bucket == "still-life":
+    if bucket in ("still-life", "about"):
         return dest_basename
     return Path(bucket, dest_basename).as_posix()

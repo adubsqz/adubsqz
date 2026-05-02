@@ -9,15 +9,18 @@ def test_publish_bw(tmp_path):
     assert p == repo / "public" / "photos" / "still-life" / "bw" / "a.jpg"
 
 
-def test_publish_still_life(tmp_path):
+def test_publish_about_root_equivalent(tmp_path):
     repo = tmp_path / "repo"
-    p = publish_file_for(repo, "still-life", "about_me.jpg")
-    assert p == repo / "public" / "photos" / "still-life" / "about_me.jpg"
+    p_sl = publish_file_for(repo, "still-life", "about_me.jpg")
+    p_about = publish_file_for(repo, "about", "about_me.jpg")
+    assert p_sl == repo / "public" / "photos" / "still-life" / "about_me.jpg"
+    assert p_about == p_sl
 
 
 def test_manifest_token():
     assert manifest_token("bw", "z.jpg") == "bw/z.jpg"
     assert manifest_token("still-life", "about.jpg") == "about.jpg"
+    assert manifest_token("about", "about.jpg") == "about.jpg"
 
 
 def test_invalid_bucket(tmp_path):

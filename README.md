@@ -79,7 +79,7 @@ npm run gallery:import -- --map YOUR_MAP.json   # optional: --dry-run, --limit N
 
 Maps use **`{ "entries": [ { "source", "bucket", "link_mode", "dest_basename"?, "photo_prompt"? }, … ] }`**. Sample: **`tools/gallery/examples/curation-map.sample.json`**.
 
-- **`bucket`:** **`bw`** | **`color`** | **`still-life`**. Entries in **`still-life`** use **bare filenames** in the manifest; they publish as **`public/photos/still-life/<file>`** and appear in the **Still life** gallery bucket on the site.
+- **`bucket`:** **`bw`** | **`color`** | **`about`** (import map; legacy **`still-life`** is accepted and maps to **`about`**). **`about`** uses **bare filenames** in the manifest; they publish as **`public/photos/still-life/<file>`** and drive the **About** page portrait only (not a gallery category tab).
 - **`link_mode`:** **`copy`** | **`symlink`**. Optimized bytes are produced under **`.tmp/optimized/`**; if **`symlink`** would point through **`.tmp`**, the importer **writes a `copy`** into **`public/`** instead and logs a short stderr note so deploys are not tied to ephemeral paths.
 - **`photo_prompt`:** optional string; invokes local **`photo-prompt`** (**`GALLERY_PHOTO_PROMPT`** env overrides default **`~/photo-prompt/.venv/bin/photo-prompt`** resolution)
 

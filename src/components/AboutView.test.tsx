@@ -22,6 +22,11 @@ describe('AboutView', () => {
     expect(img).toHaveAttribute('src', ABOUT_IMAGE_SRC);
   });
 
+  it('renders photo credit under portrait', () => {
+    render(<AboutView />);
+    expect(screen.getByText(ABOUT.photoCredit)).toBeInTheDocument();
+  });
+
   it('renders social links', () => {
     render(<AboutView />);
     ABOUT.socials.forEach((social) => {

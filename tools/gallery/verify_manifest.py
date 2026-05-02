@@ -18,7 +18,7 @@ def _flatten_manifest_tokens(repo: Path) -> set[str]:
             tok = str(raw).strip().lstrip("/").replace("\\", "/")
             if not tok:
                 continue
-            if bucket == "still-life":
+            if bucket == "about":
                 out.add(tok)
             elif "/" not in tok:
                 out.add(f"{bucket}/{tok}")

@@ -19,7 +19,7 @@ def test_verify_reports_missing_assets(tmp_path, monkeypatch):
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
     manifest = repo / "src" / "gallery-manifest.json"
     manifest.write_text(
-        json.dumps({"still-life": [], "bw": ["pixel.png"], "color": []}),
+        json.dumps({"about": [], "bw": ["pixel.png"], "color": []}),
         encoding="utf-8",
     )
     errs = verify_manifest(repo)
@@ -29,7 +29,7 @@ def test_verify_reports_missing_assets(tmp_path, monkeypatch):
 
 def test_verify_detects_orphan(tmp_path, monkeypatch):
     repo = _repo(tmp_path)
-    save_manifest(repo, {"still-life": [], "bw": [], "color": []})
+    save_manifest(repo, {"about": [], "bw": [], "color": []})
     orphan = repo / "public/photos/still-life/bw/ghost.png"
     orphan.parent.mkdir(parents=True, exist_ok=True)
     orphan.write_bytes(b"x")
@@ -41,7 +41,7 @@ def test_verify_detects_root_orphan(tmp_path, monkeypatch):
     repo = _repo(tmp_path)
     monkeypatch.chdir(repo)
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
-    save_manifest(repo, {"still-life": [], "bw": [], "color": []})
+    save_manifest(repo, {"about": [], "bw": [], "color": []})
     loose = repo / "public/photos/still-life/loose.jpg"
     loose.write_bytes(b"x")
     errs = verify_manifest(repo)

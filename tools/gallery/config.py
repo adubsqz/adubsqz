@@ -5,7 +5,7 @@ from pathlib import Path
 
 MANIFEST_REL = Path("src/gallery-manifest.json")
 PUBLISH_STILL_LIFE_REL = Path("public/photos/still-life")
-ALLOWED_BUCKETS = frozenset({"bw", "color", "still-life"})
+ALLOWED_BUCKETS = frozenset({"bw", "color", "still-life", "about"})
 ALLOWED_LINK_MODES = frozenset({"copy", "symlink"})
 
 
