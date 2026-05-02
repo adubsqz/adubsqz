@@ -8,7 +8,9 @@
     "bw/notme.JPG",
     "bw/qzar.JPG",
     "bw/bldgs.jpg",
-    "bw/spookyaf.jpg"
+    "bw/spookyaf.jpg",
+    "bw/graffiti-chainlink.jpg",
+    "bw/mirror-spheres-sculpture.jpg"
   ],
   "color": [
     "color/dusk1.jpg",
@@ -18,6 +20,14 @@
     "color/myplasticheartblur.jpg",
     "color/SILVERCUP.jpg",
     "color/subtlestimprovement.jpg",
-    "color/mbridge.jpg"
+    "color/mbridge.jpg",
+    "color/restaurant-counter.jpg",
+    "color/bldgs-fire-escape.jpg",
+    "color/skyline-from-behind.jpg",
+    "color/urban-lookout-skybridge.jpg",
+    "color/birds-waterfront-winter.jpg",
+    "color/birds-promenade-winter.jpg",
+    "color/stained-glass-transit.jpg",
+    "color/waterfront-industrial.jpg"
   ]
 }

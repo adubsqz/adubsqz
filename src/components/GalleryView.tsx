@@ -159,7 +159,7 @@ function Lightbox({
       aria-label="Image lightbox"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="mx-auto flex min-h-[100dvh] w-full max-w-[min(1200px,100vw)] flex-col px-6 pb-28 pt-8 sm:px-12 sm:pb-36 sm:pt-12">
+      <div className="mx-auto flex w-full max-w-[min(1200px,100vw)] flex-col px-6 pb-16 pt-8 sm:px-12 sm:pb-12 sm:pt-12 lg:pb-16">
         <header className="flex shrink-0 flex-col gap-8 border-b border-white/[0.06] pb-10 sm:flex-row sm:items-center sm:justify-between sm:gap-12 sm:pb-12">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <span className="text-[0.65rem] uppercase tracking-[0.22em] text-white/35">Navigate</span>
@@ -262,7 +262,7 @@ function Lightbox({
           </div>
         </section>
 
-        <div className="min-h-[15vh] shrink-0" aria-hidden />
+        <div className="h-6 shrink-0 sm:h-8" aria-hidden />
       </div>
     </div>
   );
