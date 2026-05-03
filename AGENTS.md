@@ -16,4 +16,5 @@
 - Import pipeline: optional `photo-prompt` edit, then Pillow resize + burn-in watermark (`tools/gallery/optimize_publish.py`, defaults aligned with legacy `optimize_images.py`), then copy/symlink into `public/photos/still-life/`.
 - Optional gallery env: `GALLERY_REPO_ROOT`, `GALLERY_PHOTO_PROMPT`, `GALLERY_PHOTO_PROMPT_TIMEOUT`, `GALLERY_PHOTO_PROMPT_MODEL`, resize/watermark tunables (`README` Photo curation). Gallery Python reads `.env` / `.env.local` from the repo root (and from `GALLERY_REPO_ROOT` when set) via `python-dotenv`, without overwriting already-exported shell variables.
 - Root package `build` runs `vite build` only.
+- E2E entry is `playwright-cli.mjs` (pins `PLAYWRIGHT_BROWSERS_PATH` to `.pw-browsers/`). Agents: `node playwright-cli.mjs --wrapper-help` for copy-paste examples; all other args pass through to Playwright.
 - `.venv-gallery/`, `__pycache__/`, and `.pytest_cache/` are gitignored.
