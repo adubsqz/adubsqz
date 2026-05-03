@@ -10,11 +10,11 @@
 ## Learned Workspace Facts
 
 - Gallery Python tooling lives under `tools/gallery/`; import as `gallery` with `PYTHONPATH=tools` (repo ignores `scripts/**`, so committed automation avoids `scripts/`).
-- Gallery NPM scripts: `gallery:test` (pytest via `tools/run_gallery_pytest.sh` and `.venv-gallery`), `gallery:import`, `gallery:verify`, `gallery:doctor`.
+- Gallery NPM scripts: `gallery:test` (pytest via `tools/run_gallery_pytest.sh` and `.venv-gallery`), `gallery:import` (optional `--stage-only` HITL → `.tmp/gallery-hitl`), `gallery:promote` (`--list` / `--tokens` / `--approve-all`), `gallery:verify`, `gallery:doctor`, `gallery:draft-probe-map` (random `~/originals` files not in manifest → probe JSON).
 - Gallery design spec: `docs/superpowers/specs/2026-04-30-gallery-pipeline-design.md`. Sample curation map: `tools/gallery/examples/curation-map.sample.json`.
 - Gallery manifest records finished work only (model B; no in-progress rows). Humans declare `bw` / `color` / `about` import buckets (legacy `still-life` maps to `about`), symlink vs copy, and optional `photo-prompt` text.
-- Import pipeline: optional `photo-prompt` edit, then Pillow resize + burn-in watermark (`tools/gallery/optimize_publish.py`, defaults aligned with legacy `optimize_images.py`), then copy/symlink into `public/photos/still-life/`.
-- Optional gallery env: `GALLERY_REPO_ROOT`, `GALLERY_PHOTO_PROMPT`, `GALLERY_PHOTO_PROMPT_TIMEOUT`, `GALLERY_PHOTO_PROMPT_MODEL`, resize/watermark tunables (`README` Photo curation). Gallery Python reads `.env` / `.env.local` from the repo root (and from `GALLERY_REPO_ROOT` when set) via `python-dotenv`, without overwriting already-exported shell variables.
+- Import pipeline: always-on screening (`tools/gallery/screen_asset.py`), then optional `photo-prompt` (map `photo_prompt` or auto-generated from screening), then Pillow resize + burn-in watermark (`tools/gallery/optimize_publish.py`), then copy/symlink into `public/photos/still-life/`. Rejects and dry-run failures exit non-zero; see README Photo curation for env tunables.
+- Optional gallery env: `GALLERY_REPO_ROOT`, `GALLERY_PHOTO_PROMPT`, `GALLERY_PHOTO_PROMPT_TIMEOUT`, `GALLERY_PHOTO_PROMPT_MODEL`, screening tunables (`GALLERY_SCREEN_*`, see README), resize/watermark tunables (`README` Photo curation), `GALLERY_SKIP_WATERMARK=1` (one-shot re-encode of already-watermarked sources), `GALLERY_IMPORT_SKIP_AUTO_PROMPT=1` (disable metric auto-prompt for the run). Gallery Python reads `.env` / `.env.local` from the repo root (and from `GALLERY_REPO_ROOT` when set) via `python-dotenv`, without overwriting already-exported shell variables.
 - Root package `build` runs `vite build` only.
 - E2E entry is `playwright-cli.mjs` (pins `PLAYWRIGHT_BROWSERS_PATH` to `.pw-browsers/`). Agents: `node playwright-cli.mjs --wrapper-help` for copy-paste examples; all other args pass through to Playwright.
 - `.venv-gallery/`, `__pycache__/`, and `.pytest_cache/` are gitignored.

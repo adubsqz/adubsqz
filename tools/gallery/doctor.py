@@ -3,7 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from shutil import which
 
-from gallery.config import MANIFEST_REL, PUBLISH_STILL_LIFE_REL, repo_root
+from gallery.config import HITL_PENDING_REL, MANIFEST_REL, PUBLISH_STILL_LIFE_REL, repo_root
+from gallery.hitl_pending import load_pending_entries
 from gallery.photo_prompt import resolved_photo_prompt_bin
 
 
@@ -22,6 +23,8 @@ def main(argv: list[str] | None = None) -> int:
     else:
         status = "not found (set GALLERY_PHOTO_PROMPT or install photo-prompt)"
     print("photo-prompt binary:", b, f"({status})")
+    pend = load_pending_entries(repo)
+    print("HITL pending:", len(pend), "row(s)", f"({repo / HITL_PENDING_REL})" if pend else "")
     return 0
 
 

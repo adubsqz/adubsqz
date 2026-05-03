@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -8,11 +9,13 @@ from pathlib import Path
 
 from gallery.basename_guard import assert_allowed_publish_basename
 from gallery.config import ALLOWED_LINK_MODES, repo_root
+from gallery.hitl_pending import PendingEntry, rel_from_repo, upsert_pending
 from gallery.map_model import load_map
 from gallery.manifest_store import append_if_absent
-from gallery.paths_publish import manifest_token, publish_file_for
+from gallery.paths_publish import manifest_token, publish_file_for, staging_file_for
 from gallery.optimize_publish import burn_resize_watermark
 from gallery.photo_prompt import run_photo_prompt_edit
+from gallery.screen_asset import ScreenResult, ScreeningRejected, screen_asset
 
 
 def _resolve_source(repo: Path, source: Path) -> Path:
@@ -34,6 +37,10 @@ def _stage_for_edit(repo: Path, source_abs: Path, dest_basename: str) -> Path:
     review.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source_abs, staged)
     return staged
+
+
+def _truthy_env(key: str) -> bool:
+    return os.environ.get(key, "").strip().lower() in ("1", "true", "yes")
 
 
 def _install_publish(
@@ -62,7 +69,7 @@ def _install_publish(
             fragile_tmp = str(work_res).startswith(str(tmp_root) + "/") or work_res == tmp_root
         if fragile_tmp:
             print(
-                "gallery-import: link_mode=symlink pointed at .tmp; materializing a copy under public/ "
+                "gallery-import: link_mode=symlink pointed at .tmp; materializing a copy under publish/staging "
                 "so the deployed file does not reference ephemeral paths.",
                 file=sys.stderr,
             )
@@ -74,7 +81,7 @@ def _install_publish(
         dest.symlink_to(work.resolve(), target_is_directory=False)
 
 
-def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool) -> str:
+def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool, stage_only: bool) -> str:
     if entry.bucket not in ("bw", "color", "still-life", "about"):
         raise ValueError(f"invalid bucket {entry.bucket!r}")
     if entry.link_mode not in ALLOWED_LINK_MODES:
@@ -86,20 +93,46 @@ def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool) -> str:
     if not source_abs.is_file():
         raise FileNotFoundError(f"source not found: {source_abs}")
 
-    dest = publish_file_for(repo, entry.bucket, entry.dest_basename)
+    dest = staging_file_for(repo, entry.bucket, entry.dest_basename) if stage_only else publish_file_for(
+        repo, entry.bucket, entry.dest_basename
+    )
+
+    screen: ScreenResult = screen_asset(source_abs, bucket=entry.bucket)
+    explicit_prompt = (entry.photo_prompt or "").strip()
+    if _truthy_env("GALLERY_IMPORT_SKIP_AUTO_PROMPT"):
+        effective_prompt = explicit_prompt
+    else:
+        effective_prompt = explicit_prompt or (screen.suggested_prompt.strip() if screen.suggested_prompt else "")
 
     if dry_run:
-        steps = []
-        if entry.photo_prompt:
-            steps.append("photo-prompt")
+        if not screen.publish_allowed:
+            return f"[dry-run] screening would reject ({'; '.join(screen.reasons)})"
+        steps = [
+            f"screen ok (lap_var={screen.laplacian_variance:.1f}, min_edge={screen.min_edge_px})",
+        ]
+        if effective_prompt:
+            src = "map photo_prompt" if explicit_prompt else "auto_prompt"
+            steps.append(f"photo-prompt ({src})")
         steps.append("resize+watermark")
-        steps.append(f"publish ({entry.link_mode})")
-        verb = " + ".join(steps)
-        return f"[dry-run] would {verb} -> {dest} manifest={token!r}"
+        tail = f"HITL stage -> {dest} (not public/manifest yet)" if stage_only else f"publish ({entry.link_mode}) -> {dest} manifest={token!r}"
+        steps.append(tail)
+        verb = " + ".join(steps[:-1]) + " | " + steps[-1]
+        prompt_note = f' prompt={effective_prompt[:80]!r}…' if len(effective_prompt) > 80 else f" prompt={effective_prompt!r}" if effective_prompt else ""
+        return f"[dry-run] would {verb}{prompt_note}"
 
-    work_abs = source_abs
-    if entry.photo_prompt:
-        staged = _stage_for_edit(repo, source_abs, entry.dest_basename)
+    if not screen.publish_allowed:
+        raise ScreeningRejected(screen.reasons)
+
+    staged = _stage_for_edit(repo, source_abs, entry.dest_basename)
+    print(
+        "gallery-import: screening passed "
+        f"(lap_var={screen.laplacian_variance:.1f}, luma_std={screen.luma_std:.1f}, "
+        f"shadow%={screen.pct_near_black * 100:.1f}, highlight%={screen.pct_near_white * 100:.1f})",
+        file=sys.stderr,
+    )
+
+    work_abs = staged
+    if effective_prompt:
         edited = repo / ".tmp/edited"
         edited.mkdir(parents=True, exist_ok=True)
         out_abs = edited / entry.dest_basename
@@ -108,9 +141,13 @@ def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool) -> str:
         stem = Path(entry.dest_basename).stem
         recipe = edited / f"{stem}.recipe.json"
         sidecar = edited / f"{stem}.sidecar.json"
+        if explicit_prompt:
+            print("gallery-import: photo-prompt (map)", file=sys.stderr)
+        else:
+            print(f"gallery-import: photo-prompt (auto) {effective_prompt!r}", file=sys.stderr)
         run_photo_prompt_edit(
             staged,
-            entry.photo_prompt,
+            effective_prompt,
             out_abs,
             recipe_out=recipe,
             sidecar_out=sidecar,
@@ -123,6 +160,24 @@ def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool) -> str:
     burn_resize_watermark(work_abs, opt_abs)
 
     _install_publish(repo, opt_abs, dest, entry.link_mode, dry_run=False, replace=replace)
+    if stage_only:
+        upsert_pending(
+            repo,
+            PendingEntry(
+                token=token,
+                import_bucket=entry.bucket,
+                dest_basename=entry.dest_basename,
+                source=str(source_abs),
+                staged_rel=rel_from_repo(repo, dest.resolve()),
+            ),
+        )
+        print(
+            "gallery-import: HITL — review under .tmp/gallery-hitl then: "
+            "npm run gallery:promote -- --tokens …",
+            file=sys.stderr,
+        )
+        return f"staged (HITL): {token} -> {dest}"
+
     appended = append_if_absent(repo, entry.bucket, token)
     if not appended:
         return f"publisher: already in manifest ({token})"
@@ -139,6 +194,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="overwrite existing publish targets (same dest_basename) instead of failing",
     )
+    parser.add_argument(
+        "--stage-only",
+        action="store_true",
+        help="write optimized files to .tmp/gallery-hitl only; use gallery:promote after human review (never touches public/ or gallery-manifest.json)",
+    )
     args = parser.parse_args(argv)
 
     repo = repo_root()
@@ -147,13 +207,25 @@ def main(argv: list[str] | None = None) -> int:
     lim = args.limit if args.limit > 0 else len(rows)
 
     processed = 0
+    dry_run_reject = False
     try:
         for entry in rows[:lim]:
-            msg = process_entry(repo, entry, dry_run=args.dry_run, replace=args.replace)
+            msg = process_entry(
+                repo,
+                entry,
+                dry_run=args.dry_run,
+                replace=args.replace,
+                stage_only=args.stage_only,
+            )
             print(msg)
+            if args.dry_run and "screening would reject" in msg:
+                dry_run_reject = True
             processed += 1
-    except (OSError, ValueError, subprocess.CalledProcessError) as exc:
+    except (OSError, ValueError, subprocess.CalledProcessError, ScreeningRejected) as exc:
         print(f"gallery-import: stopped after {processed} row(s): {exc}")
+        return 1
+    if dry_run_reject:
+        print("gallery-import: dry-run exit 1 (one or more rows failed screening)", file=sys.stderr)
         return 1
     return 0
 

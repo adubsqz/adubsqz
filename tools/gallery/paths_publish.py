@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from gallery.config import ALLOWED_BUCKETS, PUBLISH_STILL_LIFE_REL
+from gallery.config import ALLOWED_BUCKETS, HITL_STAGING_STILL_LIFE_REL, PUBLISH_STILL_LIFE_REL
 
 
 def publish_file_for(repo: Path, bucket: str, dest_basename: str) -> Path:
@@ -10,6 +10,17 @@ def publish_file_for(repo: Path, bucket: str, dest_basename: str) -> Path:
     if bucket not in ALLOWED_BUCKETS:
         raise ValueError(f"invalid bucket {bucket!r}; expected one of {sorted(ALLOWED_BUCKETS)}")
     pub = repo / PUBLISH_STILL_LIFE_REL
+    if bucket in ("still-life", "about"):
+        return pub / dest_basename
+    return pub / bucket / dest_basename
+
+
+def staging_file_for(repo: Path, bucket: str, dest_basename: str) -> Path:
+    """HITL staging path (mirrors ``publish_file_for`` layout under ``.tmp/gallery-hitl/``)."""
+    bucket = bucket.lower().strip()
+    if bucket not in ALLOWED_BUCKETS:
+        raise ValueError(f"invalid bucket {bucket!r}; expected one of {sorted(ALLOWED_BUCKETS)}")
+    pub = repo / HITL_STAGING_STILL_LIFE_REL
     if bucket in ("still-life", "about"):
         return pub / dest_basename
     return pub / bucket / dest_basename

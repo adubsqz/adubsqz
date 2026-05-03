@@ -1,12 +1,18 @@
 import pytest
 
-from gallery.paths_publish import manifest_token, publish_file_for
+from gallery.paths_publish import manifest_token, publish_file_for, staging_file_for
 
 
 def test_publish_bw(tmp_path):
     repo = tmp_path / "repo"
     p = publish_file_for(repo, "bw", "a.jpg")
     assert p == repo / "public" / "photos" / "still-life" / "bw" / "a.jpg"
+
+
+def test_staging_bw_mirrors_publish(tmp_path):
+    repo = tmp_path / "repo"
+    p = staging_file_for(repo, "bw", "a.jpg")
+    assert p == repo / ".tmp" / "gallery-hitl" / "photos" / "still-life" / "bw" / "a.jpg"
 
 
 def test_publish_about_root_equivalent(tmp_path):

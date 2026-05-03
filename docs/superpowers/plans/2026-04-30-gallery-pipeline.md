@@ -472,11 +472,9 @@ Due to plan length constraint, engineer should inline **trusted tiny JPEG blob**
 
 **Pragmatic**: test uses **`tmp_path`** with **`.jpg`** **`source`** containing **`b"\xff\xd8\xff\xe0`** minimal **JFIF APP0** markers + valid EOI (**copy from any tiny MIT-licensed JPEG** in repo **`gallery_tests/fixtures/minimal.jpg`** tracked binary **add file** **`gallery/tests/fixtures/one-pixel.jpg`** one-time commit).
 
-
 **Better plan:**
 
 - Task 7 fixture file created once: **`gallery_tests/fixtures/one_pixel.jpg`** (committed small binary).
-
 
 Add **Task 2a** committing fixture image **or** defer Task 7 to use **PNG** PNG tiny valid **89 bytes**:
 

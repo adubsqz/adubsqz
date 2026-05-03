@@ -25,12 +25,17 @@ def _int_env(key: str, default: int) -> int:
         raise ValueError(f"environment variable {key!r} must be an integer, got {raw!r}") from e
 
 
+def _truthy_env(key: str) -> bool:
+    return os.environ.get(key, "").strip().lower() in ("1", "true", "yes")
+
+
 def _publish_options() -> dict:
     wm_pos = os.environ.get("GALLERY_WATERMARK_POSITION", "bottom-right").strip() or "bottom-right"
     return {
-        "max_width": _int_env("GALLERY_MAX_WIDTH", 1500),
-        "max_height": _int_env("GALLERY_MAX_HEIGHT", 1500),
-        "jpeg_quality": max(1, min(100, _int_env("GALLERY_JPEG_QUALITY", 85))),
+        # Defaults tuned for ~400–500KB typical color JPEGs at 2400px long edge when sources are full-res scans.
+        "max_width": _int_env("GALLERY_MAX_WIDTH", 2400),
+        "max_height": _int_env("GALLERY_MAX_HEIGHT", 2400),
+        "jpeg_quality": max(1, min(100, _int_env("GALLERY_JPEG_QUALITY", 92))),
         "png_compression": max(0, min(9, _int_env("GALLERY_PNG_COMPRESSION", 6))),
         "watermark_text": os.environ.get("GALLERY_WATERMARK_TEXT", "© adubsqz"),
         "watermark_opacity": max(0, min(255, _int_env("GALLERY_WATERMARK_OPACITY", 180))),
@@ -125,12 +130,14 @@ def burn_resize_watermark(src: Path, dest: Path) -> None:
         if (nw, nh) != (ow, oh):
             im = im.resize((nw, nh), _lanczos())
 
-        im = _watermark_overlay(
-            im,
-            watermark_text=opts["watermark_text"],
-            watermark_opacity=opts["watermark_opacity"],
-            watermark_position=opts["watermark_position"],
-        )
+        # One-shot re-encode of already-watermarked web JPEGs: avoids a second burn-in.
+        if not _truthy_env("GALLERY_SKIP_WATERMARK"):
+            im = _watermark_overlay(
+                im,
+                watermark_text=opts["watermark_text"],
+                watermark_opacity=opts["watermark_opacity"],
+                watermark_position=opts["watermark_position"],
+            )
 
         if im.mode == "RGBA" and suffix in (".jpg", ".jpeg"):
             rgb = Image.new("RGB", im.size, (255, 255, 255))

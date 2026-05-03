@@ -54,3 +54,11 @@ Delivered in the same hygiene pass as aligning `package.json` and README with **
 ## Next step
 
 Implementation plan via `**writing-plans`** skill (tasks, ordering, CI updates when Python wrappers land).
+
+## Update: screening + auto prompts (2026-05)
+
+Shipped: `**tools/gallery/screen_asset.py`** runs on every import row before staging. Hard rejects: minimum edge, Laplacian sharpness. Soft signals become a conservative combined prompt when `**photo_prompt**` is omitted; map text overrides. `**npm run gallery:import -- --dry-run**` exits **1** if any row would fail screening.
+
+## Update: HITL staging (`--stage-only`) + `gallery:promote` (2026-05)
+
+Optional `**--stage-only**` writes optimized bytes to `**.tmp/gallery-hitl/photos/still-life/**` and `**pending.json**` only; `**public/**` and `**src/gallery-manifest.json**` stay untouched until `**npm run gallery:promote**` (`--list`, `**--tokens**`, `**--approve-all**`, `**--drop-tokens**`).
