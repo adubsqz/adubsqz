@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
@@ -150,7 +151,10 @@ function Lightbox({
     if (el) el.scrollTop = 0;
   }, [photo.id, photo.src]);
 
-  return (
+  // Portal to document.body so `position:fixed` anchors to the viewport. An ancestor
+  // `.backdrop-blur` Card uses `backdrop-filter`, which establishes a containing block
+  // and would otherwise stretch the lightbox to the full scroll height of that card.
+  return createPortal(
     <div
       ref={scrollRef}
       className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden overscroll-contain bg-black"
@@ -264,7 +268,8 @@ function Lightbox({
 
         <div className="h-6 shrink-0 sm:h-8" aria-hidden />
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
