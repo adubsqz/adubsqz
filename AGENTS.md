@@ -18,3 +18,32 @@
 - Root package `build` runs `vite build` only.
 - E2E entry is `playwright-cli.mjs` (pins `PLAYWRIGHT_BROWSERS_PATH` to `.pw-browsers/`). Agents: `node playwright-cli.mjs --wrapper-help` for copy-paste examples; all other args pass through to Playwright.
 - `.venv-gallery/`, `__pycache__/`, and `.pytest_cache/` are gitignored.
+
+## Cursor Cloud specific instructions
+
+### Services overview
+
+| Service | Start command | Notes |
+|---------|--------------|-------|
+| Vite dev server (frontend) | `npm run dev` | SPA on port 5173; for API routes use `vercel dev` instead |
+| Gallery Python tests | `npm run gallery:test` | Auto-creates `.venv-gallery/` if missing |
+
+### Running the app
+
+- `npm run dev` serves the React SPA. API routes (`/api/auth`, `/api/inquire`) require Vercel CLI (`vercel dev`) — plain Vite returns 404 for those.
+- Set `VITE_E2E=1` to bypass the password gate without needing `GALLERY_PASSWORD`/`GALLERY_AUTH_SECRET`.
+- No database or external service is required to start the frontend.
+
+### Lint / Test / Build
+
+- **Lint:** `npm run lint` (runs `tsc --noEmit` against both `tsconfig.json` and `tsconfig.api.json`)
+- **Unit tests:** `npm run test:run` (Vitest, 48 tests, mocks Resend SDK)
+- **Gallery tests:** `npm run gallery:test` (pytest, 29 tests)
+- **E2E:** `npm run playwright:install` (one-time), then `npm run test:e2e` (starts its own Vite server with `VITE_E2E=1`)
+- **Build:** `npm run build` (Vite production build → `dist/`)
+
+### Gotchas
+
+- The VM needs `python3.12-venv` apt package for gallery venv creation (`apt-get install -y python3.12-venv` if missing).
+- Playwright browsers install into `.pw-browsers/` (repo-local, not system-wide). Run `npm run playwright:install` after a fresh `npm install` if the browser cache is empty.
+- E2E tests reuse an existing dev server on port 5173 outside CI. Stop any pre-existing server or set `VITE_E2E=1` on it to avoid hitting the password gate.
