@@ -6,6 +6,7 @@
 - Before committing gallery photo imports (new binaries under `public/photos/still-life/` or `src/gallery-manifest.json` changes from `gallery:import`): ask for explicit confirmation; do not commit imported photos without approval.
 - For gallery `photo-prompt` / curation, words like "slightly" or similar minimal qualifiers mean very conservative corrections (user flagged `dusk1` when a subtle lift-shadows / warmth intent still came out overcooked under `photo_prompt`). Prefer narrower prompts, lower recipe strength when applicable, or dry-run / visual review before import.
 - For gallery curation maps: prefer one staging file — `.tmp/staged-curation.json` only; avoid ad-hoc map names (e.g. `curation-three.json`, `remap-dusk1.json`) and avoid extra map files unless necessary.
+- Prefers business-oriented examples that connect technical capabilities to photography outcomes such as gallery updates, inquiry-to-invoice flow, password-gated launches, and public buying experience.
 
 ## Learned Workspace Facts
 
@@ -18,6 +19,9 @@
 - Root package `build` runs `vite build` only.
 - E2E entry is `playwright-cli.mjs` (pins `PLAYWRIGHT_BROWSERS_PATH` to `.pw-browsers/`). Agents: `node playwright-cli.mjs --wrapper-help` for copy-paste examples; all other args pass through to Playwright.
 - `.venv-gallery/`, `__pycache__/`, and `.pytest_cache/` are gitignored.
+- Cloud-agent starter runbook lives at `skills/cloud-agent-starter/SKILL.md` and covers Cursor Cloud onboarding for this Vite/gallery repo.
+- Vercel CLI is run with `npx vercel@latest`; adding `vercel` to app dependencies introduced CLI transitive `npm audit` vulnerabilities, while removing it kept audits clean and `npx vercel@latest --version` resolved to `53.3.1`.
+- Cloud-agent run commands: `npm ci`; `npm run dev` for Vite frontend; `npx vercel@latest dev` for API routes; `VITE_E2E=1` for Playwright password-gate bypass; `npm run test:run`; `npm run gallery:test`; `npm run playwright:install && npm run test:e2e`; CI does not run Playwright.
 
 ## Cursor Cloud specific instructions
 
