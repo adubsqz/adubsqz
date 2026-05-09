@@ -13,7 +13,8 @@ This repo is a Vite/React portfolio with Vercel Edge API routes, Playwright smok
 
 - Install with `npm ci` in Cloud/CI; use `npm install` only for local package updates. CI uses Node 20.
 - Do not run `npm login`; the app has no npm registry login flow.
-- For Vercel API work, check `vercel whoami`; if unlinked, run `vercel login`, `vercel link`, then `vercel pull` before `vercel dev`.
+- Do not add the Vercel CLI to `package.json`; run it through `npx vercel@latest` so CLI advisories do not pollute app audits.
+- For Vercel API work, use `npx vercel@latest whoami`; if unlinked, run `npx vercel@latest login`, `npx vercel@latest link`, then `npx vercel@latest pull` before `npx vercel@latest dev`.
 - Put local secrets in `.env.local`. Useful keys:
   - `GALLERY_PASSWORD`, `GALLERY_AUTH_SECRET`, optional `GALLERY_PUBLIC=1`
   - `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `INQUIRY_RECIPIENT_EMAIL`
@@ -23,7 +24,7 @@ This repo is a Vite/React portfolio with Vercel Edge API routes, Playwright smok
 ## Frontend app and API routes
 
 - Run the UI with `npm run dev`.
-- Use `vercel dev` when testing `/api/auth` or `/api/inquire`; plain Vite does not serve Vercel Edge functions.
+- Use `npx vercel@latest dev` when testing `/api/auth` or `/api/inquire`; plain Vite does not serve Vercel Edge functions.
 - Build and preview with `npm run build` then `npm run preview`.
 - The gallery password gate is server-side. Local missing `GALLERY_PASSWORD` is public; Vercel missing `GALLERY_PASSWORD` stays locked unless `GALLERY_PUBLIC=1`.
 - There is no general feature-flag framework. Existing toggles are `VITE_E2E=1` for Playwright password-gate bypass and the gallery env vars above.
@@ -61,7 +62,7 @@ CI does not currently run Playwright e2e. For UI or navigation changes, run `npm
 ## Suggested verification matrix
 
 - JS-only change: `npm run lint` and `npm run test:run`; add `npm run test:e2e` for rendered UI behavior.
-- API route change: `npm run lint`, `npm run test:run`, and manual/API testing under `vercel dev` if the handler path matters.
+- API route change: `npm run lint`, `npm run test:run`, and manual/API testing under `npx vercel@latest dev` if the handler path matters.
 - Python gallery change: `npm run gallery:test` plus `npm run gallery:doctor` or `npm run gallery:verify` when paths or manifests are involved.
 - Photo import workflow: dry run or stage-only import, review generated outputs, then ask before committing photos or manifest edits.
 - Release-confidence sweep: CI matrix commands plus `npm run playwright:install` and `npm run test:e2e`.

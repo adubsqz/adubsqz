@@ -24,13 +24,13 @@
 ### Services overview
 
 | Service | Start command | Notes |
-|---------|--------------|-------|
-| Vite dev server (frontend) | `npm run dev` | SPA on port 5173; for API routes use `vercel dev` instead |
+| --- | --- | --- |
+| Vite dev server (frontend) | `npm run dev` | SPA on port 5173; for API routes use `npx vercel@latest dev` instead |
 | Gallery Python tests | `npm run gallery:test` | Auto-creates `.venv-gallery/` if missing |
 
 ### Running the app
 
-- `npm run dev` serves the React SPA. API routes (`/api/auth`, `/api/inquire`) require Vercel CLI (`vercel dev`) — plain Vite returns 404 for those.
+- `npm run dev` serves the React SPA. API routes (`/api/auth`, `/api/inquire`) require Vercel CLI (`npx vercel@latest dev`) — plain Vite returns 404 for those.
 - Set `VITE_E2E=1` to bypass the password gate without needing `GALLERY_PASSWORD`/`GALLERY_AUTH_SECRET`.
 - No database or external service is required to start the frontend.
 
