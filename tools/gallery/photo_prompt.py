@@ -10,9 +10,13 @@ def resolved_photo_prompt_bin() -> str:
     if exe:
         return exe
     home = Path.home()
-    cand = home / "photo-prompt" / ".venv" / "bin" / "photo-prompt"
-    if cand.is_file():
-        return str(cand)
+    candidates = (
+        home / "photography" / "photo-prompt" / ".venv" / "bin" / "photo-prompt",
+        home / "photo-prompt" / ".venv" / "bin" / "photo-prompt",
+    )
+    for cand in candidates:
+        if cand.is_file():
+            return str(cand)
     return "photo-prompt"
 
 
