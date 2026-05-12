@@ -196,7 +196,7 @@ def test_import_twice_fails_without_replace_then_replaces(tmp_path, monkeypatch)
         encoding="utf-8",
     )
     assert main(["--map", str(mfile)]) == 0
-    assert main(["--map", str(mfile)]) == 1
+    assert main(["--map", str(mfile)]) == 0  # clean skip when dest exists and replace=False
     assert main(["--map", str(mfile), "--replace"]) == 0
     assert (repo / "public/photos/still-life/bw/in.png").is_file()
 

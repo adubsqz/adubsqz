@@ -20,7 +20,13 @@ The deployed portfolio also publishes photo-specific terms at `/PHOTO_TERMS.md`.
 
 ```bash
 npm install
-npm run dev
+npm run dev           # Vite only — UI at http://localhost:5173 (no API routes)
+```
+
+To test API routes (`/api/auth`, `/api/inquire`) locally, use the Vercel dev server instead:
+
+```bash
+npx vercel@latest dev
 ```
 
 ## Tests

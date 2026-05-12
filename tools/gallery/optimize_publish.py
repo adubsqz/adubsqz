@@ -38,7 +38,8 @@ def _publish_options() -> dict:
         "jpeg_quality": max(1, min(100, _int_env("GALLERY_JPEG_QUALITY", 92))),
         "png_compression": max(0, min(9, _int_env("GALLERY_PNG_COMPRESSION", 6))),
         "watermark_text": os.environ.get("GALLERY_WATERMARK_TEXT", "© adubsqz"),
-        "watermark_opacity": max(0, min(255, _int_env("GALLERY_WATERMARK_OPACITY", 180))),
+        # 0–255 alpha for burn-in text; default ~84% — stronger than legacy 180 (~71%) for web legibility
+        "watermark_opacity": max(0, min(255, _int_env("GALLERY_WATERMARK_OPACITY", 215))),
         "watermark_position": wm_pos,
         "preserve_exif": os.environ.get("GALLERY_STRIP_EXIF", "").strip().lower() not in ("1", "true", "yes"),
     }

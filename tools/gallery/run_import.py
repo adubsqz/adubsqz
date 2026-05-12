@@ -97,6 +97,10 @@ def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool, stage_only
         repo, entry.bucket, entry.dest_basename
     )
 
+    if not dry_run and dest.exists() and not replace:
+        print(f"[import] skipping {entry.dest_basename}: already published (use --replace to force)")
+        return f"skipped: {entry.dest_basename} already exists"
+
     screen: ScreenResult = screen_asset(source_abs, bucket=entry.bucket)
     explicit_prompt = (entry.photo_prompt or "").strip()
     if _truthy_env("GALLERY_IMPORT_SKIP_AUTO_PROMPT"):
@@ -124,6 +128,7 @@ def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool, stage_only
         raise ScreeningRejected(screen.reasons)
 
     staged = _stage_for_edit(repo, source_abs, entry.dest_basename)
+    print(f"[import] staged for edit: {staged}")
     print(
         "gallery-import: screening passed "
         f"(lap_var={screen.laplacian_variance:.1f}, luma_std={screen.luma_std:.1f}, "
@@ -152,12 +157,18 @@ def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool, stage_only
             recipe_out=recipe,
             sidecar_out=sidecar,
         )
+        print(f"[import] photo-prompt output: {out_abs}")
+        if recipe.exists():
+            print(f"[import] recipe: {recipe}")
+        if sidecar.exists():
+            print(f"[import] sidecar: {sidecar}")
         work_abs = out_abs
 
     opt_abs = _optimized_stage_path(repo, entry.dest_basename)
     if opt_abs.exists():
         opt_abs.unlink()
     burn_resize_watermark(work_abs, opt_abs)
+    print(f"[import] optimized: {opt_abs}")
 
     _install_publish(repo, opt_abs, dest, entry.link_mode, dry_run=False, replace=replace)
     if stage_only:

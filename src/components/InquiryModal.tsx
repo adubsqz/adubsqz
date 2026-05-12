@@ -157,7 +157,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
               <label htmlFor="inquiry-name" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
-                Full Name <span className="text-red-400">*</span>
+                Full Name <span className="text-photo-muted">*</span>
               </label>
               <Input
                 id="inquiry-name"
@@ -173,7 +173,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
 
             <div>
               <label htmlFor="inquiry-email" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
-                Email <span className="text-red-400">*</span>
+                Email <span className="text-photo-muted">*</span>
               </label>
               <Input
                 id="inquiry-email"
@@ -205,7 +205,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
 
           <div>
             <label htmlFor="inquiry-address" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
-              Shipping Address <span className="text-red-400">*</span>
+              Shipping Address <span className="text-photo-muted">*</span>
             </label>
             <Textarea
               id="inquiry-address"
@@ -221,7 +221,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
 
           <div>
             <label htmlFor="inquiry-size" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
-              Print Size <span className="text-red-400">*</span>
+              Print Size <span className="text-photo-muted">*</span>
             </label>
             <Select
               id="inquiry-size"
@@ -279,7 +279,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
           {printSize === 'custom' && (
             <div>
               <label htmlFor="inquiry-custom-size" className="block text-xs uppercase tracking-wider text-photo-muted mb-2">
-                Custom Dimensions <span className="text-red-400">*</span>
+                Custom Dimensions <span className="text-photo-muted">*</span>
               </label>
               <Input
                 id="inquiry-custom-size"
@@ -310,8 +310,8 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
           </div>
 
           {submitStatus === 'error' && (
-            <div className="p-3 bg-red-900/20 border border-red-800/50 rounded-lg">
-              <p className="text-sm text-red-400">
+            <div className="p-3 bg-white/[0.04] border border-photo-border/60 rounded-lg">
+              <p className="text-sm text-photo-muted">
                 There was an error submitting your inquiry. Please try again or contact directly.
               </p>
             </div>

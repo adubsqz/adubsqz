@@ -4,6 +4,18 @@ This guide explains how to set up the inquiry system for your photography portfo
 
 ## Environment Variables
 
+**Required variables for full local operation** — create `.env.local` in the repo root:
+
+| Variable | Required | Purpose |
+|---|---|---|
+| `RESEND_API_KEY` | Yes | Resend API key (starts with `re_`) |
+| `RESEND_FROM_EMAIL` | Yes | Verified sender address in Resend |
+| `INQUIRY_RECIPIENT_EMAIL` | Yes | Your email address for receiving inquiries |
+| `GALLERY_PASSWORD` | No | Password gate (omit to leave site public locally) |
+| `GALLERY_AUTH_SECRET` | No | Signs the auth cookie — required if `GALLERY_PASSWORD` is set |
+| `GALLERY_PHOTO_PROMPT` | No | Absolute path to the `photo-prompt` binary |
+| `VITE_E2E` | No | Set to `1` to bypass the password gate in tests |
+
 1. **Get a Resend API Key**
   - Sign up at [resend.com](https://resend.com)
   - Navigate to API Keys section
@@ -30,8 +42,8 @@ GitHub Actions CI does not need Resend secrets: unit tests mock email sending.
 
 1. **Local Development**
   - Create a `.env.local` file in the project root
-  - Add the environment variables (same as above)
-  - Run `npm run dev`
+  - Add the environment variables (see table above)
+  - Run `npx vercel@latest dev` (**not** `npm run dev` — Vite alone does not mount `/api/auth` or `/api/inquire`)
   - Test the inquiry form by clicking "Request Invoice" on any photo
 2. **Production**
   - Deploy to Vercel

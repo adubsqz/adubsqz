@@ -109,7 +109,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
             </p>
             {misconfigured && (
               <div
-                className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/95"
+                className="mb-6 rounded-xl border border-photo-border bg-white/[0.04] px-4 py-3 text-sm text-photo-fg/90"
                 role="status"
               >
                 Gallery access is temporarily unavailable. Please try again later or contact the site owner.
@@ -146,7 +146,7 @@ export default function PasswordGate({ children }: PasswordGateProps) {
                   disabled={submitting || misconfigured}
                 />
                 {error && (
-                  <p className="mt-2 text-sm text-red-400">{error}</p>
+                  <p className="mt-2 text-sm text-photo-muted">{error}</p>
                 )}
               </div>
               <button

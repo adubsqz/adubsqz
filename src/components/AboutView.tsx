@@ -35,7 +35,7 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
           <h2 className="font-display text-2xl sm:text-3xl md:text-4xl leading-tight">
             {ABOUT.tagline}
           </h2>
-          <p className="text-xs sm:text-sm md:text-[0.92rem] leading-relaxed text-slate-100/90">
+          <p className="text-xs sm:text-sm md:text-[0.92rem] leading-relaxed text-photo-fg/90">
             {ABOUT.bio}
           </p>
           </CardContent>
@@ -66,9 +66,9 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
         </p>
         {onContactClick && (
           <Card className="flex flex-col gap-5 border-white/[0.14] bg-gradient-to-br from-white/[0.07] via-black/20 to-black/40 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6">
-            <p className="max-w-xl text-[0.8rem] leading-relaxed text-slate-200/90 sm:text-sm">
+            <p className="max-w-xl text-[0.8rem] leading-relaxed text-photo-fg/80 sm:text-sm">
               <span className="font-medium text-white/95">Licensing, prints, or a custom site?</span>{' '}
-              <span className="text-slate-300/88">Use the form for availability and terms—replies are direct.</span>
+              <span className="text-photo-muted/88">Use the form for availability and terms—replies are direct.</span>
             </p>
             <Button
               type="button"

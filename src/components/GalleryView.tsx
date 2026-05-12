@@ -15,22 +15,34 @@ type PhotoWithOrientation = Photo & { orientation: 'horizontal' | 'vertical' | '
 function PhotoCard({
   photo,
   onClick,
-  onFail,
   className = '',
 }: {
   photo: PhotoWithOrientation;
   onClick: () => void;
-  onFail: () => void;
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
 
   const handleError = () => {
+    console.error('Gallery photo failed to load:', photo.src ?? photo.id);
     setFailed(true);
-    onFail();
   };
 
-  if (failed) return null;
+  if (failed) {
+    const aspectClass =
+      photo.orientation === 'horizontal'
+        ? 'aspect-[4/3]'
+        : photo.orientation === 'vertical'
+        ? 'aspect-[3/4]'
+        : 'aspect-square';
+    return (
+      <div
+        className={`${aspectClass} w-full rounded-sm border-[6px] border-white/88 bg-photo-bg flex items-center justify-center ${className}`}
+      >
+        <span className="text-photo-muted/40 text-sm select-none">—</span>
+      </div>
+    );
+  }
 
   return (
     <button
@@ -49,12 +61,11 @@ function PhotoCard({
           decoding="async"
           onError={handleError}
           onClick={onClick}
-          watermarkOpacity={0.1}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-sm" />
       </div>
       {photo.caption && (
-        <p className="mt-3 text-photo-muted/80 text-xs italic leading-relaxed">{photo.caption}</p>
+        <p className="mt-3 text-photo-muted/80 text-xs italic leading-relaxed font-mono">{photo.caption}</p>
       )}
     </button>
   );
@@ -217,7 +228,6 @@ function Lightbox({
               alt={photo.alt}
               wrapperClassName="relative flex w-full max-w-full items-center justify-center"
               className="pointer-events-none block h-auto max-h-[min(78dvh,920px)] w-auto min-h-0 max-w-full object-contain sm:max-h-[min(80dvh,960px)]"
-              watermarkOpacity={0.12}
               loading="eager"
             />
           </div>
@@ -348,12 +358,10 @@ function createPhotoGroups(photos: PhotoWithOrientation[], forcePairs = false): 
 function PhotoGroup({
   group,
   onPhotoClick,
-  onFail,
   preferSideBySide = false,
 }: {
   group: PhotoGroup;
   onPhotoClick: (photo: Photo) => void;
-  onFail: (id: string) => void;
   preferSideBySide?: boolean;
 }) {
   if (group.layout === 'vertical-plus-two') {
@@ -363,18 +371,15 @@ function PhotoGroup({
         <PhotoCard
           photo={group.photos[0]}
           onClick={() => onPhotoClick(group.photos[0])}
-          onFail={() => onFail(group.photos[0].id)}
         />
         <div className="grid grid-rows-2 gap-6 sm:gap-8">
           <PhotoCard
             photo={group.photos[1]}
             onClick={() => onPhotoClick(group.photos[1])}
-            onFail={() => onFail(group.photos[1].id)}
           />
           <PhotoCard
             photo={group.photos[2]}
             onClick={() => onPhotoClick(group.photos[2])}
-            onFail={() => onFail(group.photos[2].id)}
           />
         </div>
       </div>
@@ -389,7 +394,6 @@ function PhotoGroup({
             key={photo.id}
             photo={photo}
             onClick={() => onPhotoClick(photo)}
-            onFail={() => onFail(photo.id)}
           />
         ))}
       </div>
@@ -404,7 +408,6 @@ function PhotoGroup({
             key={photo.id}
             photo={photo}
             onClick={() => onPhotoClick(photo)}
-            onFail={() => onFail(photo.id)}
           />
         ))}
       </div>
@@ -421,7 +424,6 @@ function PhotoGroup({
       <PhotoCard
         photo={singlePhoto}
         onClick={() => onPhotoClick(singlePhoto)}
-        onFail={() => onFail(singlePhoto.id)}
       />
     </div>
   );
@@ -437,7 +439,6 @@ function CollectionSection({
   preferSideBySide?: boolean;
 }) {
   const [page, setPage] = useState(1);
-  const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
   const photos = collection.photos;
 
   const totalPages = Math.max(1, Math.ceil(photos.length / PER_PAGE));
@@ -450,21 +451,11 @@ function CollectionSection({
 
   useEffect(() => {
     setPage(1);
-    setFailedIds(new Set());
   }, [collection.id]);
 
-  // Manifest rows without files (or transient load failures) can leave a page with
-  // zero visible thumbnails while totalPages still thinks another page exists.
-  useEffect(() => {
-    if (page <= 1) return;
-    if (pageSlice.length === 0) return;
-    if (failedIds.size !== pageSlice.length) return;
-    setPage((p) => Math.max(1, p - 1));
-  }, [page, pageSlice.length, failedIds.size]);
-
-  const pagePhotosToShow = orientedPhotos.filter((p) => !failedIds.has(p.id));
-
-  const handleFail = (id: string) => setFailedIds((prev) => new Set(prev).add(id));
+  // Keep every slot on the page mounted so failed images can show a placeholder
+  // (filtering failed ids out would unmount PhotoCard and hide the fallback UI).
+  const pagePhotosToShow = orientedPhotos;
 
   const photoGroups = createPhotoGroups(pagePhotosToShow, preferSideBySide);
 
@@ -478,7 +469,6 @@ function CollectionSection({
             <PhotoGroup
               group={group}
               onPhotoClick={onPhotoClick}
-              onFail={handleFail}
               preferSideBySide={preferSideBySide}
             />
           </div>
@@ -486,15 +476,20 @@ function CollectionSection({
       </div>
       {totalPages > 1 && (
         <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-          <p className="text-photo-muted text-sm">
-            Page {page} of {totalPages}
-          </p>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-photo-muted text-sm">
+              Page {page} of {totalPages}
+            </p>
+            <p className="text-photo-muted/70 text-xs">
+              Photos {start + 1}–{Math.min(start + PER_PAGE, photos.length)} of {photos.length}
+            </p>
+          </div>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="px-4 py-2 text-sm uppercase tracking-wider text-photo-muted hover:text-photo-fg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm uppercase tracking-wider text-photo-fg border border-photo-fg/25 rounded hover:border-photo-fg/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Previous
             </button>
@@ -502,7 +497,7 @@ function CollectionSection({
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="px-4 py-2 text-sm uppercase tracking-wider text-photo-muted hover:text-photo-fg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-sm uppercase tracking-wider text-photo-fg border border-photo-fg/25 rounded hover:border-photo-fg/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Next
             </button>

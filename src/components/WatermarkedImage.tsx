@@ -17,7 +17,7 @@ interface WatermarkedImageProps {
 /**
  * Protected image component with drag/download prevention
  * Images have embedded watermarks (added during optimization)
- * Plus a huge but super subtle overlay watermark for extra protection
+ * Plus a diagonal overlay watermark (readable at thumbnail scale; still non-destructive).
  */
 export default function WatermarkedImage({
   src,
@@ -29,7 +29,8 @@ export default function WatermarkedImage({
   onError,
   onClick,
   watermarkText = 'adubsqz',
-  watermarkOpacity = 0.09,
+  /** 0–1 CSS opacity on the overlay spans; keep in sync with gallery contrast needs */
+  watermarkOpacity = 0.3,
 }: WatermarkedImageProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -74,14 +75,15 @@ export default function WatermarkedImage({
             style={{
               transform: 'translate(-50%, -50%) rotate(-24deg)',
               opacity: watermarkOpacity,
-              fontSize: 'clamp(1rem, 2.2vw, 1.85rem)',
+              fontSize: 'clamp(1.1rem, 3vw, 2.25rem)',
               fontWeight: 700,
               letterSpacing: '0.28em',
               textTransform: 'uppercase',
               userSelect: 'none',
               pointerEvents: 'none',
-              color: 'rgba(255, 255, 255, 0.84)',
-              textShadow: '0 1px 3px rgba(0, 0, 0, 0.38)',
+              color: '#ffffff',
+              textShadow:
+                '0 1px 2px rgba(0, 0, 0, 0.65), 0 0 12px rgba(0, 0, 0, 0.35)',
               whiteSpace: 'nowrap',
             }}
           >
@@ -90,15 +92,15 @@ export default function WatermarkedImage({
           <span
             className="absolute right-3 bottom-2"
             style={{
-              opacity: Math.min(watermarkOpacity + 0.04, 0.2),
+              opacity: Math.min(watermarkOpacity + 0.08, 0.5),
               fontSize: 'clamp(0.72rem, 1.1vw, 0.92rem)',
               fontWeight: 600,
               letterSpacing: '0.06em',
               textTransform: 'lowercase',
               userSelect: 'none',
               pointerEvents: 'none',
-              color: 'rgba(255, 255, 255, 0.86)',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.45)',
+              color: '#ffffff',
+              textShadow: '0 1px 3px rgba(0, 0, 0, 0.55)',
               whiteSpace: 'nowrap',
             }}
           >
