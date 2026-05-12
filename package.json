@@ -20,6 +20,8 @@
     "gallery:verify": "bash tools/run_gallery_module.sh gallery.verify_manifest",
     "gallery:doctor": "bash tools/run_gallery_module.sh gallery.doctor",
     "gallery:draft-probe-map": "bash tools/run_gallery_module.sh gallery.draft_probe_map",
+    "gallery:draft-bw-prefix-map": "bash tools/run_gallery_module.sh gallery.draft_bw_prefix_map",
+    "gallery:draft-compound-manifest-map": "bash tools/run_gallery_module.sh gallery.draft_compound_manifest_map",
     "gallery:promote": "bash tools/run_gallery_module.sh gallery.run_promote"
   },
   "dependencies": {

@@ -42,8 +42,6 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
         </Card>
       </div>
 
-      <RightsReservedBlock />
-
       <div className="flex flex-wrap gap-4">
         {ABOUT.socials.map((social) => (
           <a

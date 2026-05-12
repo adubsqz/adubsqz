@@ -113,6 +113,44 @@ def _watermark_overlay(
     return Image.alpha_composite(img_rgba, layer)
 
 
+def watermark_label_screen_rect(
+    image_width: int,
+    image_height: int,
+    *,
+    watermark_text: str,
+    watermark_position: str,
+) -> tuple[int, int, int, int]:
+    """Return ``(left, upper, right, lower)`` for :meth:`PIL.Image.Image.crop` / ``numpy`` slicing.
+
+    Matches the padded rectangle around the burn-in label in :func:`_watermark_overlay`
+    (same font metrics, margin, and pad). ``right``/``lower`` follow Pillow crop convention
+    (right column and lower row excluded from the region).
+    """
+    layer = Image.new("RGB", (image_width, image_height))
+    draw = ImageDraw.Draw(layer)
+    font, _ = _font_for_width(image_width, watermark_text)
+    bbox = draw.textbbox((0, 0), watermark_text, font=font)
+    tw = bbox[2] - bbox[0]
+    th = bbox[3] - bbox[1]
+    margin = int(image_width * 0.02)
+    pad = 5
+    pmap = {
+        "bottom-right": (image_width - tw - margin, image_height - th - margin),
+        "bottom-left": (margin, image_height - th - margin),
+        "top-right": (image_width - tw - margin, margin),
+        "top-left": (margin, margin),
+        "center": ((image_width - tw) // 2, (image_height - th) // 2),
+    }
+    pos = pmap.get(watermark_position, pmap["bottom-right"])
+    l = max(0, pos[0] - pad)
+    t = max(0, pos[1] - pad)
+    r = min(image_width, pos[0] + tw + pad)
+    b = min(image_height, pos[1] + th + pad)
+    if r <= l + 2 or b <= t + 2:
+        raise ValueError("watermark label region degenerate for this image size")
+    return l, t, r, b
+
+
 def burn_resize_watermark(src: Path, dest: Path) -> None:
     """Read image from ``src``, resize (max dims), embed watermark, write ``dest`` (suffix controls format)."""
     opts = _publish_options()

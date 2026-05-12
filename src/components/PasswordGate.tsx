@@ -5,17 +5,23 @@ interface PasswordGateProps {
 }
 
 const e2eBypass = import.meta.env.VITE_E2E === '1';
+/** Plain `vite` dev server (`MODE===development`): no password; never true in prod bundle or Vitest (`MODE=test`). */
+const preferGateInDev = import.meta.env.VITE_REQUIRE_PASSWORD_GATE === '1';
+const developmentBypass =
+  import.meta.env.DEV && import.meta.env.MODE === 'development' && !preferGateInDev;
+
+const bypassGate = e2eBypass || developmentBypass;
 
 export default function PasswordGate({ children }: PasswordGateProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(e2eBypass);
+  const [isAuthenticated, setIsAuthenticated] = useState(bypassGate);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(!e2eBypass);
+  const [loading, setLoading] = useState(!bypassGate);
   const [submitting, setSubmitting] = useState(false);
   const [misconfigured, setMisconfigured] = useState(false);
 
   useEffect(() => {
-    if (e2eBypass) return;
+    if (bypassGate) return;
 
     let cancelled = false;
 
