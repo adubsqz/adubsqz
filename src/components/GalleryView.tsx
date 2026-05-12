@@ -453,6 +453,15 @@ function CollectionSection({
     setFailedIds(new Set());
   }, [collection.id]);
 
+  // Manifest rows without files (or transient load failures) can leave a page with
+  // zero visible thumbnails while totalPages still thinks another page exists.
+  useEffect(() => {
+    if (page <= 1) return;
+    if (pageSlice.length === 0) return;
+    if (failedIds.size !== pageSlice.length) return;
+    setPage((p) => Math.max(1, p - 1));
+  }, [page, pageSlice.length, failedIds.size]);
+
   const pagePhotosToShow = orientedPhotos.filter((p) => !failedIds.has(p.id));
 
   const handleFail = (id: string) => setFailedIds((prev) => new Set(prev).add(id));
