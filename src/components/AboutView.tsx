@@ -1,5 +1,4 @@
 import { ABOUT, ABOUT_IMAGE_SRC } from '../data';
-import { RightsReservedBlock } from './LicensingDetails';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 
