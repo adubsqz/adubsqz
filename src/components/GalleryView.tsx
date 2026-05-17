@@ -1,57 +1,97 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
+import { GALLERY_REEL_SIZE } from '../gallery-constants';
 import WatermarkedImage from './WatermarkedImage';
 import InquiryModal from './InquiryModal';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 
-const PER_PAGE = 8;
-
-type PhotoWithOrientation = Photo & { orientation: 'horizontal' | 'vertical' | 'square' };
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return reduced;
+}
 
 function PhotoCard({
   photo,
   onClick,
+  fetchPriority,
   className = '',
 }: {
-  photo: PhotoWithOrientation;
+  photo: Photo;
   onClick: () => void;
+  fetchPriority?: 'high' | 'low' | 'auto';
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
+  const reducedMotion = usePrefersReducedMotion();
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
 
   const handleError = () => {
     console.error('Gallery photo failed to load:', photo.src ?? photo.id);
     setFailed(true);
   };
 
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (reducedMotion || !btnRef.current) return;
+      const r = btnRef.current.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      setTilt({ rx: y * -5.5, ry: x * 5.5 });
+    },
+    [reducedMotion],
+  );
+
+  const onPointerLeave = useCallback(() => setTilt({ rx: 0, ry: 0 }), []);
+
   if (failed) {
-    const aspectClass =
-      photo.orientation === 'horizontal'
-        ? 'aspect-[4/3]'
-        : photo.orientation === 'vertical'
-        ? 'aspect-[3/4]'
-        : 'aspect-square';
     return (
       <div
-        className={`${aspectClass} w-full rounded-sm border-[6px] border-white/88 bg-photo-bg flex items-center justify-center ${className}`}
+        className={`aspect-[4/5] w-full rounded-sm border-[3px] border-mcm-line/40 bg-mcm-paper/30 flex items-center justify-center ${className}`}
       >
-        <span className="text-photo-muted/40 text-sm select-none">—</span>
+        <span className="text-photo-muted/40 text-sm select-none font-mono">—</span>
       </div>
     );
   }
 
   return (
     <button
+      ref={btnRef}
       type="button"
       onClick={onClick}
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
+      onPointerCancel={onPointerLeave}
       aria-label={`Open photo: ${photo.alt}`}
-      className={`block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-photo-fg focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg group ${className}`}
+      className={`block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-mcm-rust focus-visible:ring-offset-2 focus-visible:ring-offset-mcm-ink group ${className}`}
+      style={{ perspective: '880px' }}
     >
-      <div className="relative mx-auto w-fit max-w-full rounded-sm border-[6px] border-white/88 shadow-[0_12px_40px_rgba(0,0,0,0.55)] transition-all duration-500 group-hover:border-white group-hover:scale-[1.01]">
+      <div
+        className="relative mx-auto w-fit max-w-full rounded-sm border-[3px] border-mcm-cream/95 bg-mcm-ink shadow-[0_12px_40px_rgba(0,0,0,0.55),inset_0_0_0_1px_rgba(0,0,0,0.4)] transition-[border-color,box-shadow] duration-300 group-hover:border-mcm-sage/70 group-hover:shadow-[0_16px_52px_rgba(0,0,0,0.62)] motion-safe:transition-transform motion-safe:duration-300 [transform-style:preserve-3d]"
+        style={
+          reducedMotion
+            ? undefined
+            : {
+                transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(1.002)`,
+              }
+        }
+      >
+        <span
+          className="pointer-events-none absolute -left-1.5 top-2 z-[5] h-px w-4 bg-mcm-rust/90"
+          aria-hidden
+        />
         <WatermarkedImage
           src={photo.src}
           alt={photo.alt}
@@ -59,86 +99,30 @@ function PhotoCard({
           className="gallery-image block h-auto max-h-[70vh] w-auto max-w-full object-contain"
           loading="lazy"
           decoding="async"
+          fetchPriority={fetchPriority}
           onError={handleError}
           onClick={onClick}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-sm" />
+        <div className="absolute inset-0 bg-gradient-to-t from-mcm-ink/35 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-sm" />
       </div>
       {photo.caption && (
-        <p className="mt-3 text-photo-muted/80 text-xs italic leading-relaxed font-mono">{photo.caption}</p>
+        <p className="mt-3 text-photo-muted/85 text-[0.7rem] leading-relaxed font-mono tracking-wide">
+          {photo.caption}
+        </p>
       )}
     </button>
   );
 }
 
-// Hook to detect image orientation
-function useImageOrientation(photos: Photo[]): PhotoWithOrientation[] {
-  const [orientedPhotos, setOrientedPhotos] = useState<PhotoWithOrientation[]>(
-    photos.map(p => ({ ...p, orientation: p.orientation || 'square' as const }))
-  );
-
-  // Key off stable photo identity (id+src) instead of array reference so callers
-  // that build a fresh array each render don't retrigger the effect in a loop.
-  const photosKey = photos.map((p) => `${p.id}|${p.src}`).join('\n');
-
-  useEffect(() => {
-    let cancelled = false;
-    const loadOrientations = async () => {
-      const results = await Promise.all(
-        photos.map(photo => {
-          if (photo.orientation) {
-            return Promise.resolve({ ...photo, orientation: photo.orientation });
-          }
-          
-          return new Promise<PhotoWithOrientation>((resolve) => {
-            const img = new Image();
-            img.onload = () => {
-              const ratio = img.width / img.height;
-              let orientation: 'horizontal' | 'vertical' | 'square';
-              
-              // Portrait formats like 4:5 (0.8) and 3:4 (0.75) must read as vertical, not square.
-              if (ratio > 1.05) {
-                orientation = 'horizontal';
-              } else if (ratio < 0.95) {
-                orientation = 'vertical';
-              } else {
-                orientation = 'square';
-              }
-              
-              resolve({ ...photo, orientation });
-            };
-            img.onerror = () => {
-              resolve({ ...photo, orientation: 'square' });
-            };
-            img.src = photo.src;
-          });
-        })
-      );
-      if (!cancelled) setOrientedPhotos(results);
-    };
-
-    loadOrientations();
-    return () => {
-      cancelled = true;
-    };
-    // photosKey captures the only inputs that should retrigger detection; using
-    // `photos` directly would re-run on every render when callers pass a fresh
-    // array (e.g. result of Array#slice).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [photosKey]);
-
-  return orientedPhotos;
-}
-
-function Lightbox({ 
-  photo, 
-  onClose, 
+function Lightbox({
+  photo,
+  onClose,
   onInquire,
   onInquireTearsheet,
   onPrevious,
   onNext,
-}: { 
-  photo: Photo; 
+}: {
+  photo: Photo;
   onClose: () => void;
   onInquire: () => void;
   onInquireTearsheet: () => void;
@@ -162,28 +146,27 @@ function Lightbox({
     if (el) el.scrollTop = 0;
   }, [photo.id, photo.src]);
 
-  // Portal to document.body so `position:fixed` anchors to the viewport. An ancestor
-  // `.backdrop-blur` Card uses `backdrop-filter`, which establishes a containing block
-  // and would otherwise stretch the lightbox to the full scroll height of that card.
   return createPortal(
     <div
       ref={scrollRef}
-      className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden overscroll-contain bg-black"
+      className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden overscroll-contain bg-mcm-ink"
       role="dialog"
       aria-modal="true"
       aria-label="Image lightbox"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="mx-auto flex w-full max-w-[min(1200px,100vw)] flex-col px-6 pb-16 pt-8 sm:px-12 sm:pb-12 sm:pt-12 lg:pb-16">
-        <header className="flex shrink-0 flex-col gap-8 border-b border-white/[0.06] pb-10 sm:flex-row sm:items-center sm:justify-between sm:gap-12 sm:pb-12">
+        <header className="flex shrink-0 flex-col gap-8 border-b border-mcm-cream/10 pb-10 sm:flex-row sm:items-center sm:justify-between sm:gap-12 sm:pb-12">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <span className="text-[0.65rem] uppercase tracking-[0.22em] text-white/35">Navigate</span>
+            <span className="text-[0.65rem] uppercase tracking-[0.22em] text-mcm-cream/40 font-mono">
+              Navigate
+            </span>
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <Button
                 type="button"
                 onClick={onPrevious}
                 variant="lightbox"
-                className="rounded-md px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
+                className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
                 aria-label="View previous photo"
               >
                 Prev
@@ -192,19 +175,19 @@ function Lightbox({
                 type="button"
                 onClick={onNext}
                 variant="lightbox"
-                className="rounded-md px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
+                className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
                 aria-label="View next photo"
               >
                 Next
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 sm:pl-4 sm:border-l sm:border-white/[0.08]">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 sm:pl-4 sm:border-l sm:border-mcm-cream/10">
             <Button
               type="button"
               onClick={onInquire}
               variant="lightboxPrimary"
-              className="rounded-md px-6 py-2.5 text-[0.7rem] tracking-[0.16em] focus-visible:ring-white"
+              className="rounded-sm px-6 py-2.5 text-[0.7rem] tracking-[0.16em] focus-visible:ring-mcm-cream"
             >
               Request Invoice
             </Button>
@@ -212,7 +195,7 @@ function Lightbox({
               type="button"
               onClick={onClose}
               variant="lightbox"
-              className="rounded-md px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
+              className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
             >
               Close
             </Button>
@@ -229,6 +212,8 @@ function Lightbox({
               wrapperClassName="relative flex w-full max-w-full items-center justify-center"
               className="pointer-events-none block h-auto max-h-[min(78dvh,920px)] w-auto min-h-0 max-w-full object-contain sm:max-h-[min(80dvh,960px)]"
               loading="eager"
+              decoding="async"
+              fetchPriority="high"
             />
           </div>
         </figure>
@@ -237,39 +222,45 @@ function Lightbox({
 
         {photo.caption && (
           <>
-            <Card className="rounded-xl border-white/10 bg-white/[0.04] backdrop-blur-sm">
+            <Card className="rounded-sm border-mcm-cream/15 bg-mcm-paper/5 backdrop-blur-sm">
               <CardContent className="px-5 py-4 sm:px-8">
-                <p className="text-center text-sm italic leading-relaxed text-white/65">{photo.caption}</p>
+                <p className="text-center text-sm italic leading-relaxed text-mcm-cream/70">{photo.caption}</p>
               </CardContent>
             </Card>
             <div className="h-10 sm:h-14" aria-hidden />
           </>
         )}
 
-        <section className="space-y-12 border-t border-white/10 pt-16 sm:space-y-16 sm:pt-20">
-          <div className="text-[0.65rem] uppercase tracking-[0.28em] text-white/30">Licensing & fulfillment</div>
+        <section className="space-y-12 border-t border-mcm-cream/10 pt-16 sm:space-y-16 sm:pt-20">
+          <div className="text-[0.65rem] uppercase tracking-[0.28em] text-mcm-cream/35 font-mono">
+            Licensing & fulfillment
+          </div>
           <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-14 lg:gap-20">
-            <Card className="space-y-4 border-white/[0.12] bg-white/[0.04] p-6 sm:p-8">
-              <p className="text-[0.7rem] uppercase tracking-[0.2em] text-white/45">Trade Portal + Tearsheet</p>
-              <p className="text-sm leading-relaxed text-white/85">
+            <Card className="space-y-4 border-mcm-cream/12 bg-mcm-paper/5 p-6 sm:p-8 rounded-sm">
+              <p className="text-[0.7rem] uppercase tracking-[0.2em] text-mcm-cream/50 font-mono">
+                Trade Portal + Tearsheet
+              </p>
+              <p className="text-sm leading-relaxed text-mcm-cream/88">
                 Printable 8.5×11 lookbook pages with image SKU and title under each frame—available on request.
               </p>
               <Button
                 type="button"
                 onClick={onInquireTearsheet}
                 variant="ghost"
-                className="h-auto justify-start px-0 pt-2 text-left text-[0.75rem] tracking-[0.18em] text-photo-accent hover:text-photo-accent/90"
+                className="h-auto justify-start px-0 pt-2 text-left text-[0.75rem] tracking-[0.18em] text-mcm-rust hover:text-mcm-rust/90"
               >
                 Inquire about tearsheet…
               </Button>
             </Card>
-            <Card className="space-y-4 border-white/[0.12] bg-white/[0.04] p-6 sm:p-8">
-              <p className="text-[0.7rem] uppercase tracking-[0.2em] text-white/45">Fulfillment Options</p>
-              <p className="text-sm leading-relaxed text-white/85">
+            <Card className="space-y-4 border-mcm-cream/12 bg-mcm-paper/5 p-6 sm:p-8 rounded-sm">
+              <p className="text-[0.7rem] uppercase tracking-[0.2em] text-mcm-cream/50 font-mono">
+                Fulfillment Options
+              </p>
+              <p className="text-sm leading-relaxed text-mcm-cream/88">
                 Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ
                 delivery: 5-7 business days.
               </p>
-              <p className="text-sm leading-relaxed text-white/85">
+              <p className="text-sm leading-relaxed text-mcm-cream/88">
                 Short-term set rental is available at 20% of retail per 30-day term.
               </p>
             </Card>
@@ -279,152 +270,36 @@ function Lightbox({
         <div className="h-6 shrink-0 sm:h-8" aria-hidden />
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 
-// Smart layout grouping algorithm
-type PhotoGroup = {
-  photos: PhotoWithOrientation[];
-  layout: 'two-horizontal' | 'vertical-plus-two' | 'three-horizontal' | 'single';
-};
-
-function createPhotoGroups(photos: PhotoWithOrientation[], forcePairs = false): PhotoGroup[] {
-  const groups: PhotoGroup[] = [];
-  let i = 0;
-
-  while (i < photos.length) {
-    const current = photos[i];
-    const next = photos[i + 1];
-    const third = photos[i + 2];
-
-    if (forcePairs && next) {
-      groups.push({
-        photos: [current, next],
-        layout: 'two-horizontal',
-      });
-      i += 2;
-      continue;
-    }
-
-    // Pattern 1: Vertical photo + 2 horizontals beside it
-    if (
-      current.orientation === 'vertical' &&
-      next?.orientation === 'horizontal' &&
-      third?.orientation === 'horizontal'
-    ) {
-      groups.push({
-        photos: [current, next, third],
-        layout: 'vertical-plus-two',
-      });
-      i += 3;
-    }
-    // Pattern 2: Two horizontal photos side by side
-    else if (
-      current.orientation === 'horizontal' &&
-      next?.orientation === 'horizontal'
-    ) {
-      groups.push({
-        photos: [current, next],
-        layout: 'two-horizontal',
-      });
-      i += 2;
-    }
-    // Pattern 3: Three horizontal photos in a row (only on wider screens)
-    else if (
-      current.orientation === 'horizontal' &&
-      next?.orientation === 'horizontal' &&
-      third?.orientation === 'horizontal'
-    ) {
-      groups.push({
-        photos: [current, next, third],
-        layout: 'three-horizontal',
-      });
-      i += 3;
-    }
-    // Pattern 4: Single photo (fallback)
-    else {
-      groups.push({
-        photos: [current],
-        layout: 'single',
-      });
-      i += 1;
-    }
-  }
-
-  return groups;
-}
-
-function PhotoGroup({
-  group,
+function ReelFrame({
+  photos,
   onPhotoClick,
-  preferSideBySide = false,
 }: {
-  group: PhotoGroup;
+  photos: Photo[];
   onPhotoClick: (photo: Photo) => void;
-  preferSideBySide?: boolean;
 }) {
-  if (group.layout === 'vertical-plus-two') {
-    // 1 vertical on left, 2 horizontals stacked on right
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-        <PhotoCard
-          photo={group.photos[0]}
-          onClick={() => onPhotoClick(group.photos[0])}
-        />
-        <div className="grid grid-rows-2 gap-6 sm:gap-8">
-          <PhotoCard
-            photo={group.photos[1]}
-            onClick={() => onPhotoClick(group.photos[1])}
-          />
-          <PhotoCard
-            photo={group.photos[2]}
-            onClick={() => onPhotoClick(group.photos[2])}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (group.layout === 'two-horizontal') {
-    return (
-      <div className={`grid grid-cols-1 ${preferSideBySide ? 'sm:grid-cols-2' : 'lg:grid-cols-2'} gap-6 sm:gap-8`}>
-        {group.photos.map(photo => (
-          <PhotoCard
-            key={photo.id}
-            photo={photo}
-            onClick={() => onPhotoClick(photo)}
-          />
-        ))}
-      </div>
-    );
-  }
-
-  if (group.layout === 'three-horizontal') {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
-        {group.photos.map(photo => (
-          <PhotoCard
-            key={photo.id}
-            photo={photo}
-            onClick={() => onPhotoClick(photo)}
-          />
-        ))}
-      </div>
-    );
-  }
-
-  // Single photo
-  const singlePhoto = group.photos[0];
-  const singlePhotoWidthClass =
-    singlePhoto.orientation === 'vertical' ? 'max-w-xl' : 'max-w-3xl';
+  const n = photos.length;
+  const gridClass =
+    n === 1
+      ? 'grid grid-cols-1 place-items-stretch max-w-3xl mx-auto w-full'
+      : n === 2
+        ? 'grid grid-cols-1 md:grid-cols-2 md:max-w-5xl mx-auto w-full gap-6 sm:gap-8'
+        : 'grid grid-cols-1 md:grid-cols-3 w-full gap-5 sm:gap-7';
 
   return (
-    <div className={`${singlePhotoWidthClass} mx-auto`}>
-      <PhotoCard
-        photo={singlePhoto}
-        onClick={() => onPhotoClick(singlePhoto)}
-      />
+    <div className={gridClass}>
+      {photos.map((photo, i) => (
+        <div key={photo.id} className="[content-visibility:auto] [contain:layout]">
+          <PhotoCard
+            photo={photo}
+            onClick={() => onPhotoClick(photo)}
+            fetchPriority={i < 2 ? 'high' : i < 5 ? 'auto' : 'low'}
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -432,56 +307,71 @@ function PhotoGroup({
 function CollectionSection({
   collection,
   onPhotoClick,
-  preferSideBySide = false,
 }: {
   collection: PhotoCollection;
   onPhotoClick: (photo: Photo) => void;
-  preferSideBySide?: boolean;
 }) {
   const [page, setPage] = useState(1);
   const photos = collection.photos;
 
-  const totalPages = Math.max(1, Math.ceil(photos.length / PER_PAGE));
-  const start = (page - 1) * PER_PAGE;
+  const totalPages = Math.max(1, Math.ceil(photos.length / GALLERY_REEL_SIZE));
+  const start = (page - 1) * GALLERY_REEL_SIZE;
   const pageSlice = useMemo(
-    () => photos.slice(start, start + PER_PAGE),
+    () => photos.slice(start, start + GALLERY_REEL_SIZE),
     [photos, start],
   );
-  const orientedPhotos = useImageOrientation(pageSlice);
+
+  const preloadKey = `${collection.id}-${page}-${start}`;
 
   useEffect(() => {
     setPage(1);
   }, [collection.id]);
 
-  // Keep every slot on the page mounted so failed images can show a placeholder
-  // (filtering failed ids out would unmount PhotoCard and hide the fallback UI).
-  const pagePhotosToShow = orientedPhotos;
-
-  const photoGroups = createPhotoGroups(pagePhotosToShow, preferSideBySide);
+  useEffect(() => {
+    const head = document.head;
+    const preloadTargets = pageSlice.slice(0, 2);
+    if (preloadTargets.length === 0) return;
+    const links: HTMLLinkElement[] = [];
+    preloadTargets.forEach((p, i) => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = p.src;
+      if (i === 0) link.setAttribute('fetchpriority', 'high');
+      head.appendChild(link);
+      links.push(link);
+    });
+    return () => {
+      links.forEach((l) => l.remove());
+    };
+  }, [preloadKey]);
 
   if (photos.length === 0) return null;
 
   return (
-    <section>
-      <div className="space-y-12 sm:space-y-16">
-        {photoGroups.map((group, idx) => (
-          <div key={`group-${idx}`} role="group" aria-label={`Photo group ${idx + 1}`}>
-            <PhotoGroup
-              group={group}
-              onPhotoClick={onPhotoClick}
-              preferSideBySide={preferSideBySide}
-            />
-          </div>
-        ))}
+    <section aria-label={`Gallery reel for ${collection.title}`}>
+      <div
+        key={`${collection.id}-reel-${page}`}
+        className="relative isolate pb-2 motion-safe:animate-slide-reveal"
+      >
+        <div
+          className="pointer-events-none absolute -inset-3 sm:-inset-5 rounded-sm opacity-[0.12] motion-safe:animate-specimen-flash"
+          aria-hidden
+          style={{
+            background:
+              'radial-gradient(ellipse at center, rgba(196,92,38,0.25) 0%, transparent 55%), radial-gradient(circle at 20% 0%, rgba(235,230,220,0.12), transparent 50%)',
+          }}
+        />
+        <ReelFrame photos={pageSlice} onPhotoClick={onPhotoClick} />
       </div>
       {totalPages > 1 && (
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex flex-col gap-0.5">
-            <p className="text-photo-muted text-sm">
-              Page {page} of {totalPages}
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-mcm-line/35 pt-6 font-mono">
+          <div className="flex flex-col gap-1">
+            <p className="text-photo-muted text-[0.7rem] uppercase tracking-[0.22em]">
+              Reel {page} / {totalPages}
             </p>
-            <p className="text-photo-muted/70 text-xs">
-              Photos {start + 1}–{Math.min(start + PER_PAGE, photos.length)} of {photos.length}
+            <p className="text-photo-muted/65 text-[0.62rem] uppercase tracking-[0.16em]">
+              Frames {start + 1}–{Math.min(start + GALLERY_REEL_SIZE, photos.length)} of {photos.length}
             </p>
           </div>
           <div className="flex gap-2">
@@ -489,17 +379,17 @@ function CollectionSection({
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="px-4 py-2 text-sm uppercase tracking-wider text-photo-fg border border-photo-fg/25 rounded hover:border-photo-fg/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-[0.65rem] uppercase tracking-[0.24em] text-photo-fg border border-mcm-rust/35 rounded-sm bg-mcm-ink/40 hover:border-mcm-rust/55 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              Previous
+              ◀ Rev −
             </button>
             <button
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="px-4 py-2 text-sm uppercase tracking-wider text-photo-fg border border-photo-fg/25 rounded hover:border-photo-fg/50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 text-[0.65rem] uppercase tracking-[0.24em] text-photo-fg border border-mcm-rust/35 rounded-sm bg-mcm-ink/40 hover:border-mcm-rust/55 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              Next
+              Rev + ▶
             </button>
           </div>
         </div>
@@ -522,7 +412,6 @@ export default function GalleryView({ filter }: GalleryViewProps) {
     ...collection,
     photos: collection.photos,
   };
-  const preferSideBySide = false;
 
   useEffect(() => {
     if (!lightboxPhoto) return;
@@ -545,7 +434,7 @@ export default function GalleryView({ filter }: GalleryViewProps) {
     });
     setLightboxPhoto(null);
   };
-  
+
   const handleLightboxMove = (direction: 'next' | 'previous') => {
     if (!lightboxPhoto) return;
     if (filteredCollection.photos.length === 0) return;
@@ -559,18 +448,11 @@ export default function GalleryView({ filter }: GalleryViewProps) {
 
   return (
     <div className="space-y-12">
-
       {filteredCollection.photos.length === 0 && (
-        <p className="text-sm text-photo-muted">
-          No photos found in this category.
-        </p>
+        <p className="text-sm text-photo-muted">No photos found in this category.</p>
       )}
 
-      <CollectionSection
-        collection={filteredCollection}
-        onPhotoClick={setLightboxPhoto}
-        preferSideBySide={preferSideBySide}
-      />
+      <CollectionSection collection={filteredCollection} onPhotoClick={setLightboxPhoto} />
 
       {lightboxPhoto && (
         <Lightbox

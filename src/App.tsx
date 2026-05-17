@@ -10,8 +10,8 @@ import { Card } from './components/ui/card';
 const totalGalleryPhotos = COLLECTIONS.reduce((n, c) => n + c.photos.length, 0);
 
 const TABS: { id: PageView; label: string }[] = [
-  { id: 'gallery', label: 'Gallery' },
-  { id: 'about', label: 'About' },
+  { id: 'gallery', label: 'Program' },
+  { id: 'about', label: 'Liner notes' },
 ];
 
 export default function App() {
@@ -20,13 +20,27 @@ export default function App() {
   const [showContact, setShowContact] = useState(false);
 
   return (
-    <div className="min-h-[100dvh] text-photo-fg font-sans antialiased pb-4 sm:pb-0">
-      <div className="relative min-h-[100dvh]">
-        <main className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-6 sm:py-8">
-          <Card className="overflow-hidden rounded-3xl border-photo-border/40 bg-photo-panel/95 shadow-[0_26px_80px_rgba(0,0,0,0.9)] backdrop-blur-md">
-            <div className="pt-1">
-              <nav className="flex" role="tablist" aria-label="Main">
-                {TABS.map((tab) => {
+    <div className="min-h-[100dvh] text-photo-fg font-sans antialiased pb-28 sm:pb-32 relative selection:bg-mcm-rust/25">
+      <div className="cinematic-grid" aria-hidden />
+      <div className="relative z-[1] min-h-[100dvh]">
+        <main className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-5 sm:py-8">
+          <div className="mb-5 sm:mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-mcm-line/50 pb-4">
+            <div>
+              <p className="font-mono text-[0.62rem] uppercase tracking-[0.32em] text-mcm-rust/90">
+                Specimen 01 — portfolio
+              </p>
+              <h1 className="mt-2 font-display text-3xl sm:text-4xl font-normal tracking-tight text-mcm-cream">
+                adubsqz
+              </h1>
+            </div>
+            <p className="max-w-sm font-mono text-[0.65rem] leading-relaxed text-photo-muted">
+              Still-life frames. Mid-century rigor, darkroom patience, HTTP delivery.
+            </p>
+          </div>
+          <Card className="overflow-hidden rounded-sm border border-mcm-line/60 bg-photo-panel/95 shadow-[0_28px_100px_rgba(0,0,0,0.88)] backdrop-blur-md">
+            <div className="pt-0">
+              <nav className="flex font-mono bg-mcm-ink/35" role="tablist" aria-label="Main">
+                {TABS.map((tab, idx) => {
                   const active = view === tab.id;
                   return (
                     <button
@@ -37,34 +51,41 @@ export default function App() {
                       aria-controls={`panel-${tab.id}`}
                       id={`tab-${tab.id}`}
                       onClick={() => setView(tab.id)}
-                      className={`flex-1 py-4 sm:py-5 text-sm font-medium uppercase tracking-wider transition-colors ${
+                      className={`relative flex flex-1 flex-col items-center gap-1 py-4 sm:py-5 text-[0.68rem] font-medium uppercase tracking-[0.28em] transition-colors ${
                         active
-                          ? 'text-photo-accent border-b-2 border-photo-accent -mb-px'
+                          ? 'text-mcm-cream border-b-2 border-mcm-rust -mb-px bg-mcm-paper/[0.04]'
                           : 'text-photo-muted hover:text-photo-fg border-b-2 border-transparent'
                       }`}
                     >
+                      <span className="text-[0.55rem] text-mcm-rust/80 tabular-nums">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
                       {tab.label}
                     </button>
                   );
                 })}
               </nav>
               {view === 'gallery' && (
-                <div className="px-6 sm:px-8 pb-3 pt-1 space-y-3">
-                  <div className="text-[0.63rem] uppercase tracking-[0.18em] text-photo-muted">
-                    Categories
+                <div className="px-5 sm:px-8 pb-3 pt-4 space-y-3 border-b border-mcm-cream/[0.07]">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-block h-2 w-2 rounded-full bg-mcm-rust" aria-hidden />
+                    <div className="text-[0.58rem] uppercase tracking-[0.26em] text-photo-muted font-mono">
+                      Strip index — select channel
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-4 text-xs uppercase tracking-wider">
-                    {COLLECTIONS.map((collection) => (
+                  <div className="flex flex-wrap gap-3 text-[0.65rem] uppercase tracking-[0.2em] font-mono">
+                    {COLLECTIONS.map((collection, i) => (
                       <button
                         key={collection.id}
                         type="button"
                         onClick={() => setGalleryFilter(collection.id)}
-                        className={`transition-colors ${
+                        className={`transition-colors px-3 py-1.5 rounded-sm border ${
                           galleryFilter === collection.id
-                            ? 'text-photo-accent border-b-2 border-photo-accent -mb-px pb-1'
-                            : 'text-photo-muted hover:text-photo-fg border-b-2 border-transparent pb-1'
+                            ? 'text-mcm-cream border-mcm-rust/50 bg-mcm-rust/15 shadow-[inset_0_0_0_1px_rgba(196,92,38,0.25)]'
+                            : 'text-photo-muted hover:text-photo-fg border-mcm-line/40 hover:border-mcm-sage/35'
                         }`}
                       >
+                        <span className="mr-2 tabular-nums text-mcm-rust/70">{String(i + 1).padStart(2, '0')}</span>
                         {collection.title}
                       </button>
                     ))}
@@ -91,7 +112,7 @@ export default function App() {
               )}
               {view === 'about' && <AboutView onContactClick={() => setShowContact(true)} />}
             </div>
-            <footer className="border-t border-photo-border/50 px-5 py-5 sm:px-7 md:px-8 lg:px-10">
+            <footer className="border-t border-mcm-line/45 px-5 py-5 sm:px-7 md:px-8 lg:px-10">
               <RightsReservedBlock />
             </footer>
           </Card>

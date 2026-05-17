@@ -8,6 +8,8 @@ interface WatermarkedImageProps {
   className?: string;
   loading?: 'lazy' | 'eager';
   decoding?: 'async' | 'sync' | 'auto';
+  /** Hint LCP / visible-row priority (passed through to `<img>`) */
+  fetchPriority?: 'high' | 'low' | 'auto';
   onError?: () => void;
   onClick?: () => void;
   watermarkText?: string;
@@ -26,6 +28,7 @@ export default function WatermarkedImage({
   className = '',
   loading = 'lazy',
   decoding = 'async',
+  fetchPriority,
   onError,
   onClick,
   watermarkText = 'adubsqz',
@@ -57,6 +60,7 @@ export default function WatermarkedImage({
         className={className}
         loading={loading}
         decoding={decoding}
+        fetchPriority={fetchPriority}
         onError={onError}
         onLoad={handleImageLoad}
         style={{
