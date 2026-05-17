@@ -23,7 +23,7 @@ describe('Contact me flow (functional)', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('tab', { name: /about/i }));
+    await user.click(screen.getByRole('tab', { name: /liner notes/i }));
     await user.click(screen.getByRole('button', { name: /contact me/i }));
 
     expect(screen.getByRole('dialog', { name: /contact/i })).toBeInTheDocument();
