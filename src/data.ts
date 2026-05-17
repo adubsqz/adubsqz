@@ -160,7 +160,7 @@ export const ABOUT = {
   tagline: 'Photography',
   contactEmail: 'adubsqz@gmail.com',
   photoCredit: 'Photo captured by Cayla Holling.',
-  bio: 'Originally from the Southwest, now residing in New York for several years, a rediscovered love for film photography, acting, and writing all came together, stars aligned, or dead weight dropped, either way. with film photography, first learning the craft in high school, spending long hours in the darkroom developing film and making silver prints—a passion that stayed dormant until recently. By trade, a data scientist and software engineer at a biomolecular research company focused on fighting cancer. At night, the world of cinema, art, and storytelling awaits. Bobs your uncle, adubs is your nephew rolling spliffs by the dumpster to make it through a dull family reunion.',
+  bio: 'Originally from the Southwest, now residing in New York. By trade, a data scientist and software engineer at a biomolecular research company focused on fighting cancer. At night, the world of cinema, art, and storytelling awaits. Bobs your uncle, adubs is your nephew rolling tobacco by the dumpster to make it through a dull family reunion.',
   socials: [
     { name: 'Instagram', url: 'https://www.instagram.com/adubsqz/' },
     { name: 'GitHub', url: 'https://github.com/adubsqz/' },
