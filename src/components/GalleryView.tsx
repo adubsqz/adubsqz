@@ -321,8 +321,6 @@ function CollectionSection({
     [photos, start],
   );
 
-  const preloadKey = `${collection.id}-${page}-${start}`;
-
   useEffect(() => {
     setPage(1);
   }, [collection.id]);
@@ -344,7 +342,7 @@ function CollectionSection({
     return () => {
       links.forEach((l) => l.remove());
     };
-  }, [preloadKey]);
+  }, [pageSlice]);
 
   if (photos.length === 0) return null;
 
