@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
@@ -26,19 +26,31 @@ function PhotoCard({
   photo,
   onClick,
   fetchPriority,
+  loading,
   className = '',
 }: {
   photo: Photo;
   onClick: () => void;
   fetchPriority?: 'high' | 'low' | 'auto';
+  /** First screenful uses eager loads so lazy+layout containment cannot starve fetches (incl. Strict Mode remounts). */
+  loading?: 'lazy' | 'eager';
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
   const reducedMotion = usePrefersReducedMotion();
   const btnRef = useRef<HTMLButtonElement>(null);
   const [tilt, setTilt] = useState({ rx: 0, ry: 0 });
+  const acceptErrorsRef = useRef(false);
+
+  useLayoutEffect(() => {
+    acceptErrorsRef.current = true;
+    return () => {
+      acceptErrorsRef.current = false;
+    };
+  }, []);
 
   const handleError = () => {
+    if (!acceptErrorsRef.current) return;
     console.error('Gallery photo failed to load:', photo.src ?? photo.id);
     setFailed(true);
   };
@@ -93,11 +105,12 @@ function PhotoCard({
           aria-hidden
         />
         <WatermarkedImage
+          key={photo.src}
           src={photo.src}
           alt={photo.alt}
           wrapperClassName="relative inline-block max-w-full w-fit"
           className="gallery-image block h-auto max-h-[70vh] w-auto max-w-full object-contain"
-          loading="lazy"
+          loading={loading ?? 'lazy'}
           decoding="async"
           fetchPriority={fetchPriority}
           onError={handleError}
@@ -292,13 +305,13 @@ function ReelFrame({
   return (
     <div className={gridClass}>
       {photos.map((photo, i) => (
-        <div key={photo.id} className="[content-visibility:auto] [contain:layout]">
-          <PhotoCard
-            photo={photo}
-            onClick={() => onPhotoClick(photo)}
-            fetchPriority={i < 2 ? 'high' : i < 5 ? 'auto' : 'low'}
-          />
-        </div>
+        <PhotoCard
+          key={photo.id}
+          photo={photo}
+          onClick={() => onPhotoClick(photo)}
+          fetchPriority={i < 2 ? 'high' : i < 5 ? 'auto' : 'low'}
+          loading={i < 6 ? 'eager' : 'lazy'}
+        />
       ))}
     </div>
   );
