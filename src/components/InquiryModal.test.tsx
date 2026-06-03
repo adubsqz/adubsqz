@@ -27,7 +27,7 @@ describe('InquiryModal (unit)', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/shipping address/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/print size/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /request invoice/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /submit inquiry/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
@@ -70,7 +70,7 @@ describe('InquiryModal (unit)', () => {
       await user.type(screen.getByLabelText(/shipping address/i), '123 Main St\nNew York, NY 10001');
 
       // Default print size is already selected; submit should succeed.
-      const submitButton = screen.getByRole('button', { name: /request invoice/i });
+      const submitButton = screen.getByRole('button', { name: /submit inquiry/i });
       fireEvent.click(submitButton);
 
       // Flush the async submit handler (fetch + state updates).
@@ -116,7 +116,7 @@ describe('InquiryModal (unit)', () => {
     await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
     await user.type(screen.getByLabelText(/shipping address/i), '123 Main St\nNew York, NY 10001');
 
-    await user.click(screen.getByRole('button', { name: /request invoice/i }));
+    await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
     const sentBody = JSON.parse(fetchMock.mock.calls[0][1]?.body as string) as Record<string, unknown>;
     expect(sentBody.printSize).toBe('30x40 inches');
@@ -135,15 +135,9 @@ describe('InquiryModal (unit)', () => {
     await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
     await user.type(screen.getByLabelText(/shipping address/i), '123 Main St\nNew York, NY 10001');
 
-    await user.click(screen.getByRole('button', { name: /request invoice/i }));
+    await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
-    // There are two error messages in the DOM (sr-only live region + visible <p>),
-    // so match the longer visible text to avoid ambiguity.
-    expect(
-      await screen.findByText(
-        /there was an error submitting your inquiry\. please try again or contact directly\./i
-      )
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/bad request/i)).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
   });
 });

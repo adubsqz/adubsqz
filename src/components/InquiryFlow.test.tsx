@@ -76,7 +76,7 @@ describe('Inquiry flow (functional)', () => {
       );
 
       // Submit.
-      await user.click(screen.getByRole('button', { name: /request invoice/i }));
+      await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
 
@@ -114,9 +114,9 @@ describe('Inquiry flow (functional)', () => {
     await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
     await user.type(screen.getByLabelText(/shipping address/i), '123 Main St\nNew York, NY 10001');
 
-    await user.click(screen.getByRole('button', { name: /request invoice/i }));
+    await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
-    expect(await screen.findByText(/contact directly/i)).toBeInTheDocument();
+    expect(await screen.findByText(/bad request/i)).toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: /request invoice/i })).toBeInTheDocument();
   });
 });

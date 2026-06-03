@@ -159,26 +159,35 @@ function Lightbox({
     if (el) el.scrollTop = 0;
   }, [photo.id, photo.src]);
 
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
   return createPortal(
-    <div
-      ref={scrollRef}
-      className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden overscroll-contain bg-mcm-ink"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Image lightbox"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="mx-auto flex w-full max-w-[min(1200px,100vw)] flex-col px-6 pb-16 pt-8 sm:px-12 sm:pb-12 sm:pt-12 lg:pb-16">
-        <header className="flex shrink-0 flex-col gap-8 border-b border-mcm-cream/10 pb-10 sm:flex-row sm:items-center sm:justify-between sm:gap-12 sm:pb-12">
+    <>
+      <div className="fixed inset-0 z-[100] bg-black" aria-hidden onClick={onClose} />
+      <div
+        ref={scrollRef}
+        className="fixed inset-0 z-[101] overflow-y-auto overflow-x-hidden overscroll-contain bg-photo-bg text-photo-fg"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Image lightbox"
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+      >
+        <header className="sticky top-0 z-10 flex shrink-0 flex-col gap-6 border-b border-photo-border bg-photo-panel px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-8 sm:py-5">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <span className="text-[0.65rem] uppercase tracking-[0.22em] text-mcm-cream/40 font-mono">
+            <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-photo-muted">
               Navigate
             </span>
             <div className="flex flex-wrap gap-3 sm:gap-4">
               <Button
                 type="button"
                 onClick={onPrevious}
-                variant="lightbox"
+                variant="outline"
                 className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
                 aria-label="View previous photo"
               >
@@ -187,7 +196,7 @@ function Lightbox({
               <Button
                 type="button"
                 onClick={onNext}
-                variant="lightbox"
+                variant="outline"
                 className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
                 aria-label="View next photo"
               >
@@ -195,19 +204,19 @@ function Lightbox({
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 sm:pl-4 sm:border-l sm:border-mcm-cream/10">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 sm:border-l sm:border-photo-border sm:pl-6">
             <Button
               type="button"
               onClick={onInquire}
-              variant="lightboxPrimary"
-              className="rounded-sm px-6 py-2.5 text-[0.7rem] tracking-[0.16em] focus-visible:ring-mcm-cream"
+              variant="default"
+              className="rounded-sm px-6 py-2.5 text-[0.7rem] font-semibold tracking-[0.16em]"
             >
               Request Invoice
             </Button>
             <Button
               type="button"
               onClick={onClose}
-              variant="lightbox"
+              variant="outline"
               className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
             >
               Close
@@ -215,7 +224,7 @@ function Lightbox({
           </div>
         </header>
 
-        <div className="h-12 shrink-0 sm:h-20" aria-hidden />
+        <div className="mx-auto flex w-full max-w-[min(1200px,100vw)] flex-col px-4 pb-16 pt-8 sm:px-8 sm:pb-12 sm:pt-10 lg:pb-16">
 
         <figure className="flex w-full shrink-0 justify-center px-0">
           <div className="lightbox-frame lightbox-frame--hero w-auto max-w-[calc(100vw-3rem)] sm:max-w-[min(1100px,calc(100vw-4rem))]">
@@ -235,25 +244,25 @@ function Lightbox({
 
         {photo.caption && (
           <>
-            <Card className="rounded-sm border-mcm-cream/15 bg-mcm-paper/5 backdrop-blur-sm">
+            <Card className="rounded-sm border-photo-border bg-photo-panel/80">
               <CardContent className="px-5 py-4 sm:px-8">
-                <p className="text-center text-sm italic leading-relaxed text-mcm-cream/70">{photo.caption}</p>
+                <p className="text-center text-sm italic leading-relaxed text-photo-muted">{photo.caption}</p>
               </CardContent>
             </Card>
             <div className="h-10 sm:h-14" aria-hidden />
           </>
         )}
 
-        <section className="space-y-12 border-t border-mcm-cream/10 pt-16 sm:space-y-16 sm:pt-20">
-          <div className="text-[0.65rem] uppercase tracking-[0.28em] text-mcm-cream/35 font-mono">
+        <section className="space-y-8 border-t border-photo-border pt-12 sm:space-y-10 sm:pt-16">
+          <div className="font-mono text-[0.65rem] uppercase tracking-[0.28em] text-photo-muted">
             Licensing & fulfillment
           </div>
-          <div className="grid w-full grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-14 lg:gap-20">
-            <Card className="space-y-4 border-mcm-cream/12 bg-mcm-paper/5 p-6 sm:p-8 rounded-sm">
-              <p className="text-[0.7rem] uppercase tracking-[0.2em] text-mcm-cream/50 font-mono">
+          <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 lg:gap-12">
+            <Card className="space-y-4 rounded-sm border-photo-border bg-photo-panel/60 p-6 sm:p-8">
+              <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-photo-muted">
                 Trade Portal + Tearsheet
               </p>
-              <p className="text-sm leading-relaxed text-mcm-cream/88">
+              <p className="text-sm leading-relaxed text-photo-fg/90">
                 Printable 8.5×11 lookbook pages with image SKU and title under each frame—available on request.
               </p>
               <Button
@@ -265,15 +274,15 @@ function Lightbox({
                 Inquire about tearsheet…
               </Button>
             </Card>
-            <Card className="space-y-4 border-mcm-cream/12 bg-mcm-paper/5 p-6 sm:p-8 rounded-sm">
-              <p className="text-[0.7rem] uppercase tracking-[0.2em] text-mcm-cream/50 font-mono">
+            <Card className="space-y-4 rounded-sm border-photo-border bg-photo-panel/60 p-6 sm:p-8">
+              <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-photo-muted">
                 Fulfillment Options
               </p>
-              <p className="text-sm leading-relaxed text-mcm-cream/88">
+              <p className="text-sm leading-relaxed text-photo-fg/90">
                 Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ
                 delivery: 5-7 business days.
               </p>
-              <p className="text-sm leading-relaxed text-mcm-cream/88">
+              <p className="text-sm leading-relaxed text-photo-fg/90">
                 Short-term set rental is available at 20% of retail per 30-day term.
               </p>
             </Card>
@@ -281,8 +290,9 @@ function Lightbox({
         </section>
 
         <div className="h-6 shrink-0 sm:h-8" aria-hidden />
+        </div>
       </div>
-    </div>,
+    </>,
     document.body,
   );
 }

@@ -56,7 +56,7 @@ describe('/api/inquire (unit)', () => {
 
     expect(res.status).toBe(500);
     const json = await res.json();
-    expect(json.error).toMatch(/server email is not configured/i);
+    expect(json.error).toMatch(/RESEND_API_KEY is not configured/i);
   });
 
   it('returns 400 when required fields are missing', async () => {
@@ -101,7 +101,7 @@ describe('/api/inquire (unit)', () => {
 
     expect(res.status).toBe(500);
     const json = await res.json();
-    expect(json.error).toMatch(/email recipient\/sender is not configured/i);
+    expect(json.error).toMatch(/RESEND_FROM_EMAIL is not configured/i);
   });
 
   it('returns 200 on successful Resend send', async () => {
@@ -137,6 +137,65 @@ describe('/api/inquire (unit)', () => {
     const json = await res.json();
     expect(json.success).toBe(true);
     expect(json.messageId).toBe('msg_1');
+    expect(sendMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'to@example.com',
+        replyTo: 'jane@example.com',
+      })
+    );
+  });
+
+  it('returns 400 for invalid email', async () => {
+    vi.resetModules();
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.INQUIRY_RECIPIENT_EMAIL = 'to@example.com';
+    process.env.RESEND_FROM_EMAIL = 'from@example.com';
+
+    const { default: handler } = await import('../api/inquire.ts');
+
+    const res = await handler(
+      postJson({
+        name: 'Jane',
+        email: 'not-an-email',
+        shippingAddress: '123 Main St',
+        printSize: '16x20',
+      })
+    );
+
+    expect(res.status).toBe(400);
+    const json = await res.json();
+    expect(json.error).toMatch(/invalid email/i);
+    expect(sendMock).not.toHaveBeenCalled();
+  });
+
+  it('escapes HTML in notification bodies', async () => {
+    vi.resetModules();
+    process.env.RESEND_API_KEY = 're_test';
+    process.env.INQUIRY_RECIPIENT_EMAIL = 'to@example.com';
+    process.env.RESEND_FROM_EMAIL = 'from@example.com';
+
+    sendMock.mockResolvedValue({
+      data: { id: 'msg_2' },
+      error: null,
+    });
+
+    const { default: handler } = await import('../api/inquire.ts');
+
+    const res = await handler(
+      postJson({
+        name: '<img src=x onerror=alert(1)>',
+        email: 'jane@example.com',
+        shippingAddress: '123 Main St',
+        printSize: '16x20',
+        notes: '<script>alert(1)</script>',
+      })
+    );
+
+    expect(res.status).toBe(200);
+    const sent = sendMock.mock.calls[0][0] as { html: string };
+    expect(sent.html).not.toContain('<img src=x');
+    expect(sent.html).toContain('&lt;img src=x');
+    expect(sent.html).not.toContain('<script>');
   });
 
   it('returns 500 when Resend send returns an error', async () => {
@@ -166,6 +225,7 @@ describe('/api/inquire (unit)', () => {
 
     expect(res.status).toBe(500);
     const json = await res.json();
-    expect(json.error).toMatch(/failed to send email/i);
+    expect(json.error).toMatch(/resend failed/i);
+    expect(json.details).toBeUndefined();
   });
 });

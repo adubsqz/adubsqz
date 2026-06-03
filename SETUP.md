@@ -10,10 +10,11 @@ This guide explains how to set up the inquiry system for your photography portfo
 |---|---|---|
 | `RESEND_API_KEY` | Yes | Resend API key (starts with `re_`) |
 | `RESEND_FROM_EMAIL` | Yes | Verified sender address in Resend |
-| `INQUIRY_RECIPIENT_EMAIL` | Yes | Your email address for receiving inquiries |
+| `INQUIRY_RECIPIENT_EMAIL` | Yes | Inbox for inquiry notifications (e.g. `info@adubsqz.shop`) |
 | `GALLERY_PASSWORD` | No | Password gate (omit to leave site public locally) |
 | `GALLERY_AUTH_SECRET` | No | Signs the auth cookie — required if `GALLERY_PASSWORD` is set |
 | `GALLERY_PHOTO_PROMPT` | No | Absolute path to the `photo-prompt` binary |
+| `GALLERY_PHOTO_PROMPT_MODEL` | No | Ollama model tag for gallery edits (e.g. `llama3.1:8b`) |
 | `VITE_E2E` | No | Set to `1` to bypass the password gate in tests |
 
 1. **Get a Resend API Key**
@@ -72,9 +73,14 @@ GitHub Actions CI does not need Resend secrets: unit tests mock email sending.
 
 **Email not sending?**
 
-- Check that `RESEND_API_KEY` is set correctly
-- Verify `RESEND_FROM_EMAIL` is a verified domain/email in Resend
-- Check Vercel function logs for errors
+- **Resend API key shows “No activity”** — the `/api/inquire` handler never reached Resend. Common causes:
+  - Running `npm run dev` instead of `npx vercel@latest dev` (Vite returns 404 for `/api/inquire`)
+  - Resend vars only in `.env.local` — **Edge Functions do not read `.env.local`**. Add `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, and `INQUIRY_RECIPIENT_EMAIL` in the [Vercel project Environment Variables](https://vercel.com/docs/projects/environment-variables) (Development + Preview + Production), then restart `vercel dev`
+  - Or run: `vercel env add RESEND_API_KEY` (repeat for each var) and select all environments
+- **Domain status “Not Started” in Resend** — you cannot send from `@adubs.shop` until DNS verification completes. For a quick test, set `RESEND_FROM_EMAIL=onboarding@resend.dev` in Vercel; switch to `info@adubs.shop` after the domain shows **Verified**
+- Set `INQUIRY_RECIPIENT_EMAIL=adubsqz@gmail.com` (or your inbox) in Vercel
+- The inquiry form now surfaces Resend error text when send fails (e.g. unverified domain)
+- Check Vercel function logs for `Resend error:` lines
 
 **API route not found?**
 

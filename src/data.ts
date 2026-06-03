@@ -158,7 +158,7 @@ export const DEFAULT_GALLERY_FILTER = GALLERY_FILTERS[0] ?? '';
 export const ABOUT = {
   name: 'adubsqz',
   tagline: 'Photography',
-  contactEmail: 'adubsqz@gmail.com',
+  contactEmail: 'info@adubsqz.shop',
   photoCredit: 'Photo captured by Cayla Holling.',
   bio: 'Originally from the Southwest, now residing in New York. By trade, a data scientist and software engineer at a biomolecular research company focused on fighting cancer. At night, the world of cinema, art, and storytelling awaits. Bobs your uncle, adubs is your nephew rolling tobacco by the dumpster to make it through a dull family reunion.',
   socials: [

@@ -31,6 +31,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
   const [notes, setNotes] = useState(initialNotes ?? '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     setNotes(initialNotes ?? '');
@@ -40,6 +41,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('idle');
+    setSubmitError(null);
 
     try {
       const response = await fetch('/api/inquire', {
@@ -63,7 +65,16 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit inquiry');
+        let message = 'Failed to submit inquiry';
+        try {
+          const payload = (await response.json()) as { error?: string };
+          if (typeof payload.error === 'string' && payload.error.length > 0) {
+            message = payload.error;
+          }
+        } catch {
+          // ignore non-JSON error bodies
+        }
+        throw new Error(message);
       }
 
       setSubmitStatus('success');
@@ -73,6 +84,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
       }, 2000);
     } catch (error) {
       console.error('Inquiry submission error:', error);
+      setSubmitError(error instanceof Error ? error.message : 'Failed to submit inquiry');
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -99,8 +111,8 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
 
   return (
     <Dialog open onOpenChange={(open) => !open && !isSubmitting && onClose()}>
-      <DialogContent className="h-[100dvh] max-h-[100dvh] max-w-none rounded-none border-0 p-0 sm:max-h-[min(94dvh,56rem)] sm:max-w-5xl sm:rounded-2xl sm:border">
-        <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-photo-border bg-photo-panel px-4 py-4 sm:px-6 sm:py-5">
+      <DialogContent className="fixed inset-0 z-[110] flex h-[100dvh] max-h-[100dvh] w-full max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-0 p-0 sm:inset-auto sm:left-1/2 sm:top-1/2 sm:h-auto sm:max-h-[min(94dvh,56rem)] sm:w-[calc(100%-2rem)] sm:max-w-5xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl sm:border">
+        <div className="flex shrink-0 items-center justify-between border-b border-photo-border bg-photo-panel px-4 py-4 sm:px-6 sm:py-5">
           <DialogHeader className="space-y-1">
             <DialogTitle className="font-display mb-1">
               Request Invoice
@@ -120,31 +132,31 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
           </Button>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex min-h-0 flex-1 flex-col"
-        >
-          <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-            <aside className="order-2 flex min-h-0 w-full shrink-0 flex-col gap-4 overflow-y-auto overscroll-y-contain border-photo-border px-4 py-4 sm:px-6 lg:order-1 lg:w-[min(100%,26rem)] lg:border-r lg:py-5">
-              <WatermarkedImage
-                src={photo.src}
-                alt=""
-                loading="eager"
-                decoding="sync"
-                wrapperClassName="relative w-full overflow-hidden rounded-xl bg-black/35"
-                className="max-h-52 w-full object-contain sm:max-h-60"
-              />
-              <div className="border-b border-photo-border pb-3">
-                <p className="text-xs uppercase tracking-wider text-photo-muted mb-1">Selected print</p>
-                <p className="text-sm text-photo-fg italic leading-snug">{photo.alt}</p>
-              </div>
-              <FilmTvClearanceBlock />
-              <TearsheetAndFulfillmentGrid surface="modal" className="md:grid-cols-1" />
-              <RightsReservedBlock className="bg-photo-bg/50" />
-            </aside>
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+            <div className="flex flex-col lg:min-h-0 lg:flex-row lg:overflow-hidden lg:h-full">
+              <aside className="flex w-full shrink-0 flex-col gap-4 border-b border-photo-border px-4 py-4 sm:px-6 lg:min-h-0 lg:w-[min(100%,26rem)] lg:overflow-y-auto lg:border-b-0 lg:border-r lg:py-5">
+                <WatermarkedImage
+                  src={photo.src}
+                  alt=""
+                  loading="eager"
+                  decoding="sync"
+                  wrapperClassName="relative w-full overflow-hidden rounded-xl bg-black/35"
+                  className="max-h-40 w-full object-contain sm:max-h-52 lg:max-h-60"
+                />
+                <div className="border-b border-photo-border pb-3">
+                  <p className="text-xs uppercase tracking-wider text-photo-muted mb-1">Selected print</p>
+                  <p className="text-sm text-photo-fg italic leading-snug">{photo.alt}</p>
+                </div>
+                <div className="hidden lg:flex lg:flex-col lg:gap-4">
+                  <FilmTvClearanceBlock />
+                  <TearsheetAndFulfillmentGrid surface="modal" className="md:grid-cols-1" />
+                  <RightsReservedBlock className="bg-photo-bg/50" />
+                </div>
+              </aside>
 
-            <div className="order-1 flex min-h-0 min-w-0 flex-1 flex-col lg:order-2">
-              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-y-contain px-4 py-4 sm:space-y-5 sm:px-6 lg:py-5">
+              <div className="min-w-0 flex-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-y-contain">
+                <div className="space-y-4 px-4 py-4 sm:space-y-5 sm:px-6 lg:py-5">
           <div className="sr-only" aria-live="polite" aria-atomic="true">
             {submitStatus === 'error' && 'There was an error submitting your inquiry.'}
           </div>
@@ -312,16 +324,17 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
           {submitStatus === 'error' && (
             <div className="p-3 bg-white/[0.04] border border-photo-border/60 rounded-lg">
               <p className="text-sm text-photo-muted">
-                There was an error submitting your inquiry. Please try again or contact directly.
+                {submitError ?? 'There was an error submitting your inquiry. Please try again or contact directly.'}
               </p>
             </div>
           )}
 
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="shrink-0 border-t border-photo-border bg-photo-panel px-4 py-4 sm:px-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div className="sticky bottom-0 z-10 shrink-0 border-t border-photo-border bg-photo-panel/95 px-4 py-4 backdrop-blur-sm sm:px-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Button
                 type="button"
@@ -336,8 +349,9 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
                 type="submit"
                 disabled={isSubmitting}
                 className="flex-1 px-5 py-3"
+                variant="inquirySubmit"
               >
-                {isSubmitting ? 'Submitting...' : 'Request Invoice'}
+                {isSubmitting ? 'Submitting...' : 'Submit inquiry'}
               </Button>
             </div>
             <p className="mt-3 text-center text-[0.65rem] leading-snug text-photo-muted/80">
