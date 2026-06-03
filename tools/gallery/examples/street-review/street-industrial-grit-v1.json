@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "intent": "Industrial street grit (drum/rust): structure and mood without crushed blacks or neon contrast.",
+  "edits": {
+    "contrast": 10,
+    "shadows": 6,
+    "highlights": -8,
+    "exposure_ev": -0.05,
+    "saturation": 4
+  },
+  "meta": {
+    "mode": "deterministic",
+    "variant": "street-industrial-grit-v1",
+    "prompt_example": "Slightly moodier, a touch more contrast, protect highlight detail on metal. Gritty street/industrial — not crushed, not glossy."
+  }
+}

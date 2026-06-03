@@ -1,0 +1,22 @@
+{
+  "note": "260529 edgy/avant-garde keepers — photo-prompt review batch (originals never touched)",
+  "review_root": ".tmp/260529-street-review",
+  "batches": [
+    {
+      "id": "710-pink-lofi",
+      "recipe": "street-lofi-pink-v1.json",
+      "photo_prompt": "Cool the pink cast very slightly, lift shadows a touch, protect highlights. Street photography mood with present midtones — not faded, not punchy HDR. Keep lo-fi grain.",
+      "glob": "~/photography/originals/260529000051710*.jpg"
+    },
+    {
+      "id": "720-edgy-core",
+      "recipe_by_file": {
+        "260529000051720001.jpg": "street-candid-lofi-v1.json",
+        "260529000051720003.jpg": "street-candid-lofi-v1.json",
+        "260529000051720006.jpg": "street-overhead-doc-v1.json",
+        "260529000051720015.jpg": "street-industrial-grit-v1.json"
+      },
+      "photo_prompt_default": "Lift shadows slightly, gentle contrast, moody street tone — readable midtones, not washed out, not heavy grade."
+    }
+  ]
+}

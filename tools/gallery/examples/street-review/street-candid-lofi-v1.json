@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "intent": "720-roll candid lo-fi: open shadows slightly, neutral warmth, gentle contrast. Preserve haze and accidental framing without mushy fade.",
+  "edits": {
+    "shadows": 10,
+    "highlights": -5,
+    "contrast": 8,
+    "exposure_ev": 0.1,
+    "temperature": 40,
+    "vibrance": 5
+  },
+  "meta": {
+    "mode": "deterministic",
+    "variant": "street-candid-lofi-v1",
+    "prompt_example": "Lift shadows slightly, add a touch of warmth, very gentle contrast. Moody street/documentary feel — readable but not overly graded or hazy-faded."
+  }
+}
