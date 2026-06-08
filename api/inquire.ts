@@ -1,5 +1,4 @@
 import { Resend } from 'resend';
-import { denyIfBot } from './botidCheck.js';
 import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail } from './inquireEmail.js';
 
 function getResendClient(): Resend | null {
@@ -27,9 +26,6 @@ export default async function handler(req: Request) {
       headers: { 'Content-Type': 'application/json' },
     });
   }
-
-  const botDenied = await denyIfBot();
-  if (botDenied) return botDenied;
 
   try {
     const configError = resendConfigError();

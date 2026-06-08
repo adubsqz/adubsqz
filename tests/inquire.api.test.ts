@@ -1,11 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const sendMock = vi.fn();
-const checkBotIdMock = vi.fn().mockResolvedValue({ isBot: false, isHuman: true });
-
-vi.mock('botid/server', () => ({
-  checkBotId: (...args: unknown[]) => checkBotIdMock(...args),
-}));
 
 vi.mock('resend', () => {
   return {
@@ -30,8 +25,6 @@ function postJson(body: unknown) {
 describe('/api/inquire (unit)', () => {
   beforeEach(() => {
     sendMock.mockReset();
-    checkBotIdMock.mockReset();
-    checkBotIdMock.mockResolvedValue({ isBot: false, isHuman: true });
   });
 
   it('returns 405 for non-POST requests', async () => {
@@ -42,25 +35,6 @@ describe('/api/inquire (unit)', () => {
     expect(res.status).toBe(405);
     const json = await res.json();
     expect(json.error).toMatch(/method not allowed/i);
-  });
-
-  it('returns 403 when BotID marks the client as a bot', async () => {
-    checkBotIdMock.mockResolvedValueOnce({ isBot: true, isHuman: false });
-    vi.resetModules();
-    const { default: handler } = await import('../api/inquire.ts');
-
-    const res = await handler(
-      postJson({
-        name: 'Jane',
-        email: 'jane@example.com',
-        shippingAddress: '123 Main St',
-        printSize: '16x20',
-      })
-    );
-    expect(res.status).toBe(403);
-    const json = await res.json();
-    expect(json.error).toMatch(/access denied/i);
-    expect(sendMock).not.toHaveBeenCalled();
   });
 
   it('returns 500 when RESEND_API_KEY is not configured', async () => {

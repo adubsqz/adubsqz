@@ -1,5 +1,3 @@
-import { denyIfBot } from './botidCheck.js';
-
 const COOKIE_NAME = 'gallery_auth';
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
@@ -144,9 +142,6 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   if (req.method === 'POST') {
-    const botDenied = await denyIfBot();
-    if (botDenied) return botDenied;
-
     let submitted = '';
     try {
       const body = (await req.json()) as { password?: unknown };
