@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
-import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail } from './inquireEmail.ts';
+import { denyIfBot } from './botidCheck';
+import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail } from './inquireEmail';
 
 function getResendClient(): Resend | null {
   const key = process.env.RESEND_API_KEY?.trim();
@@ -26,6 +27,9 @@ export default async function handler(req: Request) {
       headers: { 'Content-Type': 'application/json' },
     });
   }
+
+  const botDenied = await denyIfBot();
+  if (botDenied) return botDenied;
 
   try {
     const configError = resendConfigError();
@@ -246,6 +250,6 @@ ${notes ? `\nAdditional Notes:\n${notes}` : ''}
 }
 
 export const config = {
-  runtime: 'edge',
+  runtime: 'nodejs',
   regions: ['iad1'],
 };
