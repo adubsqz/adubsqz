@@ -1,9 +1,11 @@
 import type { PhotoCollection } from './types';
+import type { Photo } from './types';
 import galleryManifest from './gallery-manifest.json';
 
 /**
  * Gallery layout is derived from gallery-manifest.json:
- * - `bw` / `color` → Greyscale / Full Spectrum collections
+ * - `bw` / `color` → Greyscale / Full Spectrum collections (array order = reel order)
+ * - Row objects may include internal curation/orientation (not shown in the public UI)
  * - `about` → bare filenames at publish root (About page portrait only; not a gallery tab)
  */
 
@@ -17,19 +19,46 @@ const ABOUT_MANIFEST_KEY = 'about';
 const GREYSCALE_ID = 'greyscale';
 const FULL_SPECTRUM_ID = 'full-spectrum';
 
-/** Manifest keys scanned for bw/color gallery rows only */
 const GALLERY_MANIFEST_KEYS = ['bw', 'color'] as const;
+
+type ManifestRow =
+  | string
+  | {
+      path: string;
+      /** Pixel aspect from publish pipeline. */
+      orientation?: string;
+      /** Optional composition override for reel paging (portrait-style in landscape file). */
+      reel_orientation?: string;
+      palette?: string;
+      vibe?: string[];
+      versatility?: string[];
+    };
 
 type GalleryManifest = {
   about?: string[];
-  bw?: string[];
-  color?: string[];
+  bw?: ManifestRow[];
+  color?: ManifestRow[];
 };
 
-/** import-12345.jpg — back-burner batch filenames */
 const IMPORT_NUMERIC_ONLY = /^import-\d+\.(jpe?g|webp)$/i;
-/** 000230040012.jpg — frame roll numbers without a slug */
 const DIGITS_ONLY_FILENAME = /^\d+\.(jpe?g|webp)$/i;
+
+function parseOrientationValue(raw: string | undefined): Photo['orientation'] {
+  const o = raw?.trim().toLowerCase();
+  if (o === 'horizontal' || o === 'vertical' || o === 'square') return o;
+  return undefined;
+}
+
+/** Reel paging uses composition override when set, else pixel orientation. */
+function parseReelOrientation(row: ManifestRow): Photo['orientation'] {
+  if (typeof row === 'string') return undefined;
+  return parseOrientationValue(row.reel_orientation) ?? parseOrientationValue(row.orientation);
+}
+
+function rowPath(manifestCategory: string, row: ManifestRow): string {
+  const entry = typeof row === 'string' ? row : row.path;
+  return normalizeManifestEntry(manifestCategory, entry);
+}
 
 function entryBasename(entry: string): string {
   return (entry.split('/').pop() ?? '').trim();
@@ -78,59 +107,64 @@ function resolveGalleryImagePath(collectionId: string, entry: string): string {
   return `${galleryPhotosBase}/${collectionId}/${normalized}`;
 }
 
-function photosFromEntries(entries: string[], collectionId: string) {
-  return entries.map((entry, i) => {
+function photosFromRows(rows: { path: string; orientation?: Photo['orientation'] }[], collectionId: string) {
+  return rows.map(({ path: entry, orientation }, i) => {
     const slug = entry.replace(/\.[^.]+$/, '').replace(/[^a-z0-9/_-]/gi, '_');
     return {
       id: `${collectionId}-${i + 1}`,
       src: resolveGalleryImagePath(collectionId, entry),
       alt: `Photograph ${slug.replace(/\//g, ' ')}`,
       caption: '',
+      orientation,
     };
   });
 }
 
 function buildPublicCollections(): PhotoCollection[] {
   const raw = galleryManifest as GalleryManifest;
-  const greyscalePaths: string[] = [];
-  const fullSpectrumPaths: string[] = [];
+  const greyscaleRows: { path: string; orientation?: Photo['orientation'] }[] = [];
+  const fullSpectrumRows: { path: string; orientation?: Photo['orientation'] }[] = [];
   const seenGrey = new Set<string>();
   const seenColor = new Set<string>();
 
   for (const manifestCategory of GALLERY_MANIFEST_KEYS) {
     const arr = raw[manifestCategory] ?? [];
     for (const rawEntry of arr) {
-      if (typeof rawEntry !== 'string') continue;
-      const normalizedEntry = normalizeManifestEntry(manifestCategory, rawEntry);
+      const normalizedEntry = rowPath(manifestCategory, rawEntry);
       if (!normalizedEntry) continue;
       const ok = selectGalleryEntries([normalizedEntry]);
       if (ok.length === 0) continue;
       const entry = ok[0]!;
       const result = classifyManifestEntry(entry);
       if (result.kind !== 'public') continue;
+      const orientation = parseReelOrientation(rawEntry);
       if (result.bucket === GREYSCALE_ID) {
         if (!seenGrey.has(entry)) {
           seenGrey.add(entry);
-          greyscalePaths.push(entry);
+          greyscaleRows.push({ path: entry, orientation });
         }
       } else if (result.bucket === FULL_SPECTRUM_ID) {
         if (!seenColor.has(entry)) {
           seenColor.add(entry);
-          fullSpectrumPaths.push(entry);
+          fullSpectrumRows.push({ path: entry, orientation });
         }
       }
     }
   }
 
   const out: PhotoCollection[] = [];
-  if (greyscalePaths.length > 0) {
-    out.push({ id: GREYSCALE_ID, title: 'Greyscale', photos: photosFromEntries(greyscalePaths, GREYSCALE_ID) });
+  if (greyscaleRows.length > 0) {
+    out.push({
+      id: GREYSCALE_ID,
+      title: 'Greyscale',
+      photos: photosFromRows(greyscaleRows, GREYSCALE_ID),
+    });
   }
-  if (fullSpectrumPaths.length > 0) {
+  if (fullSpectrumRows.length > 0) {
     out.push({
       id: FULL_SPECTRUM_ID,
       title: 'Full Spectrum',
-      photos: photosFromEntries(fullSpectrumPaths, FULL_SPECTRUM_ID),
+      photos: photosFromRows(fullSpectrumRows, FULL_SPECTRUM_ID),
     });
   }
   return out;
@@ -144,10 +178,10 @@ function resolveAboutImagePath(entry: string): string {
 
 const manifest = galleryManifest as GalleryManifest;
 const aboutFilename = (manifest[ABOUT_MANIFEST_KEY] ?? []).find((filename) =>
-  SUPPORTED_IMAGE_FILE.test(filename),
+  SUPPORTED_IMAGE_FILE.test(typeof filename === 'string' ? filename : ''),
 );
 export const ABOUT_IMAGE_SRC = aboutFilename
-  ? resolveAboutImagePath(aboutFilename)
+  ? resolveAboutImagePath(typeof aboutFilename === 'string' ? aboutFilename : '')
   : `${galleryPhotosBase}/about_me.jpg`;
 
 export const COLLECTIONS: PhotoCollection[] = buildPublicCollections();
@@ -164,6 +198,6 @@ export const ABOUT = {
   socials: [
     { name: 'Instagram', url: 'https://www.instagram.com/adubsqz/' },
     { name: 'GitHub', url: 'https://github.com/adubsqz/' },
-    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/alexanderames/'}
+    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/alexanderames/' },
   ],
 };

@@ -7,8 +7,17 @@ import { configDefaults } from 'vitest/config';
 const STILL_LIFE_PREFIX = '/photos/still-life/';
 const IMAGE_EXT = /\.(jpe?g|png|webp)$/i;
 
-function normalizeManifestEntry(category: string, entry: unknown): string {
-  if (typeof entry !== 'string') return '';
+function manifestEntryPath(category: string, entry: unknown): string {
+  if (typeof entry === 'object' && entry !== null && 'path' in entry) {
+    const path = (entry as { path: unknown }).path;
+    if (typeof path === 'string') return normalizeManifestEntry(category, path);
+    return '';
+  }
+  if (typeof entry === 'string') return normalizeManifestEntry(category, entry);
+  return '';
+}
+
+function normalizeManifestEntry(category: string, entry: string): string {
   const normalized = entry.trim().replace(/^\/+/, '');
   if (!normalized) return '';
   if (normalized.includes('/')) return normalized;
@@ -24,7 +33,7 @@ function loadManifestAllowlist(): Set<string> {
   for (const [category, entries] of Object.entries(raw)) {
     if (!Array.isArray(entries)) continue;
     for (const entry of entries) {
-      const normalized = normalizeManifestEntry(category, entry);
+      const normalized = manifestEntryPath(category, entry);
       if (!normalized) continue;
       const baseName = normalized.split('/').pop() ?? normalized;
       if (!IMAGE_EXT.test(baseName)) continue;

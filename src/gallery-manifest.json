@@ -3,66 +3,885 @@
     "takingapicofmetakingapic.jpg"
   ],
   "bw": [
-    "bw/itsgottafeelright.jpg",
-    "bw/ford.JPG",
-    "bw/notme.JPG",
-    "bw/qzar.JPG",
-    "bw/bldgs.jpg",
-    "bw/spookyaf.jpg",
-    "bw/graffiti-chainlink.jpg",
-    "bw/mirror-spheres-sculpture.jpg",
-    "bw/bw-boat-dock.jpg",
-    "bw/bw-broken.JPG",
-    "bw/bw-dog.jpg",
-    "bw/bw-facepalm.JPG",
-    "bw/bw-mercedes.jpg",
-    "bw/bw-mural.jpg",
-    "bw/bw-pier.jpg",
-    "bw/bw-police-car-1.jpg",
-    "bw/bw-siloutte-sky.JPG",
-    "bw/bw-skyline.jpg",
-    "bw/bw-slice.jpg",
-    "bw/bw-walk-alot.JPG",
-    "bw/bw-way-togo-cayla.JPG",
-    "bw/bw-workstation.jpg"
+    {
+      "path": "bw/bw-police-car-1.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "moody",
+        "industrial"
+      ],
+      "versatility": [
+        "corporate",
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/lga-manhattan-departure.jpg",
+      "palette": "cool",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate",
+        "hospitality"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/spookyaf.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "moody",
+        "abstract"
+      ],
+      "versatility": [
+        "corporate",
+        "hospitality"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/graffiti-chainlink.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "industrial",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate",
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-mural.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "industrial",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-skyline.jpg",
+      "palette": "cool",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-siloutte-sky.JPG",
+      "palette": "neutral",
+      "vibe": [
+        "moody",
+        "abstract"
+      ],
+      "versatility": [
+        "residential",
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/mirror-spheres-sculpture.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "abstract",
+        "industrial"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bldgs.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "industrial",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-pier.jpg",
+      "palette": "cool",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "residential",
+        "hospitality"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-boat-dock.jpg",
+      "palette": "cool",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-walk-alot.JPG",
+      "palette": "neutral",
+      "vibe": [
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/ford.JPG",
+      "palette": "neutral",
+      "vibe": [
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-workstation.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "industrial",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-dog.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "playful",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/qzar.JPG",
+      "palette": "mixed",
+      "vibe": [
+        "playful",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-way-togo-cayla.JPG",
+      "palette": "warm",
+      "vibe": [
+        "playful",
+        "intimate"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-photoshoot-016.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "intimate",
+        "moody"
+      ],
+      "versatility": [
+        "residential",
+        "hospitality"
+      ],
+      "orientation": "horizontal",
+      "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/bw-photoshoot-017.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "intimate",
+        "moody"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal",
+      "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/bw-photoshoot-002.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "intimate",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal",
+      "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/bw-photoshoot-001.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "intimate",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal",
+      "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/portrait-rideme-profile.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "intimate",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal",
+      "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/bw-slice.jpg",
+      "palette": "warm",
+      "vibe": [
+        "playful",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal",
+      "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/notme.JPG",
+      "palette": "neutral",
+      "vibe": [
+        "playful",
+        "intimate"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal",
+      "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/bw-facepalm.JPG",
+      "palette": "neutral",
+      "vibe": [
+        "playful",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal",
+      "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/itsgottafeelright.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "documentary",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "bw/bw-photoshoot-029.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "intimate",
+        "moody"
+      ],
+      "versatility": [
+        "residential",
+        "hospitality"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "bw/bw-mercedes.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "industrial",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "bw/bw-broken.JPG",
+      "palette": "neutral",
+      "vibe": [
+        "abstract",
+        "playful"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    }
   ],
   "color": [
-    "color/shegettinit.JPG",
-    "color/thatsitbaby.JPG",
-    "color/myplasticheartsharp.jpg",
-    "color/dusk1.jpg",
-    "color/myplasticheartblur.jpg",
-    "color/balconysunset.jpg",
-    "color/SILVERCUP.jpg",
-    "color/bldgs-fire-escape.jpg",
-    "color/isthatweed.jpg",
-    "color/trashwheels.JPG",
-    "color/walkdownme.jpg",
-    "color/skyline-from-behind.jpg",
-    "color/stained-glass-transit.jpg",
-    "color/subtlestimprovement.jpg",
-    "color/urban-lookout-skybridge.jpg",
-    "color/restaurant.jpg",
-    "color/blurreddaysharpred.jpg",
-    "color/couplesitsindusk.jpg",
-    "color/corgisunshine.jpg",
-    "color/birdsbirds.jpg",
-    "color/birdschill.jpg",
-    "color/passingdusk.jpg",
-    "color/tablesindusk.jpg",
-    "color/omgiloveshadows.jpg",
-    "color/notesfrompuertorico.jpg",
-    "color/sander.jpg",
-    "color/vw-bus-reflection.jpg",
-    "color/uk-giant-wheel.jpg",
-    "color/plants.jpg",
-    "color/uk-broken-lightbulb.jpg",
-    "color/sandcastlesontheshore.JPG",
-    "color/thrutheabyss.JPG",
-    "color/thrutheforest.JPG",
-    "color/thrutimeagain.JPG",
-    "color/probe-06-travel-reflection-2.jpg",
-    "color/probe-05-wrexham.jpg",
-    "color/probe-02-ohshhip_copy.jpg"
+    {
+      "path": "color/wall-gallery-sunbeam.jpg",
+      "palette": "warm",
+      "vibe": [
+        "bright",
+        "intimate"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/balconysunset.jpg",
+      "palette": "warm",
+      "vibe": [
+        "bright",
+        "intimate"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/couplesitsindusk.jpg",
+      "palette": "warm",
+      "vibe": [
+        "moody",
+        "intimate"
+      ],
+      "versatility": [
+        "residential",
+        "hospitality"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/passingdusk.jpg",
+      "palette": "warm",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/dusk1.jpg",
+      "palette": "cool",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate",
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/corgisunshine.jpg",
+      "palette": "warm",
+      "vibe": [
+        "bright",
+        "playful"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/sandcastlesontheshore.JPG",
+      "palette": "warm",
+      "vibe": [
+        "bright",
+        "playful"
+      ],
+      "versatility": [
+        "residential",
+        "hospitality"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/omgiloveshadows.jpg",
+      "palette": "warm",
+      "vibe": [
+        "moody",
+        "intimate"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/shegettinit.JPG",
+      "palette": "warm",
+      "vibe": [
+        "playful",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/thatsitbaby.JPG",
+      "palette": "warm",
+      "vibe": [
+        "playful",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/twilight-hoop-crescent.jpg",
+      "palette": "cool",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "residential",
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/skyline-from-behind.jpg",
+      "palette": "cool",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/notesfrompuertorico.jpg",
+      "palette": "warm",
+      "vibe": [
+        "bright",
+        "documentary"
+      ],
+      "versatility": [
+        "residential",
+        "hospitality"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/stained-glass-transit.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "bright",
+        "abstract"
+      ],
+      "versatility": [
+        "corporate",
+        "hospitality"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/thrutheabyss.JPG",
+      "palette": "cool",
+      "vibe": [
+        "abstract",
+        "moody"
+      ],
+      "versatility": [
+        "corporate",
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/uk-broken-lightbulb.jpg",
+      "palette": "cool",
+      "vibe": [
+        "abstract",
+        "moody"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/urban-lookout-skybridge.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "documentary",
+        "industrial"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/SILVERCUP.jpg",
+      "palette": "earth",
+      "vibe": [
+        "industrial",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/bldgs-fire-escape.jpg",
+      "palette": "earth",
+      "vibe": [
+        "industrial",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate",
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/trashwheels.JPG",
+      "palette": "earth",
+      "vibe": [
+        "industrial",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/walkdownme.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "documentary",
+        "industrial"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/graffiti-pursuit-overlay.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "abstract",
+        "industrial"
+      ],
+      "versatility": [
+        "corporate",
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/tulipbike.jpg",
+      "palette": "green",
+      "vibe": [
+        "bright",
+        "playful"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/birdsbirds.jpg",
+      "palette": "green",
+      "vibe": [
+        "bright",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/birdschill.jpg",
+      "palette": "green",
+      "vibe": [
+        "bright",
+        "playful"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/myplasticheartsharp.jpg",
+      "palette": "warm",
+      "vibe": [
+        "abstract",
+        "intimate"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/restaurant.jpg",
+      "palette": "warm",
+      "vibe": [
+        "intimate",
+        "documentary"
+      ],
+      "versatility": [
+        "hospitality",
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/subtlestimprovement.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "documentary",
+        "bright"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/thrutheforest.JPG",
+      "palette": "green",
+      "vibe": [
+        "abstract",
+        "moody"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/thrutimeagain.JPG",
+      "palette": "mixed",
+      "vibe": [
+        "abstract",
+        "moody"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/probe-06-travel-reflection-2.jpg",
+      "palette": "cool",
+      "vibe": [
+        "abstract",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/probe-05-wrexham.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "documentary",
+        "industrial"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/tablesindusk.jpg",
+      "palette": "warm",
+      "vibe": [
+        "moody",
+        "intimate"
+      ],
+      "versatility": [
+        "hospitality",
+        "residential"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/vine-covered-bike.jpg",
+      "palette": "green",
+      "vibe": [
+        "moody",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/uk-giant-wheel.jpg",
+      "palette": "cool",
+      "vibe": [
+        "moody",
+        "abstract"
+      ],
+      "versatility": [
+        "hospitality"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/isthatweed.jpg",
+      "palette": "green",
+      "vibe": [
+        "playful",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/plants.jpg",
+      "palette": "green",
+      "vibe": [
+        "bright",
+        "documentary"
+      ],
+      "versatility": [
+        "residential",
+        "corporate"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/myplasticheartblur.jpg",
+      "palette": "warm",
+      "vibe": [
+        "abstract",
+        "intimate"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/sander.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "intimate",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/vw-bus-reflection.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "abstract",
+        "playful"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/blurreddaysharpred.jpg",
+      "palette": "warm",
+      "vibe": [
+        "abstract",
+        "moody"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    },
+    {
+      "path": "color/probe-02-ohshhip_copy.jpg",
+      "palette": "mixed",
+      "vibe": [
+        "playful",
+        "documentary"
+      ],
+      "versatility": [
+        "residential"
+      ],
+      "orientation": "vertical"
+    }
   ]
 }

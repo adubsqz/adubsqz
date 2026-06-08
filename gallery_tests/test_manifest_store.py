@@ -52,11 +52,22 @@ def test_append_new_returns_true(tmp_path, monkeypatch):
     assert "color/z.png" in buckets["color"]
 
 
-def test_append_new_returns_true(tmp_path, monkeypatch):
+def test_append_preserves_curation_objects(tmp_path, monkeypatch):
     repo = tmp_path / "r"
     (repo / "src").mkdir(parents=True)
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
-    save_manifest(repo, _minimal_manifest())
-    assert append_if_absent(repo, "color", "color/z.png") is True
+    row = {"path": "bw/a.jpg", "palette": "neutral", "vibe": ["moody"], "versatility": ["corporate"]}
+    save_manifest(repo, {**_minimal_manifest(), "bw": [row]})
+    assert append_if_absent(repo, "bw", "bw/b.jpg") is True
     buckets = load_manifest(repo)
-    assert "color/z.png" in buckets["color"]
+    assert buckets["bw"][0] == row
+    assert buckets["bw"][-1] == "bw/b.jpg"
+
+
+def test_append_duplicate_object_token_returns_false(tmp_path, monkeypatch):
+    repo = tmp_path / "r"
+    (repo / "src").mkdir(parents=True)
+    monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
+    row = {"path": "color/x.jpg", "palette": "warm", "vibe": ["bright"], "versatility": ["residential"]}
+    save_manifest(repo, {**_minimal_manifest(), "color": [row]})
+    assert append_if_absent(repo, "color", "color/x.jpg") is False

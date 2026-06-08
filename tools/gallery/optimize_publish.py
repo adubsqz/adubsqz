@@ -106,7 +106,8 @@ def _watermark_overlay(
     pos = pmap.get(watermark_position, pmap["bottom-right"])
     pad = 5
     bg = [pos[0] - pad, pos[1] - pad, pos[0] + tw + pad, pos[1] + th + pad]
-    draw.rectangle(bg, fill=(0, 0, 0, int(watermark_opacity * 0.5)))
+    # Opaque enough to read (and pass verify) on bright corners e.g. skin/high-key B&W.
+    draw.rectangle(bg, fill=(0, 0, 0, int(min(255, watermark_opacity * 0.92))))
     draw.text(pos, watermark_text, font=font, fill=(255, 255, 255, watermark_opacity))
 
     img_rgba = img if img.mode == "RGBA" else img.convert("RGBA")

@@ -3,7 +3,9 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import GalleryView from './GalleryView';
 import { COLLECTIONS } from '../data';
-import { GALLERY_REEL_SIZE } from '../gallery-constants';
+import { HORIZONTAL_REEL_SIZE, VERTICAL_REEL_SIZE } from '../gallery-constants';
+import { paginateByOrientation } from '../gallery-reel';
+
 const DEFAULT_FILTER = COLLECTIONS[0]?.id ?? 'greyscale';
 
 describe('GalleryView', () => {
@@ -22,28 +24,30 @@ describe('GalleryView', () => {
     render(<GalleryView filter={DEFAULT_FILTER} />);
     const collection = COLLECTIONS.find((c) => c.id === DEFAULT_FILTER)!;
     const imgs = screen.queryAllByRole('img').filter((el) => el.getAttribute('alt')?.startsWith('Photograph'));
+    const firstPage = paginateByOrientation(collection.photos)[0];
     if (collection.photos.length === 0) {
       expect(imgs.length).toBe(0);
-    } else if (collection.photos.length > 1) {
+    } else if (collection.photos.length > 1 && firstPage) {
       expect(imgs.length).toBeGreaterThan(1);
-      expect(imgs.length).toBeLessThanOrEqual(GALLERY_REEL_SIZE);
+      expect(imgs.length).toBeLessThanOrEqual(firstPage.photos.length);
     }
   });
 
-  it('shows pagination when collection has more than GALLERY_REEL_SIZE photos', () => {
+  it('shows pagination when collection spans multiple orientation pages', () => {
     render(<GalleryView filter={DEFAULT_FILTER} />);
     const collection = COLLECTIONS.find((c) => c.id === DEFAULT_FILTER);
-    if ((collection?.photos.length ?? 0) > GALLERY_REEL_SIZE) {
+    const pages = paginateByOrientation(collection?.photos ?? []);
+    if (pages.length > 1) {
       expect(screen.getByText(/reel \d+ \/ \d+/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /rev −/i })).toBeInTheDocument();
     }
   });
 
-  it('renders photos from the selected category when present', () => {
+  it('renders photos from the first reel page when present', () => {
     render(<GalleryView filter={DEFAULT_FILTER} />);
     const collection = COLLECTIONS.find((c) => c.id === DEFAULT_FILTER)!;
     if (collection.photos.length === 0) return;
-    const firstPagePhotos = collection.photos.slice(0, GALLERY_REEL_SIZE);
+    const firstPagePhotos = paginateByOrientation(collection.photos)[0]?.photos ?? [];
     firstPagePhotos.forEach((photo) => {
       expect(screen.getByAltText(photo.alt)).toBeInTheDocument();
     });
@@ -70,26 +74,22 @@ describe('GalleryView', () => {
   });
 });
 
-describe('GalleryView regression: pagination and photo count', () => {
-  it('total pages are computed safely for all collections', () => {
+describe('GalleryView regression: orientation pagination', () => {
+  it('never mixes orientations on a single page', () => {
     COLLECTIONS.forEach((collection) => {
-      const totalPages = Math.max(1, Math.ceil(collection.photos.length / GALLERY_REEL_SIZE));
-      expect(totalPages).toBeGreaterThanOrEqual(1);
-      if (collection.photos.length > GALLERY_REEL_SIZE) {
-        expect(totalPages).toBeGreaterThan(1);
-      }
+      paginateByOrientation(collection.photos).forEach((page) => {
+        const orientations = new Set(page.photos.map((p) => p.orientation ?? 'horizontal'));
+        expect(orientations.size).toBe(1);
+      });
     });
   });
 
-  it('pagination slice behaves for populated collections', () => {
+  it('respects horizontal and vertical page caps', () => {
     COLLECTIONS.forEach((collection) => {
-      if (collection.photos.length === 0) return;
-      const start = (1 - 1) * GALLERY_REEL_SIZE;
-      const pagePhotos = collection.photos.slice(start, start + GALLERY_REEL_SIZE);
-      expect(pagePhotos.length).toBeGreaterThanOrEqual(1);
-      if (collection.photos.length > GALLERY_REEL_SIZE) {
-        expect(pagePhotos.length).toBe(GALLERY_REEL_SIZE);
-      }
+      paginateByOrientation(collection.photos).forEach((page) => {
+        const cap = page.orientation === 'vertical' ? VERTICAL_REEL_SIZE : HORIZONTAL_REEL_SIZE;
+        expect(page.photos.length).toBeLessThanOrEqual(cap);
+      });
     });
   });
 });

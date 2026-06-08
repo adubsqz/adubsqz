@@ -53,6 +53,11 @@ describe('data', () => {
       expect(manifest.about?.includes('takingapicofmetakingapic.jpg')).toBe(true);
     });
 
+    it('reads internal orientation from manifest objects (not shown in UI)', () => {
+      const withOrientation = COLLECTIONS.flatMap((c) => c.photos).filter((p) => p.orientation);
+      expect(withOrientation.length).toBeGreaterThan(0);
+    });
+
     it('does not surface import-########.jpg filenames in public collections', () => {
       const allSrc = COLLECTIONS.flatMap((c) => c.photos.map((p) => p.src));
       for (const src of allSrc) {

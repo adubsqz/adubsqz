@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 from gallery.config import MANIFEST_REL, repo_root
+from gallery.manifest_entry import entry_token
 
 
 _IMAGE_EXT = {".jpg", ".jpeg", ".png", ".webp"}
@@ -23,8 +24,11 @@ def _manifest_basenames(repo: Path) -> set[str]:
     out: set[str] = set()
     for key in ("about", "bw", "color"):
         for entry in data.get(key) or []:
-            if isinstance(entry, str) and entry.strip():
-                out.add(Path(entry.strip()).name)
+            try:
+                tok = entry_token(entry, key)
+            except ValueError:
+                continue
+            out.add(Path(tok).name)
     return out
 
 

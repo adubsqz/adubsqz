@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image, UnidentifiedImageError
 
 from gallery.config import PUBLISH_STILL_LIFE_REL
+from gallery.manifest_entry import entry_token
 from gallery.manifest_store import load_manifest
 from gallery.optimize_publish import _publish_options, watermark_label_screen_rect
 
@@ -95,15 +96,11 @@ def _flatten_manifest_tokens(repo: Path) -> set[str]:
     out: set[str] = set()
     for bucket, items in data.items():
         for raw in items:
-            tok = str(raw).strip().lstrip("/").replace("\\", "/")
-            if not tok:
+            try:
+                tok = entry_token(raw, bucket)
+            except ValueError:
                 continue
-            if bucket == "about":
-                out.add(tok)
-            elif "/" not in tok:
-                out.add(f"{bucket}/{tok}")
-            else:
-                out.add(tok)
+            out.add(tok)
     return out
 
 

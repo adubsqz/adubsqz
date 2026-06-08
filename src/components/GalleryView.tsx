@@ -3,7 +3,12 @@ import { createPortal } from 'react-dom';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
-import { GALLERY_REEL_SIZE } from '../gallery-constants';
+import {
+  paginateByOrientation,
+  reelLayoutFor,
+  type PhotoOrientation,
+  type ReelLayout,
+} from '../gallery-reel';
 import WatermarkedImage from './WatermarkedImage';
 import InquiryModal from './InquiryModal';
 import { Button } from './ui/button';
@@ -22,11 +27,27 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
+function imageClassForReelLayout(layout: ReelLayout): string {
+  switch (layout) {
+    case 'hero':
+      return 'gallery-image block h-auto max-h-[min(84dvh,960px)] w-auto max-w-[min(1100px,96vw)] object-contain';
+    case 'horizontal-duo':
+      return 'gallery-image block h-auto max-h-[min(72vh,780px)] w-auto max-w-full object-contain';
+    case 'horizontal-trio':
+      return 'gallery-image block h-auto max-h-[min(58vh,620px)] w-auto max-w-full object-contain';
+    case 'vertical-solo':
+      return 'gallery-image block h-auto max-h-[min(78dvh,880px)] w-auto max-w-full object-contain';
+    default:
+      return 'gallery-image block h-auto max-h-[min(70vh,720px)] w-auto max-w-full object-contain';
+  }
+}
+
 function PhotoCard({
   photo,
   onClick,
   fetchPriority,
   loading,
+  reelLayout,
   className = '',
 }: {
   photo: Photo;
@@ -34,6 +55,7 @@ function PhotoCard({
   fetchPriority?: 'high' | 'low' | 'auto';
   /** First screenful uses eager loads so lazy+layout containment cannot starve fetches (incl. Strict Mode remounts). */
   loading?: 'lazy' | 'eager';
+  reelLayout: ReelLayout;
   className?: string;
 }) {
   const [failed, setFailed] = useState(false);
@@ -109,7 +131,7 @@ function PhotoCard({
           src={photo.src}
           alt={photo.alt}
           wrapperClassName="relative inline-block max-w-full w-fit"
-          className="gallery-image block h-auto max-h-[70vh] w-auto max-w-full object-contain"
+          className={imageClassForReelLayout(reelLayout)}
           loading={loading ?? 'lazy'}
           decoding="async"
           fetchPriority={fetchPriority}
@@ -297,20 +319,32 @@ function Lightbox({
   );
 }
 
+function reelGridClass(layout: ReelLayout): string {
+  switch (layout) {
+    case 'hero':
+      return 'grid grid-cols-1 place-items-center w-full';
+    case 'horizontal-duo':
+      return 'grid grid-cols-1 md:grid-cols-2 md:max-w-6xl mx-auto w-full gap-6 sm:gap-10';
+    case 'horizontal-trio':
+      return 'grid grid-cols-1 md:grid-cols-3 w-full gap-5 sm:gap-7';
+    case 'vertical-solo':
+      return 'grid grid-cols-1 place-items-center max-w-md mx-auto w-full';
+    case 'vertical-duo':
+      return 'grid grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto w-full gap-6 sm:gap-10';
+  }
+}
+
 function ReelFrame({
   photos,
+  orientation,
   onPhotoClick,
 }: {
   photos: Photo[];
+  orientation: PhotoOrientation;
   onPhotoClick: (photo: Photo) => void;
 }) {
-  const n = photos.length;
-  const gridClass =
-    n === 1
-      ? 'grid grid-cols-1 place-items-stretch max-w-3xl mx-auto w-full'
-      : n === 2
-        ? 'grid grid-cols-1 md:grid-cols-2 md:max-w-5xl mx-auto w-full gap-6 sm:gap-8'
-        : 'grid grid-cols-1 md:grid-cols-3 w-full gap-5 sm:gap-7';
+  const layout = reelLayoutFor(photos.length, orientation);
+  const gridClass = reelGridClass(layout);
 
   return (
     <div className={gridClass}>
@@ -318,9 +352,10 @@ function ReelFrame({
         <PhotoCard
           key={photo.id}
           photo={photo}
+          reelLayout={layout}
           onClick={() => onPhotoClick(photo)}
-          fetchPriority={i < 2 ? 'high' : i < 5 ? 'auto' : 'low'}
-          loading={i < 6 ? 'eager' : 'lazy'}
+          fetchPriority={i < 2 ? 'high' : 'auto'}
+          loading={i < 3 ? 'eager' : 'lazy'}
         />
       ))}
     </div>
@@ -337,12 +372,10 @@ function CollectionSection({
   const [page, setPage] = useState(1);
   const photos = collection.photos;
 
-  const totalPages = Math.max(1, Math.ceil(photos.length / GALLERY_REEL_SIZE));
-  const start = (page - 1) * GALLERY_REEL_SIZE;
-  const pageSlice = useMemo(
-    () => photos.slice(start, start + GALLERY_REEL_SIZE),
-    [photos, start],
-  );
+  const pages = useMemo(() => paginateByOrientation(photos), [photos]);
+  const totalPages = Math.max(1, pages.length);
+  const currentPage = pages[page - 1];
+  const pageSlice = currentPage?.photos ?? [];
 
   useEffect(() => {
     setPage(1);
@@ -383,7 +416,11 @@ function CollectionSection({
               'radial-gradient(ellipse at center, rgba(196,92,38,0.25) 0%, transparent 55%), radial-gradient(circle at 20% 0%, rgba(235,230,220,0.12), transparent 50%)',
           }}
         />
-        <ReelFrame photos={pageSlice} onPhotoClick={onPhotoClick} />
+        <ReelFrame
+          photos={pageSlice}
+          orientation={currentPage?.orientation ?? 'horizontal'}
+          onPhotoClick={onPhotoClick}
+        />
       </div>
       {totalPages > 1 && (
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-mcm-line/35 pt-6 font-mono">
@@ -392,7 +429,7 @@ function CollectionSection({
               Reel {page} / {totalPages}
             </p>
             <p className="text-photo-muted/65 text-[0.62rem] uppercase tracking-[0.16em]">
-              Frames {start + 1}–{Math.min(start + GALLERY_REEL_SIZE, photos.length)} of {photos.length}
+              {pageSlice.length} frame{pageSlice.length === 1 ? '' : 's'} on this reel · {photos.length} total
             </p>
           </div>
           <div className="flex gap-2">
@@ -429,16 +466,12 @@ export default function GalleryView({ filter }: GalleryViewProps) {
   const collection: PhotoCollection = COLLECTIONS.find((c) => c.id === filter)
     ?? COLLECTIONS[0]
     ?? { id: 'empty', title: 'Empty', photos: [] };
-  const filteredCollection: PhotoCollection = {
-    ...collection,
-    photos: collection.photos,
-  };
 
   useEffect(() => {
     if (!lightboxPhoto) return;
-    const exists = filteredCollection.photos.some((photo) => photo.id === lightboxPhoto.id);
+    const exists = collection.photos.some((photo) => photo.id === lightboxPhoto.id);
     if (!exists) setLightboxPhoto(null);
-  }, [filteredCollection.photos, lightboxPhoto]);
+  }, [collection.photos, lightboxPhoto]);
 
   const handleInquire = () => {
     if (!lightboxPhoto) return;
@@ -458,22 +491,22 @@ export default function GalleryView({ filter }: GalleryViewProps) {
 
   const handleLightboxMove = (direction: 'next' | 'previous') => {
     if (!lightboxPhoto) return;
-    if (filteredCollection.photos.length === 0) return;
-    const currentIndex = filteredCollection.photos.findIndex((photo) => photo.id === lightboxPhoto.id);
+    if (collection.photos.length === 0) return;
+    const currentIndex = collection.photos.findIndex((photo) => photo.id === lightboxPhoto.id);
     if (currentIndex < 0) return;
     const step = direction === 'next' ? 1 : -1;
     const nextIndex =
-      (currentIndex + step + filteredCollection.photos.length) % filteredCollection.photos.length;
-    setLightboxPhoto(filteredCollection.photos[nextIndex]);
+      (currentIndex + step + collection.photos.length) % collection.photos.length;
+    setLightboxPhoto(collection.photos[nextIndex]);
   };
 
   return (
     <div className="space-y-12">
-      {filteredCollection.photos.length === 0 && (
+      {collection.photos.length === 0 && (
         <p className="text-sm text-photo-muted">No photos found in this category.</p>
       )}
 
-      <CollectionSection collection={filteredCollection} onPhotoClick={setLightboxPhoto} />
+      <CollectionSection collection={collection} onPhotoClick={setLightboxPhoto} />
 
       {lightboxPhoto && (
         <Lightbox
