@@ -30,15 +30,15 @@ function usePrefersReducedMotion(): boolean {
 function imageClassForReelLayout(layout: ReelLayout): string {
   switch (layout) {
     case 'hero':
-      return 'gallery-image block h-auto max-h-[min(84dvh,960px)] w-auto max-w-[min(1100px,96vw)] object-contain';
+      return 'gallery-image block h-auto max-h-[min(90dvh,1080px)] w-auto max-w-[min(1220px,99vw)] object-contain';
     case 'horizontal-duo':
-      return 'gallery-image block h-auto max-h-[min(72vh,780px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(82dvh,920px)] w-auto max-w-full object-contain';
     case 'horizontal-trio':
-      return 'gallery-image block h-auto max-h-[min(58vh,620px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(72dvh,760px)] w-auto max-w-full object-contain';
     case 'vertical-solo':
-      return 'gallery-image block h-auto max-h-[min(78dvh,880px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(84dvh,960px)] w-auto max-w-full object-contain';
     default:
-      return 'gallery-image block h-auto max-h-[min(70vh,720px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(80dvh,840px)] w-auto max-w-full object-contain';
   }
 }
 
@@ -324,13 +324,13 @@ function reelGridClass(layout: ReelLayout): string {
     case 'hero':
       return 'grid grid-cols-1 place-items-center w-full';
     case 'horizontal-duo':
-      return 'grid grid-cols-1 md:grid-cols-2 md:max-w-6xl mx-auto w-full gap-6 sm:gap-10';
+      return 'grid grid-cols-1 md:grid-cols-2 w-full gap-3 sm:gap-5';
     case 'horizontal-trio':
-      return 'grid grid-cols-1 md:grid-cols-3 w-full gap-5 sm:gap-7';
+      return 'grid grid-cols-1 md:grid-cols-3 w-full gap-2.5 sm:gap-4';
     case 'vertical-solo':
-      return 'grid grid-cols-1 place-items-center max-w-md mx-auto w-full';
+      return 'grid grid-cols-1 place-items-center max-w-xl mx-auto w-full';
     case 'vertical-duo':
-      return 'grid grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto w-full gap-6 sm:gap-10';
+      return 'grid grid-cols-1 sm:grid-cols-2 max-w-6xl mx-auto w-full gap-3 sm:gap-6';
   }
 }
 
@@ -406,7 +406,7 @@ function CollectionSection({
     <section aria-label={`Gallery reel for ${collection.title}`}>
       <div
         key={`${collection.id}-reel-${page}`}
-        className="relative isolate pb-2 motion-safe:animate-slide-reveal"
+        className="relative isolate pb-1 motion-safe:animate-slide-reveal"
       >
         <div
           className="pointer-events-none absolute -inset-3 sm:-inset-5 rounded-sm opacity-[0.12] motion-safe:animate-specimen-flash"
@@ -423,7 +423,7 @@ function CollectionSection({
         />
       </div>
       {totalPages > 1 && (
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-mcm-line/35 pt-6 font-mono">
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-mcm-line/35 pt-5 font-mono">
           <div className="flex flex-col gap-1">
             <p className="text-photo-muted text-[0.7rem] uppercase tracking-[0.22em]">
               Reel {page} / {totalPages}
@@ -501,7 +501,7 @@ export default function GalleryView({ filter }: GalleryViewProps) {
   };
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10 -mx-3 sm:-mx-5 lg:-mx-8">
       {collection.photos.length === 0 && (
         <p className="text-sm text-photo-muted">No photos found in this category.</p>
       )}
