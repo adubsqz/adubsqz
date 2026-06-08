@@ -21,3 +21,9 @@ __pycache__/
 *.pyc
 .pytest_cache/
 tools/gallery/
+.cursorrules
+.cursor-reference.md
+.cursor-reference/
+.cursor-history/
+.cursor-history-local/
+.cursor-history-local-*/
