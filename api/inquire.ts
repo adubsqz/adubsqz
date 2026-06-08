@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
-import { denyIfBot } from './botidCheck';
-import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail } from './inquireEmail';
+import { denyIfBot } from './botidCheck.js';
+import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail } from './inquireEmail.js';
 
 function getResendClient(): Resend | null {
   const key = process.env.RESEND_API_KEY?.trim();

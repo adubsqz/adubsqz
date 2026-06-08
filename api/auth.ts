@@ -1,4 +1,4 @@
-import { denyIfBot } from './botidCheck';
+import { denyIfBot } from './botidCheck.js';
 
 const COOKIE_NAME = 'gallery_auth';
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
