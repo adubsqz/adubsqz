@@ -30,19 +30,6 @@
       "orientation": "horizontal"
     },
     {
-      "path": "bw/spookyaf.jpg",
-      "palette": "neutral",
-      "vibe": [
-        "moody",
-        "abstract"
-      ],
-      "versatility": [
-        "corporate",
-        "hospitality"
-      ],
-      "orientation": "horizontal"
-    },
-    {
       "path": "bw/graffiti-chainlink.jpg",
       "palette": "neutral",
       "vibe": [
@@ -98,18 +85,6 @@
       "vibe": [
         "abstract",
         "industrial"
-      ],
-      "versatility": [
-        "corporate"
-      ],
-      "orientation": "horizontal"
-    },
-    {
-      "path": "bw/bldgs.jpg",
-      "palette": "neutral",
-      "vibe": [
-        "industrial",
-        "documentary"
       ],
       "versatility": [
         "corporate"
@@ -212,20 +187,6 @@
       "orientation": "horizontal"
     },
     {
-      "path": "bw/bw-photoshoot-016.jpg",
-      "palette": "neutral",
-      "vibe": [
-        "intimate",
-        "moody"
-      ],
-      "versatility": [
-        "residential",
-        "hospitality"
-      ],
-      "orientation": "horizontal",
-      "reel_orientation": "vertical"
-    },
-    {
       "path": "bw/bw-photoshoot-017.jpg",
       "palette": "neutral",
       "vibe": [
@@ -315,6 +276,18 @@
       ],
       "orientation": "horizontal",
       "reel_orientation": "vertical"
+    },
+    {
+      "path": "bw/bldgs.jpg",
+      "palette": "neutral",
+      "vibe": [
+        "industrial",
+        "documentary"
+      ],
+      "versatility": [
+        "corporate"
+      ],
+      "orientation": "vertical"
     },
     {
       "path": "bw/itsgottafeelright.jpg",

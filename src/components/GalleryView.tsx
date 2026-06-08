@@ -30,11 +30,11 @@ function usePrefersReducedMotion(): boolean {
 function imageClassForReelLayout(layout: ReelLayout): string {
   switch (layout) {
     case 'hero':
-      return 'gallery-image block h-auto max-h-[min(90dvh,1080px)] w-auto max-w-[min(1220px,99vw)] object-contain';
+      return 'gallery-image block h-auto max-h-[min(92dvh,1120px)] w-auto max-w-[min(1240px,99vw)] object-contain';
     case 'horizontal-duo':
-      return 'gallery-image block h-auto max-h-[min(82dvh,920px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(84dvh,980px)] w-auto max-w-full object-contain';
     case 'horizontal-trio':
-      return 'gallery-image block h-auto max-h-[min(72dvh,760px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(78dvh,860px)] w-auto max-w-full object-contain';
     case 'vertical-solo':
       return 'gallery-image block h-auto max-h-[min(84dvh,960px)] w-auto max-w-full object-contain';
     default:
@@ -122,10 +122,6 @@ function PhotoCard({
               }
         }
       >
-        <span
-          className="pointer-events-none absolute -left-1.5 top-2 z-[5] h-px w-4 bg-mcm-rust/90"
-          aria-hidden
-        />
         <WatermarkedImage
           key={photo.src}
           src={photo.src}
@@ -191,18 +187,18 @@ function Lightbox({
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[100] bg-black" aria-hidden onClick={onClose} />
+      <div className="fixed inset-0 z-[100] bg-white" aria-hidden onClick={onClose} />
       <div
         ref={scrollRef}
-        className="fixed inset-0 z-[101] overflow-y-auto overflow-x-hidden overscroll-contain bg-photo-bg text-photo-fg"
+        className="lightbox-shell fixed inset-0 z-[101] overflow-y-auto overflow-x-hidden overscroll-contain bg-white text-neutral-900"
         role="dialog"
         aria-modal="true"
         aria-label="Image lightbox"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <header className="sticky top-0 z-10 flex shrink-0 flex-col gap-6 border-b border-photo-border bg-photo-panel px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-8 sm:py-5">
+        <header className="sticky top-0 z-10 flex shrink-0 flex-col gap-6 border-b border-neutral-200 bg-white/95 px-4 py-4 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-8 sm:py-5">
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-photo-muted">
+            <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-neutral-500">
               Navigate
             </span>
             <div className="flex flex-wrap gap-3 sm:gap-4">
@@ -210,7 +206,7 @@ function Lightbox({
                 type="button"
                 onClick={onPrevious}
                 variant="outline"
-                className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
+                className="rounded-sm border-neutral-300 bg-white px-5 py-2.5 text-[0.7rem] tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white"
                 aria-label="View previous photo"
               >
                 Prev
@@ -219,19 +215,19 @@ function Lightbox({
                 type="button"
                 onClick={onNext}
                 variant="outline"
-                className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
+                className="rounded-sm border-neutral-300 bg-white px-5 py-2.5 text-[0.7rem] tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white"
                 aria-label="View next photo"
               >
                 Next
               </Button>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 sm:border-l sm:border-photo-border sm:pl-6">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 sm:border-l sm:border-neutral-200 sm:pl-6">
             <Button
               type="button"
               onClick={onInquire}
-              variant="default"
-              className="rounded-sm px-6 py-2.5 text-[0.7rem] font-semibold tracking-[0.16em]"
+              variant="lightboxPrimary"
+              className="rounded-sm px-6 py-2.5 text-[0.7rem] font-semibold tracking-[0.16em] focus-visible:ring-offset-white"
             >
               Request Invoice
             </Button>
@@ -239,7 +235,7 @@ function Lightbox({
               type="button"
               onClick={onClose}
               variant="outline"
-              className="rounded-sm px-5 py-2.5 text-[0.7rem] tracking-[0.18em]"
+              className="rounded-sm border-neutral-300 bg-white px-5 py-2.5 text-[0.7rem] tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white"
             >
               Close
             </Button>
@@ -266,45 +262,45 @@ function Lightbox({
 
         {photo.caption && (
           <>
-            <Card className="rounded-sm border-photo-border bg-photo-panel/80">
+            <Card className="rounded-sm border-neutral-200 bg-neutral-50">
               <CardContent className="px-5 py-4 sm:px-8">
-                <p className="text-center text-sm italic leading-relaxed text-photo-muted">{photo.caption}</p>
+                <p className="text-center text-sm italic leading-relaxed text-neutral-600">{photo.caption}</p>
               </CardContent>
             </Card>
             <div className="h-10 sm:h-14" aria-hidden />
           </>
         )}
 
-        <section className="space-y-8 border-t border-photo-border pt-12 sm:space-y-10 sm:pt-16">
-          <div className="font-mono text-[0.65rem] uppercase tracking-[0.28em] text-photo-muted">
+        <section className="space-y-8 border-t border-neutral-200 pt-12 sm:space-y-10 sm:pt-16">
+          <div className="font-mono text-[0.65rem] uppercase tracking-[0.28em] text-neutral-500">
             Licensing & fulfillment
           </div>
           <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 lg:gap-12">
-            <Card className="space-y-4 rounded-sm border-photo-border bg-photo-panel/60 p-6 sm:p-8">
-              <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-photo-muted">
+            <Card className="space-y-4 rounded-sm border-neutral-200 bg-neutral-50 p-6 sm:p-8">
+              <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-neutral-500">
                 Trade Portal + Tearsheet
               </p>
-              <p className="text-sm leading-relaxed text-photo-fg/90">
+              <p className="text-sm leading-relaxed text-neutral-800">
                 Printable 8.5×11 lookbook pages with image SKU and title under each frame—available on request.
               </p>
               <Button
                 type="button"
                 onClick={onInquireTearsheet}
                 variant="ghost"
-                className="h-auto justify-start px-0 pt-2 text-left text-[0.75rem] tracking-[0.18em] text-mcm-rust hover:text-mcm-rust/90"
+                className="h-auto justify-start px-0 pt-2 text-left text-[0.75rem] tracking-[0.18em] text-mcm-rust hover:bg-transparent hover:text-mcm-rust/90"
               >
                 Inquire about tearsheet…
               </Button>
             </Card>
-            <Card className="space-y-4 rounded-sm border-photo-border bg-photo-panel/60 p-6 sm:p-8">
-              <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-photo-muted">
+            <Card className="space-y-4 rounded-sm border-neutral-200 bg-neutral-50 p-6 sm:p-8">
+              <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-neutral-500">
                 Fulfillment Options
               </p>
-              <p className="text-sm leading-relaxed text-photo-fg/90">
+              <p className="text-sm leading-relaxed text-neutral-800">
                 Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ
                 delivery: 5-7 business days.
               </p>
-              <p className="text-sm leading-relaxed text-photo-fg/90">
+              <p className="text-sm leading-relaxed text-neutral-800">
                 Short-term set rental is available at 20% of retail per 30-day term.
               </p>
             </Card>
@@ -324,9 +320,9 @@ function reelGridClass(layout: ReelLayout): string {
     case 'hero':
       return 'grid grid-cols-1 place-items-center w-full';
     case 'horizontal-duo':
-      return 'grid grid-cols-1 md:grid-cols-2 w-full gap-3 sm:gap-5';
+      return 'grid grid-cols-1 md:grid-cols-2 w-full gap-2 sm:gap-4';
     case 'horizontal-trio':
-      return 'grid grid-cols-1 md:grid-cols-3 w-full gap-2.5 sm:gap-4';
+      return 'grid grid-cols-1 md:grid-cols-3 w-full gap-1.5 sm:gap-2.5';
     case 'vertical-solo':
       return 'grid grid-cols-1 place-items-center max-w-xl mx-auto w-full';
     case 'vertical-duo':
@@ -406,16 +402,8 @@ function CollectionSection({
     <section aria-label={`Gallery reel for ${collection.title}`}>
       <div
         key={`${collection.id}-reel-${page}`}
-        className="relative isolate pb-1 motion-safe:animate-slide-reveal"
+        className="relative isolate motion-safe:animate-slide-reveal"
       >
-        <div
-          className="pointer-events-none absolute -inset-3 sm:-inset-5 rounded-sm opacity-[0.12] motion-safe:animate-specimen-flash"
-          aria-hidden
-          style={{
-            background:
-              'radial-gradient(ellipse at center, rgba(196,92,38,0.25) 0%, transparent 55%), radial-gradient(circle at 20% 0%, rgba(235,230,220,0.12), transparent 50%)',
-          }}
-        />
         <ReelFrame
           photos={pageSlice}
           orientation={currentPage?.orientation ?? 'horizontal'}
@@ -423,21 +411,21 @@ function CollectionSection({
         />
       </div>
       {totalPages > 1 && (
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-mcm-line/35 pt-5 font-mono">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-4 font-mono">
           <div className="flex flex-col gap-1">
-            <p className="text-photo-muted text-[0.7rem] uppercase tracking-[0.22em]">
+            <p className="text-photo-muted/80 text-[0.68rem] uppercase tracking-[0.2em]">
               Reel {page} / {totalPages}
             </p>
-            <p className="text-photo-muted/65 text-[0.62rem] uppercase tracking-[0.16em]">
-              {pageSlice.length} frame{pageSlice.length === 1 ? '' : 's'} on this reel · {photos.length} total
+            <p className="text-photo-muted/50 text-[0.6rem] uppercase tracking-[0.14em]">
+              {pageSlice.length} frame{pageSlice.length === 1 ? '' : 's'} · {photos.length} total
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <button
               type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
-              className="px-4 py-2 text-[0.65rem] uppercase tracking-[0.24em] text-photo-fg border border-mcm-rust/35 rounded-sm bg-mcm-ink/40 hover:border-mcm-rust/55 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="text-[0.65rem] uppercase tracking-[0.22em] text-photo-muted hover:text-photo-fg disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
             >
               ◀ Rev −
             </button>
@@ -445,7 +433,7 @@ function CollectionSection({
               type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
-              className="px-4 py-2 text-[0.65rem] uppercase tracking-[0.24em] text-photo-fg border border-mcm-rust/35 rounded-sm bg-mcm-ink/40 hover:border-mcm-rust/55 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="text-[0.65rem] uppercase tracking-[0.22em] text-photo-muted hover:text-photo-fg disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
             >
               Rev + ▶
             </button>
@@ -501,7 +489,7 @@ export default function GalleryView({ filter }: GalleryViewProps) {
   };
 
   return (
-    <div className="space-y-10 -mx-3 sm:-mx-5 lg:-mx-8">
+    <div className="space-y-6">
       {collection.photos.length === 0 && (
         <p className="text-sm text-photo-muted">No photos found in this category.</p>
       )}

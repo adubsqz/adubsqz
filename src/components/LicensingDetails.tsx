@@ -20,7 +20,28 @@ export function FilmTvClearanceBlock({ className = '' }: { className?: string })
   );
 }
 
-export function RightsReservedBlock({ className = '' }: { className?: string }) {
+export function RightsReservedBlock({
+  className = '',
+  plain = false,
+}: {
+  className?: string;
+  plain?: boolean;
+}) {
+  if (plain) {
+    return (
+      <div className={`space-y-1.5 ${className}`}>
+        <p className="text-[0.62rem] uppercase tracking-[0.18em] text-photo-muted/70">
+          Rights reserved
+        </p>
+        <p className="max-w-3xl text-[0.65rem] leading-relaxed text-photo-muted/60">
+          All photographs, site design, source code, written content, and metadata are copyright © 2026
+          Alexander Ames. No copying, redistribution, scraping, or derivative use without prior written
+          permission.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <Card className={`p-4 space-y-2 ${className}`}>
       <p className="text-[0.66rem] uppercase tracking-[0.18em] text-photo-muted">

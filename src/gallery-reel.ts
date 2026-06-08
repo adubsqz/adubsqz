@@ -30,7 +30,7 @@ export function reelLayoutFor(count: number, orientation: PhotoOrientation): Ree
 
 /**
  * Paginate without mixing orientations on the same reel page (preserves manifest order).
- * Horizontal/square pages hold up to 3; vertical pages hold up to 2.
+ * Horizontal/square pages hold up to 2; vertical pages hold up to 2.
  */
 export function paginateByOrientation(photos: Photo[]): OrientationPage[] {
   if (photos.length === 0) return [];

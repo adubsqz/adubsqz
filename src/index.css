@@ -136,3 +136,17 @@ img {
     border-radius: 4px;
   }
 }
+
+/* White lightbox shell: softer mat shadow on bright ground */
+.lightbox-shell .lightbox-frame {
+  box-shadow:
+    0 0 0 1px rgba(196, 92, 38, 0.2) inset,
+    0 12px 40px rgba(0, 0, 0, 0.14);
+}
+
+.lightbox-shell .lightbox-frame--hero {
+  box-shadow:
+    0 0 0 1px rgba(196, 92, 38, 0.18) inset,
+    0 16px 48px rgba(0, 0, 0, 0.16),
+    0 0 80px rgba(196, 92, 38, 0.04);
+}

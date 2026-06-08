@@ -21,7 +21,7 @@ describe('paginateByOrientation', () => {
     expect(pages[2]?.photos.map((x) => x.id)).toEqual(['d']);
   });
 
-  it('caps horizontal pages at 3 and vertical at 2', () => {
+  it('caps horizontal pages at 2 and vertical at 2', () => {
     const photos = [
       p('h1', 'horizontal'),
       p('h2', 'horizontal'),
@@ -32,8 +32,8 @@ describe('paginateByOrientation', () => {
       p('v3', 'vertical'),
     ];
     const pages = paginateByOrientation(photos);
-    expect(pages[0]?.photos).toHaveLength(3);
-    expect(pages[1]?.photos).toHaveLength(1);
+    expect(pages[0]?.photos).toHaveLength(2);
+    expect(pages[1]?.photos).toHaveLength(2);
     expect(pages[2]?.photos).toHaveLength(2);
     expect(pages[3]?.photos).toHaveLength(1);
   });
