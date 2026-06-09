@@ -94,7 +94,8 @@ export function detectDevTools() {
     }
   };
 
-  setInterval(check, 1000);
+  // Low-frequency check avoids adding main-thread work during interaction (INP / TBT).
+  setInterval(check, 5000);
 }
 
 /**

@@ -5,8 +5,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['Newsreader', 'Instrument Serif', 'Georgia', 'serif'],
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        display: ['Newsreader', 'Georgia', 'serif'],
         mono: [
           'IBM Plex Mono',
           'ui-monospace',

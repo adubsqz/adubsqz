@@ -350,8 +350,8 @@ function ReelFrame({
           photo={photo}
           reelLayout={layout}
           onClick={() => onPhotoClick(photo)}
-          fetchPriority={i < 2 ? 'high' : 'auto'}
-          loading={i < 3 ? 'eager' : 'lazy'}
+          fetchPriority={i === 0 ? 'high' : 'auto'}
+          loading={i === 0 ? 'eager' : 'lazy'}
         />
       ))}
     </div>
@@ -379,18 +379,16 @@ function CollectionSection({
 
   useEffect(() => {
     const head = document.head;
-    const preloadTargets = pageSlice.slice(0, 2);
-    if (preloadTargets.length === 0) return;
+    const lcpPhoto = pageSlice[0];
+    if (!lcpPhoto) return;
     const links: HTMLLinkElement[] = [];
-    preloadTargets.forEach((p, i) => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.as = 'image';
-      link.href = p.src;
-      if (i === 0) link.setAttribute('fetchpriority', 'high');
-      head.appendChild(link);
-      links.push(link);
-    });
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = lcpPhoto.src;
+    link.setAttribute('fetchpriority', 'high');
+    head.appendChild(link);
+    links.push(link);
     return () => {
       links.forEach((l) => l.remove());
     };
