@@ -55,9 +55,17 @@ This repo is a Vite/React portfolio with Vercel Edge API routes, Playwright smok
 
 ## CI/CD coverage
 
-GitHub Actions runs `npm ci`, `npm run lint`, `npm run test:run`, `bash tools/run_gallery_pytest.sh -q`, and `npm run build`.
+GitHub Actions runs `npm ci`, `npm run lint`, `npm run test:run`, `bash tools/run_gallery_pytest.sh -q`, `npm run gallery:verify -- --parity-only`, and `npm run build`.
 
 CI does not currently run Playwright e2e. For UI or navigation changes, run `npm run playwright:install` and `npm run test:e2e` locally before calling the branch ready.
+
+## Vercel Agent / deployment review
+
+- **Vercel Agent** (project Settings → AI) reviews PRs for security, logic, and performance; enable on the linked Vercel project for automatic feedback on pushes.
+- Production gallery auth is fail-closed on Vercel unless `GALLERY_PASSWORD` + `GALLERY_AUTH_SECRET` are set, or `GALLERY_PUBLIC=1` for an intentional public launch.
+- API routes (`/api/auth`, `/api/inquire`) require `npx vercel@latest dev` locally; inquiry needs Resend env vars (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `INQUIRY_RECIPIENT_EMAIL`).
+- After manifest or `public/photos/` changes, run `npm run gallery:verify -- --parity-only` before push (now enforced in CI).
+- Gallery buckets: `bw`, `color`, `redscale`, `about` (manifest keys). Redscale is intentional Harman redscale work — use `GALLERY_IMPORT_SKIP_AUTO_PROMPT=1` so screening does not apply a cooler auto-prompt.
 
 ## Suggested verification matrix
 

@@ -15,6 +15,7 @@ describe('App', () => {
     render(<App />);
     expect(screen.getByRole('button', { name: /greyscale/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /full spectrum/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /redscale/i })).toBeInTheDocument();
   });
 
   it('switches to About view when About me tab is clicked', async () => {

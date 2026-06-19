@@ -855,6 +855,15 @@
         "residential"
       ],
       "orientation": "vertical"
-    }
+    },
+    "color/jfk-manhattan-skyline.jpg"
+  ],
+  "redscale": [
+    "redscale/harmon-red-boat-couple.jpg",
+    "redscale/harmon-red-abstract-glow.jpg",
+    "redscale/harmon-red-church-miniature.jpg",
+    "redscale/harmon-red-skyline-cinematic.jpg",
+    "redscale/harmon-red-skyline-cap.jpg",
+    "redscale/harmon-red-industrial-skyline.jpg"
   ]
 }

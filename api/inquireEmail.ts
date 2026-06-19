@@ -14,6 +14,11 @@ export function isValidInquiryEmail(value: string): boolean {
   return typeof value === 'string' && value.length <= 254 && EMAIL_RE.test(value);
 }
 
+/** Strip CR/LF and cap length for email subject / header fields. */
+export function sanitizeEmailHeader(value: string, maxLen = 200): string {
+  return value.replace(/[\r\n]+/g, ' ').trim().slice(0, maxLen);
+}
+
 /** Allow site-relative paths or http(s) URLs for photo links in email bodies. */
 export function isSafePhotoSrc(value: unknown): boolean {
   if (typeof value !== 'string' || value.length === 0 || value.length > 2048) {

@@ -82,7 +82,7 @@ def _install_publish(
 
 
 def process_entry(repo: Path, entry, dry_run: bool, *, replace: bool, stage_only: bool) -> str:
-    if entry.bucket not in ("bw", "color", "still-life", "about"):
+    if entry.bucket not in ("bw", "color", "redscale", "still-life", "about"):
         raise ValueError(f"invalid bucket {entry.bucket!r}")
     if entry.link_mode not in ALLOWED_LINK_MODES:
         raise ValueError(f"invalid link_mode {entry.link_mode!r}")

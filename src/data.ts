@@ -4,7 +4,7 @@ import galleryManifest from './gallery-manifest.json';
 
 /**
  * Gallery layout is derived from gallery-manifest.json:
- * - `bw` / `color` → Greyscale / Full Spectrum collections (array order = reel order)
+ * - `bw` / `color` / `redscale` → Greyscale / Full Spectrum / Redscale collections (array order = reel order)
  * - Row objects may include internal curation/orientation (not shown in the public UI)
  * - `about` → bare filenames at publish root (About page portrait only; not a gallery tab)
  */
@@ -18,8 +18,9 @@ const ABOUT_MANIFEST_KEY = 'about';
 
 const GREYSCALE_ID = 'greyscale';
 const FULL_SPECTRUM_ID = 'full-spectrum';
+const REDSCALE_ID = 'redscale';
 
-const GALLERY_MANIFEST_KEYS = ['bw', 'color'] as const;
+const GALLERY_MANIFEST_KEYS = ['bw', 'color', 'redscale'] as const;
 
 type ManifestRow =
   | string
@@ -38,6 +39,7 @@ type GalleryManifest = {
   about?: string[];
   bw?: ManifestRow[];
   color?: ManifestRow[];
+  redscale?: ManifestRow[];
 };
 
 const IMPORT_NUMERIC_ONLY = /^import-\d+\.(jpe?g|webp)$/i;
@@ -68,7 +70,9 @@ function normalizeManifestEntry(manifestCategory: string, entry: string): string
   const normalized = entry.trim().replace(/^\/+/, '');
   if (!normalized) return '';
   if (normalized.includes('/')) return normalized;
-  if (manifestCategory === 'bw' || manifestCategory === 'color') return `${manifestCategory}/${normalized}`;
+  if (manifestCategory === 'bw' || manifestCategory === 'color' || manifestCategory === 'redscale') {
+    return `${manifestCategory}/${normalized}`;
+  }
   return normalized;
 }
 
@@ -80,7 +84,7 @@ function selectGalleryEntries(entries: string[]): string[] {
 }
 
 function classifyManifestEntry(entry: string):
-  | { kind: 'public'; bucket: typeof GREYSCALE_ID | typeof FULL_SPECTRUM_ID }
+  | { kind: 'public'; bucket: typeof GREYSCALE_ID | typeof FULL_SPECTRUM_ID | typeof REDSCALE_ID }
   | { kind: 'hidden'; reason: 'import_numeric' | 'numeric_only_filename' | 'unsupported_path' | 'unsupported_mime' } {
   const normalized = entry.trim().replace(/^\/+/, '');
   const baseName = entryBasename(normalized);
@@ -97,6 +101,7 @@ function classifyManifestEntry(entry: string):
 
   if (normalized.startsWith('bw/')) return { kind: 'public', bucket: GREYSCALE_ID };
   if (normalized.startsWith('color/')) return { kind: 'public', bucket: FULL_SPECTRUM_ID };
+  if (normalized.startsWith('redscale/')) return { kind: 'public', bucket: REDSCALE_ID };
   return { kind: 'hidden', reason: 'unsupported_path' };
 }
 
@@ -124,8 +129,10 @@ function buildPublicCollections(): PhotoCollection[] {
   const raw = galleryManifest as GalleryManifest;
   const greyscaleRows: { path: string; orientation?: Photo['orientation'] }[] = [];
   const fullSpectrumRows: { path: string; orientation?: Photo['orientation'] }[] = [];
+  const redscaleRows: { path: string; orientation?: Photo['orientation'] }[] = [];
   const seenGrey = new Set<string>();
   const seenColor = new Set<string>();
+  const seenRedscale = new Set<string>();
 
   for (const manifestCategory of GALLERY_MANIFEST_KEYS) {
     const arr = raw[manifestCategory] ?? [];
@@ -148,6 +155,11 @@ function buildPublicCollections(): PhotoCollection[] {
           seenColor.add(entry);
           fullSpectrumRows.push({ path: entry, orientation });
         }
+      } else if (result.bucket === REDSCALE_ID) {
+        if (!seenRedscale.has(entry)) {
+          seenRedscale.add(entry);
+          redscaleRows.push({ path: entry, orientation });
+        }
       }
     }
   }
@@ -165,6 +177,13 @@ function buildPublicCollections(): PhotoCollection[] {
       id: FULL_SPECTRUM_ID,
       title: 'Full Spectrum',
       photos: photosFromRows(fullSpectrumRows, FULL_SPECTRUM_ID),
+    });
+  }
+  if (redscaleRows.length > 0) {
+    out.push({
+      id: REDSCALE_ID,
+      title: 'Redscale',
+      photos: photosFromRows(redscaleRows, REDSCALE_ID),
     });
   }
   return out;

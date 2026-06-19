@@ -8,14 +8,14 @@ from typing import Any
 from gallery.config import MANIFEST_REL
 from gallery.manifest_entry import entry_token
 
-_KEYS = ("about", "bw", "color")
+_KEYS = ("about", "bw", "color", "redscale")
 
 
 def _storage_manifest_key(import_bucket: str) -> str:
     b = import_bucket.lower().strip()
     if b in ("still-life", "about"):
         return "about"
-    if b in ("bw", "color"):
+    if b in ("bw", "color", "redscale"):
         return b
     raise ValueError(f"unsupported manifest import bucket {import_bucket!r}")
 

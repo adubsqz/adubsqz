@@ -6,7 +6,7 @@ from gallery.manifest_store import append_if_absent, load_manifest, save_manifes
 
 
 def _minimal_manifest():
-    return {"about": [], "bw": [], "color": []}
+    return {"about": [], "bw": [], "color": [], "redscale": []}
 
 
 def test_manifest_key_order_stable(tmp_path, monkeypatch):
@@ -14,13 +14,14 @@ def test_manifest_key_order_stable(tmp_path, monkeypatch):
     (repo / "src").mkdir(parents=True)
     m = repo / "src" / "gallery-manifest.json"
     monkeypatch.setenv("GALLERY_REPO_ROOT", str(repo))
-    m.write_text(json.dumps({"about": [], "bw": [], "color": []}), encoding="utf-8")
+    m.write_text(json.dumps(_minimal_manifest()), encoding="utf-8")
     save_manifest(repo, load_manifest(repo))
     text = m.read_text(encoding="utf-8")
     i_about = text.index('"about"')
     i_bw = text.index('"bw"')
     i_co = text.index('"color"')
-    assert i_about < i_bw < i_co
+    i_rs = text.index('"redscale"')
+    assert i_about < i_bw < i_co < i_rs
 
 
 def test_append_duplicate_returns_false(tmp_path, monkeypatch):

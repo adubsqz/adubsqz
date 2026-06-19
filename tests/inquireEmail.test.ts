@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail } from '../api/inquireEmail.ts';
+import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail, sanitizeEmailHeader } from '../api/inquireEmail.ts';
 
 describe('inquireEmail helpers', () => {
   it('escapeHtml neutralizes markup', () => {
@@ -15,5 +15,9 @@ describe('inquireEmail helpers', () => {
     expect(isSafePhotoSrc('/photos/still-life/bw/1.jpg')).toBe(true);
     expect(isSafePhotoSrc('javascript:alert(1)')).toBe(false);
     expect(isSafePhotoSrc('https://adubs.shop/photos/1.jpg')).toBe(true);
+  });
+
+  it('sanitizeEmailHeader strips newlines for subject safety', () => {
+    expect(sanitizeEmailHeader('hello\r\nBcc: evil@x.com')).toBe('hello Bcc: evil@x.com');
   });
 });

@@ -43,9 +43,9 @@ describe('data', () => {
       });
     });
 
-    it('Greyscale / Full Spectrum only (About photo is manifest `about`, not a tab)', () => {
+    it('Greyscale / Full Spectrum / Redscale tabs (About is manifest `about`, not a tab)', () => {
       const ids = COLLECTIONS.map((c) => c.id).sort();
-      expect(ids).toEqual(['full-spectrum', 'greyscale']);
+      expect(ids).toEqual(['full-spectrum', 'greyscale', 'redscale']);
     });
 
     it('about manifest entry resolves at gallery publish root (/photos/still-life/<file>)', () => {

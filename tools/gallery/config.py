@@ -8,7 +8,7 @@ PUBLISH_STILL_LIFE_REL = Path("public/photos/still-life")
 # Human-in-the-loop: optimized bytes land here until `gallery:promote` (gitignored via `.tmp/`).
 HITL_STAGING_STILL_LIFE_REL = Path(".tmp/gallery-hitl/photos/still-life")
 HITL_PENDING_REL = Path(".tmp/gallery-hitl/pending.json")
-ALLOWED_BUCKETS = frozenset({"bw", "color", "still-life", "about"})
+ALLOWED_BUCKETS = frozenset({"bw", "color", "redscale", "still-life", "about"})
 ALLOWED_LINK_MODES = frozenset({"copy", "symlink"})
 
 

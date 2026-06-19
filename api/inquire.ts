@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail } from './inquireEmail.js';
+import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail, sanitizeEmailHeader } from './inquireEmail.js';
 
 function getResendClient(): Resend | null {
   const key = process.env.RESEND_API_KEY?.trim();
@@ -202,11 +202,15 @@ ${printMedium ? `Print Medium: ${printMedium}\n` : ''}${printFinish ? `Finish: $
 ${notes ? `\nAdditional Notes:\n${notes}` : ''}
     `.trim();
 
+    const subjectPhoto = sanitizeEmailHeader(String(photoAlt || photoId || 'Unknown photo'));
+    const subjectName = sanitizeEmailHeader(String(name));
+    const subjectCompany = company ? sanitizeEmailHeader(String(company)) : '';
+
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to: recipientEmail,
       replyTo: email,
-      subject: `New Print Inquiry: ${photoAlt || photoId} - ${name}${company ? ` (${company})` : ''}`,
+      subject: `New Print Inquiry: ${subjectPhoto} - ${subjectName}${subjectCompany ? ` (${subjectCompany})` : ''}`,
       html: emailHtml,
       text: emailText,
     });
@@ -232,16 +236,10 @@ ${notes ? `\nAdditional Notes:\n${notes}` : ''}
     );
   } catch (error) {
     console.error('Inquiry handler error:', error);
-    return new Response(
-      JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
 
