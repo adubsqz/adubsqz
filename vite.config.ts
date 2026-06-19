@@ -86,6 +86,28 @@ function manifestAssetGuardPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), manifestAssetGuardPlugin()],
+  build: {
+    target: 'es2020',
+    modulePreload: { polyfill: false },
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/')) {
+            return 'react-vendor';
+          }
+          if (id.includes('node_modules/@radix-ui')) {
+            return 'radix-vendor';
+          }
+          if (
+            id.includes('node_modules/@vercel/analytics') ||
+            id.includes('node_modules/@vercel/speed-insights')
+          ) {
+            return 'vercel-insights';
+          }
+        },
+      },
+    },
+  },
   // Avoid ELOOP from FSWatcher when .tmp contains symlink cycles (e.g. review tooling).
   server: {
     watch: {

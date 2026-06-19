@@ -23,7 +23,7 @@ describe('App', () => {
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about me/i }));
     const aboutPanel = screen.getByRole('tabpanel');
-    expect(within(aboutPanel).getByText(ABOUT.tagline)).toBeInTheDocument();
+    expect(await within(aboutPanel).findByText(ABOUT.tagline)).toBeInTheDocument();
     expect(within(aboutPanel).getByText(ABOUT.name)).toBeInTheDocument();
   });
 
@@ -38,8 +38,8 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about me/i }));
-    await user.click(screen.getByRole('button', { name: /contact me/i }));
-    expect(screen.getByRole('dialog', { name: /contact/i })).toBeInTheDocument();
+    await user.click(await screen.findByRole('button', { name: /contact me/i }));
+    expect(await screen.findByRole('dialog', { name: /contact/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
   });
@@ -48,8 +48,8 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about me/i }));
-    await user.click(screen.getByRole('button', { name: /contact me/i }));
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await user.click(await screen.findByRole('button', { name: /contact me/i }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /close/i }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

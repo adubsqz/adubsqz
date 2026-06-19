@@ -68,7 +68,7 @@ describe('Inquiry flow (functional)', () => {
       await user.click(within(lightbox).getByRole('button', { name: /request invoice/i }));
 
       // Fill required fields.
-      await user.type(screen.getByLabelText(/full name/i), 'Jane Doe');
+      await user.type(await screen.findByLabelText(/full name/i), 'Jane Doe');
       await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
       await user.type(
         screen.getByLabelText(/shipping address/i),

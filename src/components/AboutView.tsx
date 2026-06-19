@@ -16,6 +16,8 @@ export default function AboutView({ onContactClick }: AboutViewProps) {
               src={ABOUT_IMAGE_SRC}
               alt="Portrait, photographed on film."
               className="w-full h-full object-cover object-center"
+              loading="lazy"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
           </div>

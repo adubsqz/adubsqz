@@ -67,6 +67,14 @@ CI does not currently run Playwright e2e. For UI or navigation changes, run `npm
 - After manifest or `public/photos/` changes, run `npm run gallery:verify -- --parity-only` before push (now enforced in CI).
 - Gallery buckets: `bw`, `color`, `redscale`, `about` (manifest keys). Redscale is intentional Harman redscale work — use `GALLERY_IMPORT_SKIP_AUTO_PROMPT=1` so screening does not apply a cooler auto-prompt.
 
+## Performance / Vercel scoring
+
+- **Static photos** ship from `public/photos/still-life/` with long-cache headers (`vercel.json`); gallery publish caps at `GALLERY_MAX_*` (default 2400px). No Blob migration needed unless uploads go dynamic.
+- **LCP**: first reel frame uses `preload` + `fetchPriority=high` + `loading=eager` in `GalleryView`; fonts load async in `index.html`.
+- **JS budget**: Vite `manualChunks` splits React, Radix, and Vercel insights; About/Contact/Inquiry modals are lazy-loaded.
+- **Functions**: `/api/auth` stays Edge (fast cookie check); `/api/inquire` stays Node.js (Resend SDK). Limits declared in `vercel.json`.
+- **Observability**: `@vercel/analytics` + `@vercel/speed-insights` mount after main bundle via lazy `VercelInsights` chunk — check Speed Insights in the Vercel project dashboard for LCP/CLS regressions.
+
 ## Suggested verification matrix
 
 - JS-only change: `npm run lint` and `npm run test:run`; add `npm run test:e2e` for rendered UI behavior.

@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { COLLECTIONS } from '../data';
 import type { Photo, PhotoCollection } from '../types';
@@ -10,9 +10,10 @@ import {
   type ReelLayout,
 } from '../gallery-reel';
 import WatermarkedImage from './WatermarkedImage';
-import InquiryModal from './InquiryModal';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
+
+const InquiryModal = lazy(() => import('./InquiryModal'));
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -506,11 +507,13 @@ export default function GalleryView({ filter }: GalleryViewProps) {
       )}
 
       {inquiry && (
-        <InquiryModal
-          photo={inquiry.photo}
-          initialNotes={inquiry.initialNotes}
-          onClose={() => setInquiry(null)}
-        />
+        <Suspense fallback={null}>
+          <InquiryModal
+            photo={inquiry.photo}
+            initialNotes={inquiry.initialNotes}
+            onClose={() => setInquiry(null)}
+          />
+        </Suspense>
       )}
     </div>
   );

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import type { PageView, GalleryFilter } from './types';
 import GalleryView from './components/GalleryView';
-import AboutView from './components/AboutView';
-import ContactModal from './components/ContactModal';
 import { COLLECTIONS, DEFAULT_GALLERY_FILTER } from './data';
+
+const AboutView = lazy(() => import('./components/AboutView'));
+const ContactModal = lazy(() => import('./components/ContactModal'));
 import { RightsReservedBlock } from './components/LicensingDetails';
 
 const totalGalleryPhotos = COLLECTIONS.reduce((n, c) => n + c.photos.length, 0);
@@ -104,14 +105,22 @@ export default function App() {
                   Python tool path).
                 </p>
               )}
-              {view === 'about' && <AboutView onContactClick={() => setShowContact(true)} />}
+              {view === 'about' && (
+                <Suspense fallback={<p className="text-sm text-photo-muted">Loading…</p>}>
+                  <AboutView onContactClick={() => setShowContact(true)} />
+                </Suspense>
+              )}
             </div>
             <footer className="px-1 py-6 sm:px-3 sm:py-8">
               <RightsReservedBlock plain />
             </footer>
           </div>
         </main>
-        {showContact && <ContactModal onClose={() => setShowContact(false)} />}
+        {showContact && (
+          <Suspense fallback={null}>
+            <ContactModal onClose={() => setShowContact(false)} />
+          </Suspense>
+        )}
       </div>
     </div>
   );
