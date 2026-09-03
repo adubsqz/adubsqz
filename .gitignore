@@ -26,4 +26,14 @@ tools/gallery/
 .cursor-reference/
 .cursor-history/
 .cursor-history-local/
+
+
+dist/
+.vercel/
+
+playwright-report/
+test-results/
+.qwen/
+
+
 .cursor-history-local-*/
