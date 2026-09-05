@@ -164,29 +164,23 @@ function buildPublicCollections(): PhotoCollection[] {
     }
   }
 
-  const out: PhotoCollection[] = [];
-  if (greyscaleRows.length > 0) {
-    out.push({
+  return [
+    {
       id: GREYSCALE_ID,
       title: 'Greyscale',
       photos: photosFromRows(greyscaleRows, GREYSCALE_ID),
-    });
-  }
-  if (fullSpectrumRows.length > 0) {
-    out.push({
+    },
+    {
       id: FULL_SPECTRUM_ID,
       title: 'Full Spectrum',
       photos: photosFromRows(fullSpectrumRows, FULL_SPECTRUM_ID),
-    });
-  }
-  if (redscaleRows.length > 0) {
-    out.push({
+    },
+    {
       id: REDSCALE_ID,
       title: 'Redscale',
       photos: photosFromRows(redscaleRows, REDSCALE_ID),
-    });
-  }
-  return out;
+    },
+  ];
 }
 
 function resolveAboutImagePath(entry: string): string {

@@ -3,6 +3,8 @@
 
 interface ImportMetaEnv {
   readonly VITE_E2E?: string;
-  /** Set to `"1"` to keep the password gate when running \`vite\` locally (defaults to open gallery in dev). */
   readonly VITE_REQUIRE_PASSWORD_GATE?: string;
+  readonly VITE_FORMSUBMIT_EMAIL?: string;
+  readonly VITE_WEB3FORMS_ACCESS_KEY?: string;
+  readonly VITE_GOATCOUNTER_CODE?: string;
 }

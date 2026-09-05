@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Photo } from '../types';
+import { submitPrintInquiry } from '../inquireStatic';
 import { FilmTvClearanceBlock, RightsReservedBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
 import WatermarkedImage from './WatermarkedImage';
 import { Button } from './ui/button';
@@ -44,41 +45,19 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
     setSubmitError(null);
 
     try {
-      const response = await fetch('/api/inquire', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          photoId: photo.id,
-          photoAlt: photo.alt,
-          photoSrc: photo.src,
-          name,
-          email,
-          company,
-          shippingAddress,
-          printSize: printSize === 'custom' ? customSize : printSize,
-          printMedium,
-          printFinish,
-          notes,
-        }),
+      const size = printSize === 'custom' ? customSize : printSize;
+      await submitPrintInquiry({
+        photo,
+        name,
+        email,
+        company,
+        shippingAddress,
+        size,
+        printMedium,
+        printFinish,
+        notes,
       });
-
-      if (!response.ok) {
-        let message = 'Failed to submit inquiry';
-        try {
-          const payload = (await response.json()) as { error?: string };
-          if (typeof payload.error === 'string' && payload.error.length > 0) {
-            message = payload.error;
-          }
-        } catch {
-          // ignore non-JSON error bodies
-        }
-        throw new Error(message);
-      }
-
       setSubmitStatus('success');
-      // Auto-close after 2 seconds on success
       setTimeout(() => {
         onClose();
       }, 2000);
@@ -141,7 +120,7 @@ export default function InquiryModal({ photo, initialNotes, onClose }: InquiryMo
                   alt=""
                   loading="eager"
                   decoding="sync"
-                  wrapperClassName="relative w-full overflow-hidden rounded-xl bg-black/35"
+                  wrapperClassName="relative w-full overflow-hidden rounded-xl bg-photo-panel"
                   className="max-h-40 w-full object-contain sm:max-h-52 lg:max-h-60"
                 />
                 <div className="border-b border-photo-border pb-3">

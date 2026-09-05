@@ -20,13 +20,13 @@ export default function App() {
   const [showContact, setShowContact] = useState(false);
 
   return (
-    <div className="min-h-[100dvh] text-photo-fg font-sans antialiased pb-28 sm:pb-32 relative selection:bg-mcm-rust/25">
+    <div className="min-h-[100dvh] text-photo-fg font-sans antialiased pb-28 sm:pb-32 relative selection:bg-mcm-rust/20">
       <div className="cinematic-grid" aria-hidden />
       <div className="relative z-[1] min-h-[100dvh]">
         <main className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-5 sm:py-8">
           <div className="mb-4 sm:mb-6 flex flex-wrap items-end justify-between gap-4 pb-2">
             <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-mcm-cream">
+              <h1 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-photo-fg">
                 adubsqz
               </h1>
             </div>
@@ -50,8 +50,8 @@ export default function App() {
                       onClick={() => setView(tab.id)}
                       className={`relative flex flex-1 flex-col items-center py-3 sm:py-4 text-[0.72rem] font-medium uppercase tracking-[0.24em] transition-colors ${
                         active
-                          ? 'text-mcm-cream border-b-2 border-mcm-rust'
-                          : 'text-photo-muted hover:text-photo-fg'
+                          ? 'text-mcm-rust border-b-2 border-mcm-rust'
+                          : 'text-photo-muted hover:text-mcm-sky'
                       }`}
                     >
                       {tab.label}
@@ -73,8 +73,8 @@ export default function App() {
                         onClick={() => setGalleryFilter(collection.id)}
                         className={`transition-colors ${
                           galleryFilter === collection.id
-                            ? 'text-mcm-cream underline decoration-mcm-rust decoration-2 underline-offset-[6px]'
-                            : 'text-photo-muted hover:text-photo-fg'
+                            ? 'text-mcm-rust underline decoration-mcm-sky decoration-2 underline-offset-[6px]'
+                            : 'text-photo-muted hover:text-mcm-sky'
                         }`}
                       >
                         {collection.title}

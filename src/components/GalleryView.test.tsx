@@ -27,9 +27,8 @@ describe('GalleryView', () => {
     const firstPage = paginateByOrientation(collection.photos)[0];
     if (collection.photos.length === 0) {
       expect(imgs.length).toBe(0);
-    } else if (collection.photos.length > 1 && firstPage) {
-      expect(imgs.length).toBeGreaterThan(1);
-      expect(imgs.length).toBeLessThanOrEqual(firstPage.photos.length);
+    } else if (firstPage) {
+      expect(imgs.length).toBe(firstPage.photos.length);
     }
   });
 

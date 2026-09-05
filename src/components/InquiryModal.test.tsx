@@ -3,17 +3,20 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InquiryModal from './InquiryModal';
 import type { Photo } from '../types';
+import { ABOUT } from '../data';
 
 describe('InquiryModal (unit)', () => {
   const onClose = vi.fn();
   const photo: Photo = { id: 'bw-1', src: '/photos/still-life/bw/000230040034.jpg', alt: 'Still life 1' };
 
-  const fetchMock = vi.fn();
-
   beforeEach(() => {
     onClose.mockClear();
-    fetchMock.mockReset();
-    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    const location = window.location;
+    delete (window as unknown as { location?: Location }).location;
+    (window as unknown as { location: Location }).location = {
+      ...location,
+      href: '',
+    } as Location;
   });
 
   afterEach(() => {
@@ -41,19 +44,11 @@ describe('InquiryModal (unit)', () => {
     expect(screen.getByLabelText(/custom dimensions/i)).toBeInTheDocument();
   });
 
-  it('submits the form and shows success, then calls onClose after 2s', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ success: true, messageId: 'm1' }),
-    });
-
+  it('submits via mailto and shows success, then calls onClose after 2s', async () => {
     const realSetTimeout = globalThis.setTimeout;
     const setTimeoutSpy = vi
       .spyOn(globalThis, 'setTimeout')
       .mockImplementation((cb, ms?: number, ...args: unknown[]) => {
-        // Auto-close is scheduled for 2s; for unit tests, run immediately.
-        // Delegate all other timeouts to the real implementation so
-        // Testing Library's internal polling isn't disrupted.
         if (ms === 2000) {
           if (typeof cb === 'function') (cb as () => void)();
           return 0 as unknown as ReturnType<typeof setTimeout>;
@@ -69,44 +64,23 @@ describe('InquiryModal (unit)', () => {
       await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
       await user.type(screen.getByLabelText(/shipping address/i), '123 Main St\nNew York, NY 10001');
 
-      // Default print size is already selected; submit should succeed.
-      const submitButton = screen.getByRole('button', { name: /submit inquiry/i });
-      fireEvent.click(submitButton);
+      fireEvent.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
-      // Flush the async submit handler (fetch + state updates).
       await act(async () => {
         await Promise.resolve();
       });
 
-      expect(fetchMock).toHaveBeenCalledTimes(1);
-      expect(fetchMock.mock.calls[0][0]).toBe('/api/inquire');
-      expect(fetchMock.mock.calls[0][1]?.method).toBe('POST');
-
-      // Validate payload shape (without being overly strict about optional fields).
-      const sentBody = JSON.parse(fetchMock.mock.calls[0][1]?.body as string) as Record<string, unknown>;
-      expect(sentBody.photoId).toBe(photo.id);
-      expect(sentBody.photoAlt).toBe(photo.alt);
-      expect(sentBody.photoSrc).toBe(photo.src);
-      expect(sentBody.name).toBe('Jane Doe');
-      expect(sentBody.email).toBe('jane@example.com');
-      expect(sentBody.shippingAddress).toContain('123 Main St');
-
+      expect(window.location.href).toContain('mailto:');
+      expect(window.location.href).toContain(ABOUT.contactEmail);
+      expect(window.location.href).toContain(encodeURIComponent(photo.id));
       expect(screen.getByText(/inquiry submitted/i)).toBeInTheDocument();
       expect(onClose).toHaveBeenCalledTimes(1);
-
-      const scheduledAutoClose = setTimeoutSpy.mock.calls.some((call) => call[1] === 2000);
-      expect(scheduledAutoClose).toBe(true);
     } finally {
       setTimeoutSpy.mockRestore();
     }
   });
 
-  it('maps custom print size to the custom dimensions value', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ success: true, messageId: 'm1' }),
-    });
-
+  it('maps custom print size into the mailto body', async () => {
     const user = userEvent.setup();
     render(<InquiryModal photo={photo} onClose={onClose} />);
 
@@ -118,27 +92,6 @@ describe('InquiryModal (unit)', () => {
 
     await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
-    const sentBody = JSON.parse(fetchMock.mock.calls[0][1]?.body as string) as Record<string, unknown>;
-    expect(sentBody.printSize).toBe('30x40 inches');
-  });
-
-  it('shows an error state when the API responds with !ok', async () => {
-    fetchMock.mockResolvedValue({
-      ok: false,
-      json: async () => ({ error: 'bad request' }),
-    });
-
-    const user = userEvent.setup();
-    render(<InquiryModal photo={photo} onClose={onClose} />);
-
-    await user.type(screen.getByLabelText(/full name/i), 'Jane Doe');
-    await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
-    await user.type(screen.getByLabelText(/shipping address/i), '123 Main St\nNew York, NY 10001');
-
-    await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
-
-    expect(await screen.findByText(/bad request/i)).toBeInTheDocument();
-    expect(onClose).not.toHaveBeenCalled();
+    expect(window.location.href).toContain(encodeURIComponent('30x40 inches'));
   });
 });
-

@@ -110,11 +110,11 @@ function PhotoCard({
       onPointerLeave={onPointerLeave}
       onPointerCancel={onPointerLeave}
       aria-label={`Open photo: ${photo.alt}`}
-      className={`block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-mcm-rust focus-visible:ring-offset-2 focus-visible:ring-offset-mcm-ink group ${className}`}
+      className={`block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-mcm-rust focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg group ${className}`}
       style={{ perspective: '880px' }}
     >
       <div
-        className="relative mx-auto w-fit max-w-full rounded-sm border-[3px] border-mcm-cream/95 bg-mcm-ink shadow-[0_12px_40px_rgba(0,0,0,0.55),inset_0_0_0_1px_rgba(0,0,0,0.4)] transition-[border-color,box-shadow] duration-300 group-hover:border-mcm-sage/70 group-hover:shadow-[0_16px_52px_rgba(0,0,0,0.62)] motion-safe:transition-transform motion-safe:duration-300 [transform-style:preserve-3d]"
+        className="relative mx-auto w-fit max-w-full rounded-sm border-[3px] border-photo-fg/80 bg-photo-panel shadow-[0_10px_28px_rgba(26,23,20,0.12),inset_0_0_0_1px_rgba(26,23,20,0.08)] transition-[border-color,box-shadow] duration-300 group-hover:border-mcm-rust group-hover:shadow-[0_14px_36px_rgba(197,106,58,0.18)] motion-safe:transition-transform motion-safe:duration-300 [transform-style:preserve-3d]"
         style={
           reducedMotion
             ? undefined
@@ -135,7 +135,7 @@ function PhotoCard({
           onError={handleError}
           onClick={onClick}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-mcm-ink/35 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-sm" />
+        <div className="absolute inset-0 bg-gradient-to-t from-mcm-sky/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-sm" />
       </div>
       {photo.caption && (
         <p className="mt-3 text-photo-muted/85 text-[0.7rem] leading-relaxed font-mono tracking-wide">
@@ -191,7 +191,7 @@ function Lightbox({
       <div className="fixed inset-0 z-[100] bg-white" aria-hidden onClick={onClose} />
       <div
         ref={scrollRef}
-        className="lightbox-shell fixed inset-0 z-[101] overflow-y-auto overflow-x-hidden overscroll-contain bg-white text-neutral-900"
+        className="lightbox-shell fixed inset-0 z-[101] overflow-y-auto overflow-x-hidden overscroll-contain bg-mcm-cream text-photo-fg"
         role="dialog"
         aria-modal="true"
         aria-label="Image lightbox"

@@ -21,13 +21,13 @@ scripts/**
 .vercel
 .env.local
 .env*.local
+.secrets/
 .claude/
 .tmp/
 .venv-gallery/
 __pycache__/
 *.pyc
 .pytest_cache/
-tools/gallery/
 .cursorrules
 .cursor-reference.md
 .cursor-reference/

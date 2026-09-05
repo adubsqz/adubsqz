@@ -1,19 +1,14 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
 body {
   font-family: 'Outfit', system-ui, sans-serif;
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
-  color: #ebe6dc;
-  background-color: #141210;
-  background-image:
-    linear-gradient(165deg, rgba(20, 18, 16, 0.88) 0%, rgba(12, 11, 9, 0.94) 45%, rgba(18, 16, 14, 0.9) 100%),
-    url('/photos/site/BACKGROUND.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: scroll;
-  background-repeat: no-repeat;
+  color: #1a1714;
+  background-color: #f4eee4;
+  background-image: none;
 }
 
 .cinematic-grid {
@@ -21,30 +16,30 @@ body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.4;
   background-image:
-    linear-gradient(rgba(196, 92, 38, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(196, 92, 38, 0.07) 1px, transparent 1px),
-    linear-gradient(rgba(235, 230, 220, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(235, 230, 220, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(197, 106, 58, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(197, 106, 58, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(142, 185, 206, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(142, 185, 206, 0.07) 1px, transparent 1px);
   background-size:
     48px 48px,
     48px 48px,
     12px 12px,
     12px 12px;
-  mix-blend-mode: soft-light;
+  mix-blend-mode: multiply;
   mask-image: radial-gradient(ellipse 85% 70% at 50% 40%, black 20%, transparent 75%);
 }
 
 html {
   scroll-behavior: smooth;
   min-height: 100dvh;
-  background-color: #141210;
+  background-color: #f4eee4;
 }
 
 ::selection {
-  background-color: rgba(148, 163, 184, 0.35);
-  color: #F9FAFB;
+  background-color: rgba(197, 106, 58, 0.28);
+  color: #1a1714;
 }
 
 /* Enhanced image protection */
@@ -100,12 +95,12 @@ img {
   max-width: 100%;
   max-height: 100%;
   padding: 6px;
-  background: #141210;
-  border: 6px solid rgba(245, 240, 230, 0.94);
+  background: #f4eee4;
+  border: 6px solid #1a1714;
   border-radius: 2px;
   box-shadow:
-    0 0 0 1px rgba(196, 92, 38, 0.35) inset,
-    0 14px 48px rgba(0, 0, 0, 0.75);
+    0 0 0 1px rgba(197, 106, 58, 0.45) inset,
+    0 14px 48px rgba(26, 23, 20, 0.18);
 }
 
 @media (min-width: 640px) {

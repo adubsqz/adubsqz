@@ -7,14 +7,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-photo-accent text-photo-bg hover:opacity-90',
-        outline: 'border border-photo-border bg-photo-bg text-photo-fg hover:bg-white/5',
-        ghost: 'text-photo-muted hover:text-photo-fg',
-        lightbox: 'border border-white/20 bg-white/[0.06] text-white/80 hover:border-white/35 hover:bg-white/[0.1] hover:text-white',
+        default: 'bg-mcm-rust text-mcm-cream hover:bg-mcm-rust/90',
+        outline: 'border border-photo-border bg-photo-panel text-photo-fg hover:border-mcm-sky hover:text-mcm-sky',
+        ghost: 'text-photo-muted hover:text-mcm-rust',
+        lightbox: 'border border-photo-border bg-photo-panel text-photo-fg hover:border-mcm-sky hover:text-mcm-sky',
         lightboxPrimary:
-          'border border-mcm-rust/70 bg-mcm-rust text-mcm-cream shadow-[0_8px_32px_rgba(0,0,0,0.55)] hover:bg-mcm-rust/90',
+          'border border-mcm-rust/80 bg-mcm-rust text-mcm-cream shadow-[0_8px_24px_rgba(197,106,58,0.28)] hover:bg-mcm-rust/90',
         inquirySubmit:
-          'border border-[#6b5a1e]/80 bg-[#8a7420] text-mcm-cream hover:bg-[#7a661c] focus-visible:ring-[#8a7420]/60',
+          'border border-mcm-rust/80 bg-mcm-rust text-mcm-cream hover:bg-mcm-rust/90 focus-visible:ring-mcm-sky/60',
       },
       size: {
         default: 'h-10 px-4 py-2',

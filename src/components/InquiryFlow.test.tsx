@@ -22,11 +22,13 @@ vi.mock('../data', async (importOriginal) => {
 import App from '../App';
 
 describe('Inquiry flow (functional)', () => {
-  const fetchMock = vi.fn();
-
   beforeEach(() => {
-    fetchMock.mockReset();
-    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    const location = window.location;
+    delete (window as unknown as { location?: Location }).location;
+    (window as unknown as { location: Location }).location = {
+      ...location,
+      href: '',
+    } as Location;
   });
 
   afterEach(() => {
@@ -34,12 +36,7 @@ describe('Inquiry flow (functional)', () => {
     vi.restoreAllMocks();
   });
 
-  it('opens InquiryModal from a lightbox, submits, and auto-closes on success', async () => {
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ success: true, messageId: 'm1' }),
-    });
-
+  it('opens InquiryModal from a lightbox and submits via mailto', async () => {
     let autoCloseCb: (() => void) | undefined;
     const realSetTimeout = globalThis.setTimeout;
     const setTimeoutSpy = vi
@@ -67,7 +64,6 @@ describe('Inquiry flow (functional)', () => {
 
       await user.click(within(lightbox).getByRole('button', { name: /request invoice/i }));
 
-      // Fill required fields.
       await user.type(await screen.findByLabelText(/full name/i), 'Jane Doe');
       await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
       await user.type(
@@ -75,49 +71,18 @@ describe('Inquiry flow (functional)', () => {
         '123 Main St\nNew York, NY 10001'
       );
 
-      // Submit.
       await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
-      expect(fetchMock).toHaveBeenCalledTimes(1);
-
+      expect(window.location.href).toContain('mailto:');
       expect(await screen.findByText(/inquiry submitted/i)).toBeInTheDocument();
 
-      // Trigger the captured auto-close callback (scheduled for 2s).
       act(() => {
         autoCloseCb?.();
       });
 
-      // Auto-close should remove the modal from the DOM.
       expect(screen.queryByText(/inquiry submitted/i)).not.toBeInTheDocument();
     } finally {
       setTimeoutSpy.mockRestore();
     }
   });
-
-  it('stays in the inquiry form and shows error when the API responds !ok', async () => {
-    fetchMock.mockResolvedValue({
-      ok: false,
-      json: async () => ({ error: 'bad request' }),
-    });
-
-    const user = userEvent.setup();
-    const { container } = render(<App />);
-
-    const clickTarget = container.querySelector('.absolute.inset-0.z-10');
-    if (!clickTarget) throw new Error('Photo click target not found');
-
-    await user.click(clickTarget);
-    const lightbox = await screen.findByRole('dialog', { name: /image lightbox/i });
-    await user.click(within(lightbox).getByRole('button', { name: /request invoice/i }));
-
-    await user.type(screen.getByLabelText(/full name/i), 'Jane Doe');
-    await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
-    await user.type(screen.getByLabelText(/shipping address/i), '123 Main St\nNew York, NY 10001');
-
-    await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
-
-    expect(await screen.findByText(/bad request/i)).toBeInTheDocument();
-    expect(screen.getByRole('dialog', { name: /request invoice/i })).toBeInTheDocument();
-  });
 });
-
