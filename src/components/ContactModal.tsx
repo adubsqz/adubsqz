@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ABOUT } from '../data';
+import { submitContactMessage } from '../inquireStatic';
 import { FilmTvClearanceBlock, RightsReservedBlock, TearsheetAndFulfillmentGrid } from './LicensingDetails';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
@@ -15,19 +15,21 @@ export default function ContactModal({ onClose }: ContactModalProps) {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const to = (ABOUT as { contactEmail?: string }).contactEmail ?? '';
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const body = `From: ${name} (${email})\n\n${content}`;
-    const mailto = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-    onClose();
+    setIsSubmitting(true);
+    try {
+      await submitContactMessage({ name, email, subject, message: content });
+      onClose();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={(open) => !open && !isSubmitting && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto p-0">
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-photo-border bg-photo-panel px-5 py-4">
           <DialogHeader className="space-y-1">
@@ -38,7 +40,7 @@ export default function ContactModal({ onClose }: ContactModalProps) {
               Start a private licensing conversation
             </DialogDescription>
           </DialogHeader>
-          <Button aria-label="Close" className="h-8 px-2 text-lg leading-none" variant="ghost" onClick={onClose}>
+          <Button aria-label="Close" className="h-8 px-2 text-lg leading-none" variant="ghost" onClick={onClose} disabled={isSubmitting}>
             ×
           </Button>
         </div>
@@ -110,14 +112,16 @@ export default function ContactModal({ onClose }: ContactModalProps) {
               onClick={onClose}
               className="flex-1"
               variant="ghost"
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               type="submit"
               className="flex-1"
+              disabled={isSubmitting}
             >
-              Send
+              {isSubmitting ? 'Sending...' : 'Send'}
             </Button>
           </div>
         </form>

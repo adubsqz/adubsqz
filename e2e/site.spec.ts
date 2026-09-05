@@ -40,6 +40,29 @@ test.describe('site', () => {
     await page.getByRole('button', { name: /cancel/i }).click();
     await expect(page.getByRole('dialog', { name: /contact/i })).toHaveCount(0);
 
+    await page.route('https://formsubmit.co/**', async (route) => {
+      expect(route.request().url()).toContain(encodeURIComponent('adubsqz@gmail.com'));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true }),
+      });
+    });
+    await page.route('https://api.web3forms.com/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true }),
+      });
+    });
+    await page.getByRole('button', { name: /contact me/i }).click();
+    await page.getByLabel(/name/i).fill('Ada');
+    await page.getByLabel(/email/i).fill('ada@example.com');
+    await page.getByLabel(/subject/i).fill('Prints');
+    await page.getByLabel(/message/i).fill('Hello');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByRole('dialog', { name: /contact/i })).toHaveCount(0);
+
     const coverage = await page.coverage.stopJSCoverage();
     const src = coverage.filter(
       (entry) => entry.url.includes('/src/') && !entry.url.includes('.test.') && !entry.url.includes('/test/'),

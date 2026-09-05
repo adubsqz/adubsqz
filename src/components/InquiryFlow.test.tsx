@@ -29,14 +29,16 @@ describe('Inquiry flow (functional)', () => {
       ...location,
       href: '',
     } as Location;
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
-  it('opens InquiryModal from a lightbox and submits via mailto', async () => {
+  it('opens InquiryModal from a lightbox and submits via mailto:adubsqz@gmail.com', async () => {
     let autoCloseCb: (() => void) | undefined;
     const realSetTimeout = globalThis.setTimeout;
     const setTimeoutSpy = vi
@@ -73,7 +75,7 @@ describe('Inquiry flow (functional)', () => {
 
       await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
-      expect(window.location.href).toContain('mailto:');
+      expect(window.location.href).toContain('mailto:adubsqz@gmail.com');
       expect(await screen.findByText(/inquiry submitted/i)).toBeInTheDocument();
 
       act(() => {
@@ -85,4 +87,32 @@ describe('Inquiry flow (functional)', () => {
       setTimeoutSpy.mockRestore();
     }
   });
+
+  it('posts Request Invoice to FormSubmit at adubsqz@gmail.com when fetch succeeds', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+
+    const clickTarget = container.querySelector('.absolute.inset-0.z-10');
+    if (!clickTarget) throw new Error('Photo click target not found');
+
+    await user.click(clickTarget);
+    const lightbox = await screen.findByRole('dialog', { name: /image lightbox/i });
+    await user.click(within(lightbox).getByRole('button', { name: /request invoice/i }));
+
+    await user.type(await screen.findByLabelText(/full name/i), 'Jane Doe');
+    await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
+    await user.type(screen.getByLabelText(/shipping address/i), '123 Main St');
+    await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `https://formsubmit.co/ajax/${encodeURIComponent('adubsqz@gmail.com')}`,
+      expect.objectContaining({ method: 'POST' }),
+    );
+    expect(window.location.href).not.toMatch(/^mailto:/);
+    expect(await screen.findByText(/inquiry submitted/i)).toBeInTheDocument();
+  });
 });
+

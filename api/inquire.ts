@@ -1,6 +1,8 @@
 import { Resend } from 'resend';
 import { escapeHtml, isSafePhotoSrc, isValidInquiryEmail, sanitizeEmailHeader } from './inquireEmail.js';
 
+// Unused on GitHub Pages (static). Do not embed keys. Pages outreach uses inquireStatic.
+
 function getResendClient(): Resend | null {
   const key = process.env.RESEND_API_KEY?.trim();
   return key ? new Resend(key) : null;

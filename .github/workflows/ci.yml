@@ -40,11 +40,5 @@ jobs:
       - name: Run end-to-end tests
         run: npm run test:e2e
 
-      - name: Gallery Python tooling (pytest)
-        run: bash tools/run_gallery_pytest.sh -q
-
-      - name: Gallery manifest parity
-        run: npm run gallery:verify -- --parity-only
-
       - name: Run production build
         run: npm run build

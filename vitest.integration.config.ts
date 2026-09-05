@@ -9,6 +9,7 @@ export default mergeConfig(
         'src/App.test.tsx',
         'src/components/ContactFlow.test.tsx',
         'src/components/InquiryFlow.test.tsx',
+        'tests/inquire.env-contract.test.ts',
       ],
       coverage: {
         reportsDirectory: './coverage/integration',

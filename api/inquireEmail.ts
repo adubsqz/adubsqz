@@ -35,4 +35,4 @@ export function isSafePhotoSrc(value: unknown): boolean {
   }
 }
 
-export const INQUIRY_RECIPIENT_DEFAULT = 'info@adubsqz.shop';
+export const INQUIRY_RECIPIENT_DEFAULT = 'adubsqz@gmail.com';

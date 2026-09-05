@@ -6,7 +6,6 @@ import { ABOUT } from '../data';
 
 describe('Contact me flow (functional)', () => {
   beforeEach(() => {
-    // Prevent jsdom navigation when ContactModal sets `window.location.href` to a mailto URL.
     const location = window.location;
     delete (window as unknown as { location?: Location }).location;
     (window as unknown as { location: Location }).location = {
@@ -16,10 +15,13 @@ describe('Contact me flow (functional)', () => {
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
-  it('submits contact form from the About page and closes the modal', async () => {
+  it('submits contact via mailto:adubsqz@gmail.com when FormSubmit fails', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
     const user = userEvent.setup();
     render(<App />);
 
@@ -35,7 +37,7 @@ describe('Contact me flow (functional)', () => {
 
     await user.click(screen.getByRole('button', { name: /send/i }));
 
-    expect(window.location.href).toContain('mailto:');
+    expect(window.location.href).toContain('mailto:adubsqz@gmail.com');
     expect(window.location.href).toContain(ABOUT.contactEmail ?? '');
     expect(window.location.href).toContain('subject=');
     expect(window.location.href).toContain(encodeURIComponent('Hello'));
@@ -45,5 +47,26 @@ describe('Contact me flow (functional)', () => {
 
     expect(screen.queryByRole('dialog', { name: /contact/i })).not.toBeInTheDocument();
   });
-});
 
+  it('posts CONTACT ME to FormSubmit at adubsqz@gmail.com when fetch succeeds', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubGlobal('fetch', fetchMock);
+    const user = userEvent.setup();
+    render(<App />);
+
+    await user.click(screen.getByRole('tab', { name: /about me/i }));
+    await user.click(await screen.findByRole('button', { name: /contact me/i }));
+    await user.type(screen.getByLabelText(/name/i), 'Jane');
+    await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
+    await user.type(screen.getByLabelText(/subject/i), 'Hello');
+    await user.type(screen.getByLabelText(/message/i), 'Hi there');
+    await user.click(screen.getByRole('button', { name: /send/i }));
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `https://formsubmit.co/ajax/${encodeURIComponent('adubsqz@gmail.com')}`,
+      expect.objectContaining({ method: 'POST' }),
+    );
+    expect(window.location.href).not.toMatch(/^mailto:/);
+    expect(screen.queryByRole('dialog', { name: /contact/i })).not.toBeInTheDocument();
+  });
+});

@@ -13,6 +13,13 @@ export type InquirePayload = {
   notes: string;
 };
 
+export type ContactPayload = {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+};
+
 function bodyText(p: InquirePayload): string {
   return [
     `From: ${p.name} (${p.email})`,
@@ -29,53 +36,76 @@ function bodyText(p: InquirePayload): string {
     .join('\n');
 }
 
-function mailto(p: InquirePayload): void {
-  const subject = `Print inquiry: ${p.photo.alt || p.photo.id}`;
-  window.location.href = `mailto:${ABOUT.contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText(p))}`;
+function inbox(): string {
+  return ABOUT.contactEmail;
+}
+
+function formsubmitTo(): string {
+  return import.meta.env.VITE_FORMSUBMIT_EMAIL?.trim() || inbox();
+}
+
+function mailtoHref(subject: string, body: string): string {
+  return `mailto:${inbox()}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 /** FormSubmit AJAX. No API key. First submission sends a confirm-the-email message. */
-async function formsubmit(p: InquirePayload, to: string): Promise<boolean> {
+async function formsubmit(to: string, name: string, email: string, subject: string, message: string): Promise<boolean> {
   const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
-      name: p.name,
-      email: p.email,
-      _subject: `Print inquiry: ${p.photo.alt || p.photo.id}`,
-      message: bodyText(p),
+      name,
+      email,
+      _subject: subject,
+      message,
     }),
   });
   return res.ok;
 }
 
 /** Web3Forms. Access key is meant for the browser. */
-async function web3forms(p: InquirePayload, accessKey: string): Promise<boolean> {
+async function web3forms(accessKey: string, name: string, email: string, subject: string, message: string): Promise<boolean> {
   const res = await fetch('https://api.web3forms.com/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       access_key: accessKey,
-      subject: `Print inquiry: ${p.photo.alt || p.photo.id}`,
-      from_name: p.name,
-      email: p.email,
-      message: bodyText(p),
+      subject,
+      from_name: name,
+      email,
+      message,
     }),
   });
   return res.ok;
 }
 
-export async function submitPrintInquiry(p: InquirePayload): Promise<void> {
+async function tryRemoteSubmit(name: string, email: string, subject: string, message: string): Promise<boolean> {
   const web3 = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY?.trim();
-  const formTo = import.meta.env.VITE_FORMSUBMIT_EMAIL?.trim();
   try {
     if (web3) {
-      if (await web3forms(p, web3)) return;
-    } else if (formTo) {
-      if (await formsubmit(p, formTo)) return;
+      if (await web3forms(web3, name, email, subject, message)) return true;
+    } else {
+      const to = formsubmitTo();
+      if (to && (await formsubmit(to, name, email, subject, message))) return true;
     }
   } catch {
     // Fall through to mailto so a static host never eats a sale.
   }
-  mailto(p);
+  return false;
+}
+
+function assignMailto(subject: string, body: string): void {
+  window.location.href = mailtoHref(subject, body);
+}
+
+export async function submitContactMessage(p: ContactPayload): Promise<void> {
+  const body = `From: ${p.name} (${p.email})\n\n${p.message}`;
+  if (await tryRemoteSubmit(p.name, p.email, p.subject, body)) return;
+  assignMailto(p.subject, body);
+}
+
+export async function submitPrintInquiry(p: InquirePayload): Promise<void> {
+  const subject = `Print inquiry: ${p.photo.alt || p.photo.id}`;
+  if (await tryRemoteSubmit(p.name, p.email, subject, bodyText(p))) return;
+  assignMailto(subject, bodyText(p));
 }

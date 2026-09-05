@@ -77,6 +77,7 @@ describe('data', () => {
       expect(ABOUT).toHaveProperty('name');
       expect(ABOUT).toHaveProperty('tagline');
       expect(ABOUT).toHaveProperty('contactEmail');
+      expect(ABOUT.contactEmail).toBe('adubsqz@gmail.com');
       expect(ABOUT).toHaveProperty('bio');
       expect(ABOUT).toHaveProperty('photoCredit');
       expect(ABOUT).toHaveProperty('socials');

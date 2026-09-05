@@ -18,10 +18,13 @@ describe('InquiryModal (unit)', () => {
       ...location,
       href: '',
     } as Location;
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it('renders the inquiry form dialog', () => {
@@ -71,7 +74,7 @@ describe('InquiryModal (unit)', () => {
         await Promise.resolve();
       });
 
-      expect(window.location.href).toContain('mailto:');
+      expect(window.location.href).toContain('mailto:adubsqz@gmail.com');
       expect(window.location.href).toContain(ABOUT.contactEmail);
       expect(window.location.href).toContain(encodeURIComponent(photo.id));
       expect(screen.getByText(/inquiry submitted/i)).toBeInTheDocument();

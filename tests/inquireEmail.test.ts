@@ -7,6 +7,7 @@ describe('inquireEmail helpers', () => {
   });
 
   it('isValidInquiryEmail accepts normal addresses', () => {
+    expect(isValidInquiryEmail('adubsqz@gmail.com')).toBe(true);
     expect(isValidInquiryEmail('info@adubsqz.shop')).toBe(true);
     expect(isValidInquiryEmail('not-an-email')).toBe(false);
   });

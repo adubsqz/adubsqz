@@ -16,9 +16,12 @@ describe('ContactModal', () => {
       ...location,
       href: '',
     } as Location;
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
   });
 
@@ -66,7 +69,7 @@ describe('ContactModal', () => {
     await user.click(submitButton);
 
     expect(onClose).toHaveBeenCalledTimes(1);
-    expect(window.location.href).toContain('mailto:');
+    expect(window.location.href).toContain('mailto:adubsqz@gmail.com');
     expect(window.location.href).toContain(ABOUT.contactEmail);
     expect(window.location.href).toContain('subject=');
     expect(window.location.href).toContain(encodeURIComponent('Hello'));
@@ -74,4 +77,23 @@ describe('ContactModal', () => {
     expect(window.location.href).toContain(encodeURIComponent('jane@example.com'));
     expect(window.location.href).toContain(encodeURIComponent('Hi there'));
   });
+
+  it('posts to FormSubmit at adubsqz@gmail.com when fetch succeeds', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubGlobal('fetch', fetchMock);
+    const user = userEvent.setup();
+    render(<ContactModal onClose={onClose} />);
+    await user.type(screen.getByLabelText(/name/i), 'Jane');
+    await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
+    await user.type(screen.getByLabelText(/subject/i), 'Hello');
+    await user.type(screen.getByLabelText(/message/i), 'Hi there');
+    await user.click(screen.getByRole('button', { name: /send/i }));
+    expect(fetchMock).toHaveBeenCalledWith(
+      `https://formsubmit.co/ajax/${encodeURIComponent('adubsqz@gmail.com')}`,
+      expect.objectContaining({ method: 'POST' }),
+    );
+    expect(window.location.href).not.toMatch(/^mailto:/);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });
+
