@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import galleryManifest from './gallery-manifest.json';
-import { COLLECTIONS, ABOUT } from './data';
+import { COLLECTIONS, ABOUT, classifyManifestEntry, resolveGalleryImagePath, resolveAboutImagePath } from './data';
 import type { Photo, PhotoCollection } from './types';
 
 describe('data', () => {
@@ -93,6 +93,22 @@ describe('data', () => {
         expect(typeof social.name).toBe('string');
         expect(typeof social.url).toBe('string');
       });
+    });
+  });
+
+  describe('path helpers', () => {
+    it('classifies public buckets and hides junk paths', () => {
+      expect(classifyManifestEntry('bw/a.jpg').kind).toBe('public');
+      expect(classifyManifestEntry('color/a.jpg').kind).toBe('public');
+      expect(classifyManifestEntry('redscale/a.jpg').kind).toBe('public');
+      expect(classifyManifestEntry('import-1.jpg')).toEqual({ kind: 'hidden', reason: 'import_numeric' });
+      expect(classifyManifestEntry('12.jpg')).toEqual({ kind: 'hidden', reason: 'numeric_only_filename' });
+      expect(classifyManifestEntry('note.txt')).toEqual({ kind: 'hidden', reason: 'unsupported_mime' });
+      expect(classifyManifestEntry('other/a.jpg')).toEqual({ kind: 'hidden', reason: 'unsupported_path' });
+      expect(resolveGalleryImagePath('greyscale', '')).toBe('');
+      expect(resolveGalleryImagePath('greyscale', 'plain.jpg')).toContain('/greyscale/plain.jpg');
+      expect(resolveAboutImagePath('')).toBe('');
+      expect(resolveAboutImagePath('about.jpg')).toContain('/photos/still-life/about.jpg');
     });
   });
 });

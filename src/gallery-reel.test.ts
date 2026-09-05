@@ -38,9 +38,11 @@ describe('paginateByOrientation', () => {
     expect(pages[3]?.photos).toHaveLength(1);
   });
 
-  it('maps singleton horizontal to hero layout', () => {
-    expect(reelLayoutFor(1, 'horizontal')).toBe('hero');
-    expect(reelLayoutFor(3, 'horizontal')).toBe('horizontal-trio');
-    expect(reelLayoutFor(2, 'vertical')).toBe('vertical-duo');
+  it('maps singleton vertical and empty lists', () => {
+    expect(paginateByOrientation([])).toEqual([]);
+    expect(reelLayoutFor(1, 'vertical')).toBe('vertical-solo');
+    expect(reelLayoutFor(2, 'horizontal')).toBe('horizontal-duo');
+    const square = paginateByOrientation([p('s', 'square')]);
+    expect(square[0]?.orientation).toBe('square');
   });
 });

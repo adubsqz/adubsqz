@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import InquiryModal from './InquiryModal';
 import type { Photo } from '../types';
 import { ABOUT } from '../data';
+import * as inquireStatic from '../inquireStatic';
 
 describe('InquiryModal (unit)', () => {
   const onClose = vi.fn();
@@ -89,9 +90,30 @@ describe('InquiryModal (unit)', () => {
     await user.type(screen.getByLabelText(/full name/i), 'Jane Doe');
     await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
     await user.type(screen.getByLabelText(/shipping address/i), '123 Main St\nNew York, NY 10001');
+    await user.selectOptions(screen.getByLabelText(/print medium/i), 'canvas');
+    await user.selectOptions(screen.getByLabelText(/^finish$/i), 'gloss');
+    await user.type(screen.getByLabelText(/additional notes/i), 'frame it');
 
     await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
     expect(window.location.href).toContain(encodeURIComponent('30x40 inches'));
+  });
+
+  it('shows an error when submitPrintInquiry throws', async () => {
+    vi.spyOn(inquireStatic, 'submitPrintInquiry').mockRejectedValueOnce(new Error('nope'));
+    const user = userEvent.setup();
+    render(<InquiryModal photo={photo} onClose={onClose} />);
+    await user.type(screen.getByLabelText(/full name/i), 'Jane Doe');
+    await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
+    await user.type(screen.getByLabelText(/shipping address/i), '123 Main St');
+    await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
+    expect(await screen.findByText(/nope/i)).toBeInTheDocument();
+  });
+
+  it('calls onClose from cancel', async () => {
+    const user = userEvent.setup();
+    render(<InquiryModal photo={photo} onClose={onClose} />);
+    await user.click(screen.getByRole('button', { name: /cancel/i }));
+    expect(onClose).toHaveBeenCalled();
   });
 });

@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
-import { ABOUT } from './data';
 
 describe('App', () => {
   it('renders navigation with Gallery and About me tabs', () => {
@@ -23,8 +22,11 @@ describe('App', () => {
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about me/i }));
     const aboutPanel = screen.getByRole('tabpanel');
-    expect(await within(aboutPanel).findByText(ABOUT.tagline)).toBeInTheDocument();
-    expect(within(aboutPanel).getByText(ABOUT.name)).toBeInTheDocument();
+    expect(
+      await within(aboutPanel).findByText(/lightweight portfolio sites for photographers/i),
+    ).toBeInTheDocument();
+    expect(within(aboutPanel).getByRole('button', { name: /contact me/i })).toBeInTheDocument();
+    expect(within(aboutPanel).queryByText(/Originally from the Southwest/i)).not.toBeInTheDocument();
   });
 
   it('switches back to Gallery when Gallery tab is clicked after viewing About', async () => {
@@ -42,6 +44,26 @@ describe('App', () => {
     expect(await screen.findByRole('dialog', { name: /contact/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+  });
+
+  it('switches gallery collection filters', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(screen.getByRole('button', { name: /^full spectrum$/i }));
+    expect(screen.getByRole('button', { name: /^full spectrum$/i }).className).toMatch(/mcm-rust/);
+    await user.click(screen.getByRole('button', { name: /^redscale$/i }));
+    expect(screen.getByRole('button', { name: /^redscale$/i }).className).toMatch(/mcm-rust/);
+  });
+
+  it('keeps rights copy on About only once and restores the gallery footer', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    expect(screen.getByText(/rights reserved/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: /about me/i }));
+    expect(await screen.findByText(/lightweight portfolio sites/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/rights reserved/i)).toHaveLength(1);
+    await user.click(screen.getByRole('tab', { name: /^gallery$/i }));
+    expect(screen.getByText(/rights reserved/i)).toBeInTheDocument();
   });
 
   it('closes contact modal when Close is clicked', async () => {

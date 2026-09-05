@@ -83,7 +83,7 @@ function selectGalleryEntries(entries: string[]): string[] {
   });
 }
 
-function classifyManifestEntry(entry: string):
+export function classifyManifestEntry(entry: string):
   | { kind: 'public'; bucket: typeof GREYSCALE_ID | typeof FULL_SPECTRUM_ID | typeof REDSCALE_ID }
   | { kind: 'hidden'; reason: 'import_numeric' | 'numeric_only_filename' | 'unsupported_path' | 'unsupported_mime' } {
   const normalized = entry.trim().replace(/^\/+/, '');
@@ -105,7 +105,7 @@ function classifyManifestEntry(entry: string):
   return { kind: 'hidden', reason: 'unsupported_path' };
 }
 
-function resolveGalleryImagePath(collectionId: string, entry: string): string {
+export function resolveGalleryImagePath(collectionId: string, entry: string): string {
   const normalized = entry.trim().replace(/^\/+/, '');
   if (!normalized) return '';
   if (normalized.includes('/')) return `${galleryPhotosBase}/${normalized}`;
@@ -183,7 +183,7 @@ function buildPublicCollections(): PhotoCollection[] {
   ];
 }
 
-function resolveAboutImagePath(entry: string): string {
+export function resolveAboutImagePath(entry: string): string {
   const normalized = entry.trim().replace(/^\/+/, '');
   if (!normalized) return '';
   return `${galleryPhotosBase}/${normalized}`;

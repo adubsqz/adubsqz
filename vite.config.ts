@@ -114,5 +114,23 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     exclude: [...configDefaults.exclude, 'e2e/**', 'tests/inquire.api.test.ts', 'tests/inquireEmail.test.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'src/**/*.test.*',
+        'src/test/**',
+        'src/vite-env.d.ts',
+        'src/main.tsx',
+        'src/gallery-manifest.json',
+      ],
+      thresholds: {
+        lines: 90,
+        functions: 90,
+        statements: 90,
+        branches: 70,
+      },
+    },
   },
 });

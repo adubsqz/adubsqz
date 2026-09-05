@@ -1,40 +1,27 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import AboutView from './AboutView';
-import { ABOUT, ABOUT_IMAGE_SRC } from '../data';
 
 describe('AboutView', () => {
-  it('renders about content with name and tagline', () => {
+  it('renders only the portfolio pitch, contact CTA, and rights block', () => {
     render(<AboutView />);
-    expect(screen.getByText(ABOUT.name)).toBeInTheDocument();
-    expect(screen.getByText(ABOUT.tagline)).toBeInTheDocument();
+    expect(
+      screen.getByText(/I design and build lightweight portfolio sites for photographers/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Licensing, prints, or a custom site/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /contact me/i })).toBeInTheDocument();
+    expect(screen.getByText(/rights reserved/i)).toBeInTheDocument();
+    expect(screen.getByText(/copyright © 2026 Alexander Ames/i)).toBeInTheDocument();
+    expect(screen.queryByAltText(/portrait/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /instagram/i })).not.toBeInTheDocument();
   });
 
-  it('renders bio text', () => {
-    render(<AboutView />);
-    expect(screen.getByText(ABOUT.bio)).toBeInTheDocument();
-  });
-
-  it('renders portrait image with correct alt', () => {
-    render(<AboutView />);
-    const img = screen.getByAltText(/portrait, photographed on film/i);
-    expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute('src', ABOUT_IMAGE_SRC);
-  });
-
-  it('renders photo credit under portrait', () => {
-    render(<AboutView />);
-    expect(screen.getByText(ABOUT.photoCredit)).toBeInTheDocument();
-  });
-
-  it('renders social links', () => {
-    render(<AboutView />);
-    ABOUT.socials.forEach((social) => {
-      const link = screen.getByRole('link', { name: social.name });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', social.url);
-      expect(link).toHaveAttribute('target', '_blank');
-      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-    });
+  it('invokes onContactClick from CONTACT ME', async () => {
+    const onContactClick = vi.fn();
+    const user = userEvent.setup();
+    render(<AboutView onContactClick={onContactClick} />);
+    await user.click(screen.getByRole('button', { name: /contact me/i }));
+    expect(onContactClick).toHaveBeenCalledTimes(1);
   });
 });

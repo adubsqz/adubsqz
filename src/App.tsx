@@ -111,9 +111,11 @@ export default function App() {
                 </Suspense>
               )}
             </div>
-            <footer className="px-1 py-6 sm:px-3 sm:py-8">
-              <RightsReservedBlock plain />
-            </footer>
+            {view === 'gallery' && (
+              <footer className="px-1 py-6 sm:px-3 sm:py-8">
+                <RightsReservedBlock plain />
+              </footer>
+            )}
           </div>
         </main>
         {showContact && (

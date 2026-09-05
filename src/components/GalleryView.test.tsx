@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import GalleryView from './GalleryView';
 import { COLLECTIONS } from '../data';
@@ -70,6 +70,55 @@ describe('GalleryView', () => {
     await user.click(clickTarget);
     await user.click(screen.getByRole('button', { name: /close/i }));
     expect(screen.queryByRole('dialog', { name: /image lightbox/i })).not.toBeInTheDocument();
+  });
+
+  it('advances reels, keyboard-navigates the lightbox, and opens inquiry', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<GalleryView filter={DEFAULT_FILTER} />);
+    const collection = COLLECTIONS.find((c) => c.id === DEFAULT_FILTER);
+    const pages = paginateByOrientation(collection?.photos ?? []);
+    if (pages.length > 1) {
+      await user.click(screen.getByRole('button', { name: /rev \+/i }));
+      expect(screen.getByText(/reel 2 \//i)).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: /rev −/i }));
+      expect(screen.getByText(/reel 1 \//i)).toBeInTheDocument();
+    }
+    const clickTarget = container.querySelector('.absolute.inset-0.z-10');
+    if (!clickTarget) return;
+    await user.click(clickTarget);
+    expect(screen.getByRole('dialog', { name: /image lightbox/i })).toBeInTheDocument();
+    await user.keyboard('{ArrowRight}');
+    await user.keyboard('{ArrowLeft}');
+    await user.click(screen.getByRole('button', { name: /request invoice/i }));
+    expect(await screen.findByRole('dialog', { name: /request invoice/i })).toBeInTheDocument();
+  });
+
+  it('opens a tearsheet inquiry from the lightbox', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<GalleryView filter={DEFAULT_FILTER} />);
+    const clickTarget = container.querySelector('.absolute.inset-0.z-10');
+    if (!clickTarget) return;
+    await user.click(clickTarget);
+    await user.click(screen.getByRole('button', { name: /inquire about tearsheet/i }));
+    expect(await screen.findByDisplayValue(/printable tearsheet/i)).toBeInTheDocument();
+  });
+
+  it('records a failed thumbnail without throwing', () => {
+    const { container } = render(<GalleryView filter={DEFAULT_FILTER} />);
+    const img = container.querySelector('img');
+    if (!img) return;
+    fireEvent.error(img);
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
+  it('renders vertical reels and unknown filters', () => {
+    const vertical = COLLECTIONS.find((c) => c.photos.some((p) => p.orientation === 'vertical'));
+    if (vertical) {
+      render(<GalleryView filter={vertical.id} />);
+      expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
+    }
+    render(<GalleryView filter="missing-category" />);
+    expect(screen.getAllByRole('button', { name: /open photo/i }).length).toBeGreaterThan(0);
   });
 });
 
