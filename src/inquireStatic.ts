@@ -1,6 +1,9 @@
 import { ABOUT } from './data';
 import type { Photo } from './types';
 
+/** FormSubmit hash from the activation email — required after confirm, not the naked inbox. */
+export const FORMSUBMIT_FORM_ID = '9e5f95e3027a5d9d5fd6e84de3e2ebf4';
+
 export type InquirePayload = {
   photo: Photo;
   name: string;
@@ -40,27 +43,46 @@ function inbox(): string {
   return ABOUT.contactEmail;
 }
 
-function formsubmitTo(): string {
-  return import.meta.env.VITE_FORMSUBMIT_EMAIL?.trim() || inbox();
+export function formsubmitEndpoint(): string {
+  const id = import.meta.env.VITE_FORMSUBMIT_ID?.trim();
+  if (id) return id;
+  const email = import.meta.env.VITE_FORMSUBMIT_EMAIL?.trim();
+  if (email) return email;
+  return FORMSUBMIT_FORM_ID;
+}
+
+function formsubmitAjaxUrl(endpoint: string): string {
+  const slug = endpoint.includes('@') ? encodeURIComponent(endpoint) : endpoint;
+  return `https://formsubmit.co/ajax/${slug}`;
 }
 
 function mailtoHref(subject: string, body: string): string {
   return `mailto:${inbox()}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-/** FormSubmit AJAX. No API key. First submission sends a confirm-the-email message. */
+function remoteSucceeded(res: Response, data: unknown): boolean {
+  if (!res.ok) return false;
+  if (!data || typeof data !== 'object') return false;
+  const success = (data as { success?: unknown }).success;
+  return success === true || success === 'true';
+}
+
+/** FormSubmit AJAX. After activation, POST to the hash — email URLs stop delivering. */
 async function formsubmit(to: string, name: string, email: string, subject: string, message: string): Promise<boolean> {
-  const res = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(to)}`, {
+  const res = await fetch(formsubmitAjaxUrl(to), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
       name,
       email,
+      _replyto: email,
       _subject: subject,
+      _captcha: 'false',
       message,
     }),
   });
-  return res.ok;
+  const data: unknown = await res.json().catch(() => null);
+  return remoteSucceeded(res, data);
 }
 
 /** Web3Forms. Access key is meant for the browser. */
@@ -76,7 +98,8 @@ async function web3forms(accessKey: string, name: string, email: string, subject
       message,
     }),
   });
-  return res.ok;
+  const data: unknown = await res.json().catch(() => null);
+  return remoteSucceeded(res, data);
 }
 
 async function tryRemoteSubmit(name: string, email: string, subject: string, message: string): Promise<boolean> {
@@ -85,7 +108,7 @@ async function tryRemoteSubmit(name: string, email: string, subject: string, mes
     if (web3) {
       if (await web3forms(web3, name, email, subject, message)) return true;
     } else {
-      const to = formsubmitTo();
+      const to = formsubmitEndpoint();
       if (to && (await formsubmit(to, name, email, subject, message))) return true;
     }
   } catch {

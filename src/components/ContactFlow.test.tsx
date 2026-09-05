@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 import { ABOUT } from '../data';
+import { FORMSUBMIT_FORM_ID } from '../inquireStatic';
 
 describe('Contact me flow (functional)', () => {
   beforeEach(() => {
@@ -45,11 +46,14 @@ describe('Contact me flow (functional)', () => {
     expect(window.location.href).toContain(encodeURIComponent('jane@example.com'));
     expect(window.location.href).toContain(encodeURIComponent('Hi there'));
 
-    expect(screen.queryByRole('dialog', { name: /contact/i })).not.toBeInTheDocument();
+    expect(await screen.findByText(/message sent/i)).toBeInTheDocument();
   });
 
-  it('posts CONTACT ME to FormSubmit at adubsqz@gmail.com when fetch succeeds', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+  it('posts CONTACT ME to the activated FormSubmit hash when fetch succeeds', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
     vi.stubGlobal('fetch', fetchMock);
     const user = userEvent.setup();
     render(<App />);
@@ -63,10 +67,12 @@ describe('Contact me flow (functional)', () => {
     await user.click(screen.getByRole('button', { name: /send/i }));
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `https://formsubmit.co/ajax/${encodeURIComponent('adubsqz@gmail.com')}`,
+      `https://formsubmit.co/ajax/${FORMSUBMIT_FORM_ID}`,
       expect.objectContaining({ method: 'POST' }),
     );
     expect(window.location.href).not.toMatch(/^mailto:/);
-    expect(screen.queryByRole('dialog', { name: /contact/i })).not.toBeInTheDocument();
+    expect(await screen.findByText(/message sent/i)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /^close$/i }));
+    expect(screen.queryByText(/message sent/i)).not.toBeInTheDocument();
   });
 });

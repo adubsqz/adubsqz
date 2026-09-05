@@ -16,20 +16,43 @@ export default function ContactModal({ onClose }: ContactModalProps) {
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       await submitContactMessage({ name, email, subject, message: content });
-      onClose();
+      setSent(true);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !isSubmitting) onClose();
+  };
+
+  if (sent) {
+    return (
+      <Dialog open onOpenChange={handleOpenChange}>
+        <DialogContent className="max-w-xl p-8">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl">Message sent</DialogTitle>
+            <DialogDescription className="text-sm text-photo-muted">
+              Check adubsqz@gmail.com (and spam). If nothing arrives, Send again and your mail app will open.
+            </DialogDescription>
+          </DialogHeader>
+          <Button type="button" className="mt-6" onClick={onClose}>
+            Close
+          </Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
-    <Dialog open onOpenChange={(open) => !open && !isSubmitting && onClose()}>
+      <Dialog open onOpenChange={handleOpenChange}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto p-0">
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-photo-border bg-photo-panel px-5 py-4">
           <DialogHeader className="space-y-1">

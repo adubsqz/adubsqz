@@ -1,6 +1,18 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { submitPrintInquiry, submitContactMessage, type InquirePayload } from './inquireStatic';
+import {
+  submitPrintInquiry,
+  submitContactMessage,
+  FORMSUBMIT_FORM_ID,
+  type InquirePayload,
+} from './inquireStatic';
 import { ABOUT } from './data';
+
+function okFetch() {
+  return vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ success: true }),
+  });
+}
 
 const photo = { id: 'p1', src: '/photos/still-life/color/x.jpg', alt: 'Neon' };
 
@@ -35,7 +47,7 @@ describe('submitPrintInquiry', () => {
   it('uses Web3Forms when the access key is set and the request succeeds', async () => {
     vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', 'wk');
     stubLocation();
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    const fetchMock = okFetch();
     vi.stubGlobal('fetch', fetchMock);
     await submitPrintInquiry(payload({ company: 'Studio', notes: 'rush' }));
     expect(fetchMock).toHaveBeenCalledWith(
@@ -45,14 +57,15 @@ describe('submitPrintInquiry', () => {
     expect(window.location.href).not.toMatch(/^mailto:/);
   });
 
-  it('uses FormSubmit to adubsqz@gmail.com when Web3 is unset and FormSubmit succeeds', async () => {
+  it('uses the activated FormSubmit hash when Web3 is unset', async () => {
     vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', '');
     vi.stubEnv('VITE_FORMSUBMIT_EMAIL', '');
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubEnv('VITE_FORMSUBMIT_ID', '');
+    const fetchMock = okFetch();
     vi.stubGlobal('fetch', fetchMock);
     await submitPrintInquiry(payload());
     expect(fetchMock).toHaveBeenCalledWith(
-      `https://formsubmit.co/ajax/${encodeURIComponent(ABOUT.contactEmail)}`,
+      `https://formsubmit.co/ajax/${FORMSUBMIT_FORM_ID}`,
       expect.objectContaining({ method: 'POST' }),
     );
     expect(ABOUT.contactEmail).toBe('adubsqz@gmail.com');
@@ -61,13 +74,27 @@ describe('submitPrintInquiry', () => {
   it('honors VITE_FORMSUBMIT_EMAIL when set', async () => {
     vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', '');
     vi.stubEnv('VITE_FORMSUBMIT_EMAIL', 'inbox@example.com');
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    const fetchMock = okFetch();
     vi.stubGlobal('fetch', fetchMock);
     await submitPrintInquiry(payload());
     expect(fetchMock).toHaveBeenCalledWith(
       'https://formsubmit.co/ajax/inbox%40example.com',
       expect.objectContaining({ method: 'POST' }),
     );
+  });
+
+  it('falls back to mailto when FormSubmit returns HTTP 200 without success', async () => {
+    vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', '');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ success: false, message: 'This form needs Activation' }),
+      }),
+    );
+    stubLocation();
+    await submitPrintInquiry(payload());
+    expect(window.location.href).toContain('mailto:adubsqz@gmail.com');
   });
 
   it('falls back to mailto:adubsqz@gmail.com when remote submit fails', async () => {
@@ -95,10 +122,10 @@ describe('submitContactMessage', () => {
     vi.restoreAllMocks();
   });
 
-  it('posts contact mail to FormSubmit at adubsqz@gmail.com', async () => {
+  it('posts contact mail to the activated FormSubmit hash', async () => {
     vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', '');
     stubLocation();
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    const fetchMock = okFetch();
     vi.stubGlobal('fetch', fetchMock);
     await submitContactMessage({
       name: 'Jane',
@@ -107,7 +134,7 @@ describe('submitContactMessage', () => {
       message: 'Hi there',
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      `https://formsubmit.co/ajax/${encodeURIComponent('adubsqz@gmail.com')}`,
+      `https://formsubmit.co/ajax/${FORMSUBMIT_FORM_ID}`,
       expect.objectContaining({ method: 'POST' }),
     );
     expect(window.location.href).not.toMatch(/^mailto:/);

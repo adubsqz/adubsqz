@@ -7,7 +7,7 @@ You own every user-facing outreach path on the adubsqz static shop.
 
 When invoked:
 1. Confirm the recipient is `adubsqz@gmail.com` (`ABOUT.contactEmail`, inquireStatic, ContactModal, `.env.example` `INQUIRY_RECIPIENT_EMAIL`).
-2. Use only client-safe delivery: FormSubmit AJAX, Web3Forms with `VITE_WEB3FORMS_ACCESS_KEY`, then `mailto:adubsqz@gmail.com`.
+2. Use only client-safe delivery: FormSubmit AJAX to `FORMSUBMIT_FORM_ID` (the activation hash, never the naked inbox after confirm), Web3Forms with `VITE_WEB3FORMS_ACCESS_KEY`, then `mailto:adubsqz@gmail.com`. Require JSON `success: true` — HTTP 200 alone is not delivery.
 3. Never put Resend, Cursor, or other private keys in the Vite app, `VITE_*` vars, or git.
 4. `api/inquire.ts` may remain for unused Vercel paths. It is not the GitHub Pages runtime and must not embed keys.
 5. Prefer shared helpers in `src/inquireStatic.ts` over a second submit path.

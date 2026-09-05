@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ContactModal from './ContactModal';
 import { ABOUT } from '../data';
+import { FORMSUBMIT_FORM_ID } from '../inquireStatic';
 
 describe('ContactModal', () => {
   const onClose = vi.fn();
@@ -68,7 +69,7 @@ describe('ContactModal', () => {
     const submitButton = screen.getByRole('button', { name: /send/i });
     await user.click(submitButton);
 
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText(/message sent/i)).toBeInTheDocument();
     expect(window.location.href).toContain('mailto:adubsqz@gmail.com');
     expect(window.location.href).toContain(ABOUT.contactEmail);
     expect(window.location.href).toContain('subject=');
@@ -78,8 +79,11 @@ describe('ContactModal', () => {
     expect(window.location.href).toContain(encodeURIComponent('Hi there'));
   });
 
-  it('posts to FormSubmit at adubsqz@gmail.com when fetch succeeds', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+  it('posts to the activated FormSubmit hash when fetch succeeds', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
     vi.stubGlobal('fetch', fetchMock);
     const user = userEvent.setup();
     render(<ContactModal onClose={onClose} />);
@@ -89,11 +93,11 @@ describe('ContactModal', () => {
     await user.type(screen.getByLabelText(/message/i), 'Hi there');
     await user.click(screen.getByRole('button', { name: /send/i }));
     expect(fetchMock).toHaveBeenCalledWith(
-      `https://formsubmit.co/ajax/${encodeURIComponent('adubsqz@gmail.com')}`,
+      `https://formsubmit.co/ajax/${FORMSUBMIT_FORM_ID}`,
       expect.objectContaining({ method: 'POST' }),
     );
     expect(window.location.href).not.toMatch(/^mailto:/);
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText(/message sent/i)).toBeInTheDocument();
   });
 });
 

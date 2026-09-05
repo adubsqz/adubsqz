@@ -20,6 +20,7 @@ vi.mock('../data', async (importOriginal) => {
 });
 
 import App from '../App';
+import { FORMSUBMIT_FORM_ID } from '../inquireStatic';
 
 describe('Inquiry flow (functional)', () => {
   beforeEach(() => {
@@ -89,7 +90,10 @@ describe('Inquiry flow (functional)', () => {
   });
 
   it('posts Request Invoice to FormSubmit at adubsqz@gmail.com when fetch succeeds', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
     vi.stubGlobal('fetch', fetchMock);
 
     const user = userEvent.setup();
@@ -108,7 +112,7 @@ describe('Inquiry flow (functional)', () => {
     await user.click(screen.getByRole('button', { name: /submit inquiry/i }));
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `https://formsubmit.co/ajax/${encodeURIComponent('adubsqz@gmail.com')}`,
+      `https://formsubmit.co/ajax/${FORMSUBMIT_FORM_ID}`,
       expect.objectContaining({ method: 'POST' }),
     );
     expect(window.location.href).not.toMatch(/^mailto:/);

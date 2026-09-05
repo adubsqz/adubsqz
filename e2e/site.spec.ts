@@ -41,7 +41,7 @@ test.describe('site', () => {
     await expect(page.getByRole('dialog', { name: /contact/i })).toHaveCount(0);
 
     await page.route('https://formsubmit.co/**', async (route) => {
-      expect(route.request().url()).toContain(encodeURIComponent('adubsqz@gmail.com'));
+      expect(route.request().url()).toContain('9e5f95e3027a5d9d5fd6e84de3e2ebf4');
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -61,7 +61,7 @@ test.describe('site', () => {
     await page.getByLabel(/subject/i).fill('Prints');
     await page.getByLabel(/message/i).fill('Hello');
     await page.getByRole('button', { name: /send/i }).click();
-    await expect(page.getByRole('dialog', { name: /contact/i })).toHaveCount(0);
+    await expect(page.getByText(/message sent/i)).toBeVisible();
 
     const coverage = await page.coverage.stopJSCoverage();
     const src = coverage.filter(
