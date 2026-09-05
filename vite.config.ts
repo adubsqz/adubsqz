@@ -86,7 +86,8 @@ function manifestAssetGuardPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), manifestAssetGuardPlugin()],
-  base: '/',
+  // Project Pages live at https://adubsqz.github.io/adubsqz/
+  base: process.env.GITHUB_PAGES === '1' ? '/adubsqz/' : '/',
   build: {
     target: 'es2020',
     modulePreload: { polyfill: false },
