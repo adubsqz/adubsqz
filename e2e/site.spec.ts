@@ -21,11 +21,23 @@ test.describe('site', () => {
     await expect(lightbox).toBeHidden();
 
     await thumb.click();
-    await page.getByRole('button', { name: /request invoice/i }).click();
-    await expect(page.getByRole('dialog', { name: /request invoice/i })).toBeVisible();
+    await expect(lightbox).toBeVisible();
+    await expect(lightbox.getByRole('button', { name: /contact me/i })).toBeVisible();
+    await expect(lightbox.getByRole('button', { name: /request invoice/i })).toHaveCount(0);
+    await expect(lightbox.getByText(/tearsheet/i)).toHaveCount(0);
+    await expect(lightbox.getByText(/request invoice/i)).toHaveCount(0);
+    await lightbox.getByRole('button', { name: /contact me/i }).click();
+    const contactFromPhoto = page.getByRole('dialog', { name: /contact/i });
+    await expect(contactFromPhoto).toBeVisible();
+    await expect(page.getByRole('dialog', { name: /request invoice/i })).toHaveCount(0);
+    await expect(page.getByLabel(/shipping address/i)).toHaveCount(0);
+    await expect(page.getByLabel(/subject/i)).not.toHaveValue('');
+    await expect(page.getByLabel(/message/i)).not.toHaveValue('');
     await page.getByRole('button', { name: /cancel/i }).click();
+    await expect(contactFromPhoto).toHaveCount(0);
 
     await page.getByRole('tab', { name: /about me/i }).click();
+    await expect(page.getByText(/I am not an AI robot/i)).toBeVisible();
     await expect(page.getByText(/lightweight portfolio sites for photographers/i)).toBeVisible();
     await expect(page.getByText(/licensing, prints, or a custom site/i)).toBeVisible();
     await expect(page.getByText(/rights reserved/i)).toBeVisible();

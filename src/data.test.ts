@@ -70,6 +70,30 @@ describe('data', () => {
       }
     });
 
+    it('uses gallery-manifest.json array order as the reel order', () => {
+      const manifest = galleryManifest as {
+        bw?: Array<string | { path: string }>;
+        color?: Array<string | { path: string }>;
+        redscale?: Array<string | { path: string }>;
+      };
+      const rowPath = (row: string | { path: string }) => (typeof row === 'string' ? row : row.path);
+      const publicPaths = (rows: Array<string | { path: string }>) =>
+        rows.map(rowPath).filter((entry) => classifyManifestEntry(entry).kind === 'public');
+      const expected: Record<string, string[]> = {
+        greyscale: publicPaths(manifest.bw ?? []),
+        'full-spectrum': publicPaths(manifest.color ?? []),
+        redscale: publicPaths(manifest.redscale ?? []),
+      };
+      for (const collection of COLLECTIONS) {
+        const srcs = collection.photos.map((photo) => {
+          const marker = '/photos/still-life/';
+          const idx = photo.src.indexOf(marker);
+          return decodeURIComponent(idx >= 0 ? photo.src.slice(idx + marker.length) : photo.src);
+        });
+        expect(srcs).toEqual(expected[collection.id]);
+      }
+    });
+
   });
 
   describe('ABOUT', () => {
@@ -79,10 +103,16 @@ describe('data', () => {
       expect(ABOUT).toHaveProperty('contactEmail');
       expect(ABOUT.contactEmail).toBe('adubsqz@gmail.com');
       expect(ABOUT).toHaveProperty('bio');
+      expect(ABOUT).toHaveProperty('voice');
+      expect(ABOUT).toHaveProperty('portfolioPitch');
       expect(ABOUT).toHaveProperty('photoCredit');
       expect(ABOUT).toHaveProperty('socials');
       expect(typeof ABOUT.name).toBe('string');
       expect(typeof ABOUT.bio).toBe('string');
+      expect(typeof ABOUT.voice).toBe('string');
+      expect(ABOUT.voice).toContain('I am not an AI robot');
+      expect(ABOUT.voice).toContain("Let's talk, like humans do");
+      expect(ABOUT.portfolioPitch).toContain('lightweight portfolio sites');
       expect(typeof ABOUT.photoCredit).toBe('string');
       expect(Array.isArray(ABOUT.socials)).toBe(true);
     });

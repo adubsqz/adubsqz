@@ -2,7 +2,7 @@
   "about": [],
   "bw": [
     {
-      "path": "bw/000220500005 3.jpg",
+      "path": "bw/bw-06-57530032.jpg",
       "orientation": "horizontal"
     },
     {
@@ -42,25 +42,29 @@
       "orientation": "horizontal"
     },
     {
-      "path": "bw/bw-02-000230040012.jpg",
-      "orientation": "horizontal"
-    },
-    {
       "path": "bw/bw-05-000220490008.jpg",
       "orientation": "vertical"
     },
     {
-      "path": "bw/bw-06-57530032.jpg",
+      "path": "bw/bw-police-car-1.jpg",
       "orientation": "horizontal"
     },
     {
-      "path": "bw/bw-police-car-1.jpg",
+      "path": "bw/000220500005 3.jpg",
+      "orientation": "horizontal"
+    },
+    {
+      "path": "bw/bw-02-000230040012.jpg",
       "orientation": "horizontal"
     }
   ],
   "color": [
     {
-      "path": "color/00033195-ames-chinatown.jpg",
+      "path": "color/color-04-260604000055080021.jpg",
+      "orientation": "horizontal"
+    },
+    {
+      "path": "color/color-kodak-000008.jpg",
       "orientation": "horizontal"
     },
     {
@@ -72,15 +76,11 @@
       "orientation": "horizontal"
     },
     {
-      "path": "color/00033195-ames-psychic-readings.jpg",
+      "path": "color/00033195-ames-skatepark-reflection.jpg",
       "orientation": "horizontal"
     },
     {
-      "path": "color/00033195-ames-reflection.jpg",
-      "orientation": "vertical"
-    },
-    {
-      "path": "color/00033195-ames-skatepark-reflection.jpg",
+      "path": "color/00033195-ames-chinatown.jpg",
       "orientation": "horizontal"
     },
     {
@@ -92,15 +92,15 @@
       "orientation": "horizontal"
     },
     {
+      "path": "color/00033195-ames-reflection.jpg",
+      "orientation": "vertical"
+    },
+    {
       "path": "color/color-01-000255310036.jpg",
       "orientation": "horizontal"
     },
     {
-      "path": "color/color-04-260604000055080021.jpg",
-      "orientation": "horizontal"
-    },
-    {
-      "path": "color/color-kodak-000008.jpg",
+      "path": "color/00033195-ames-psychic-readings.jpg",
       "orientation": "horizontal"
     }
   ],
@@ -110,11 +110,11 @@
       "orientation": "horizontal"
     },
     {
-      "path": "redscale/redscale-03-harmon-red-0017.jpg",
+      "path": "redscale/redscale-04-harmon-red-0037.jpg",
       "orientation": "vertical"
     },
     {
-      "path": "redscale/redscale-04-harmon-red-0037.jpg",
+      "path": "redscale/redscale-03-harmon-red-0017.jpg",
       "orientation": "vertical"
     }
   ]

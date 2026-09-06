@@ -4,8 +4,10 @@ import userEvent from '@testing-library/user-event';
 import AboutView from './AboutView';
 
 describe('AboutView', () => {
-  it('renders only the portfolio pitch, contact CTA, and rights block', () => {
+  it('renders the human voice, portfolio pitch, contact CTA, and rights block', () => {
     render(<AboutView />);
+    expect(screen.getByText(/I am not an AI robot/i)).toBeInTheDocument();
+    expect(screen.getByText(/Let's talk, like humans do/i)).toBeInTheDocument();
     expect(
       screen.getByText(/I design and build lightweight portfolio sites for photographers/i),
     ).toBeInTheDocument();

@@ -22,8 +22,9 @@ describe('App', () => {
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about me/i }));
     const aboutPanel = screen.getByRole('tabpanel');
+    expect(await within(aboutPanel).findByText(/I am not an AI robot/i)).toBeInTheDocument();
     expect(
-      await within(aboutPanel).findByText(/lightweight portfolio sites for photographers/i),
+      within(aboutPanel).getByText(/lightweight portfolio sites for photographers/i),
     ).toBeInTheDocument();
     expect(within(aboutPanel).getByRole('button', { name: /contact me/i })).toBeInTheDocument();
     expect(within(aboutPanel).queryByText(/Originally from the Southwest/i)).not.toBeInTheDocument();

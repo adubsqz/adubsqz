@@ -37,6 +37,21 @@ describe('ContactModal', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
+  it('prefills subject and message for a named still', () => {
+    render(
+      <ContactModal
+        onClose={onClose}
+        initialSubject="About Photograph neon"
+        initialMessage="I'd like to talk about this still: Photograph neon (color-1)."
+      />,
+    );
+    expect(screen.getByLabelText(/subject/i)).toHaveValue('About Photograph neon');
+    expect(screen.getByLabelText(/message/i)).toHaveValue(
+      "I'd like to talk about this still: Photograph neon (color-1).",
+    );
+    expect(screen.queryByLabelText(/shipping address/i)).not.toBeInTheDocument();
+  });
+
   it('calls onClose when Close button is clicked', async () => {
     const user = userEvent.setup();
     render(<ContactModal onClose={onClose} />);

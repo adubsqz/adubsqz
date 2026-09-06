@@ -14,6 +14,7 @@ export type InquirePayload = {
   printMedium: string;
   printFinish: string;
   notes: string;
+  inquiryCode?: string;
 };
 
 export type ContactPayload = {
@@ -21,10 +22,32 @@ export type ContactPayload = {
   email: string;
   subject: string;
   message: string;
+  inquiryCode?: string;
 };
 
-function bodyText(p: InquirePayload): string {
+export function contactPrefillForPhoto(photo: Pick<Photo, 'id' | 'alt'>): { subject: string; message: string } {
+  const label = photo.alt?.trim() || photo.id;
+  return {
+    subject: `About ${label}`,
+    message: `I'd like to talk about this still: ${label} (${photo.id}).`,
+  };
+}
+
+const INQUIRY_CODE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+export function newInquiryCode(): string {
+  const bytes = new Uint8Array(9);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => INQUIRY_CODE_CHARS[b % INQUIRY_CODE_CHARS.length]!).join('');
+}
+
+export function confirmationAutoresponse(name: string, code: string): string {
+  return `Hi ${name}, we received your message. Your inquiry number is ${code}. Keep this code to track the conversation. — adubsqz`;
+}
+
+function bodyText(p: InquirePayload, inquiryCode: string): string {
   return [
+    `Inquiry #: ${inquiryCode}`,
     `From: ${p.name} (${p.email})`,
     p.company ? `Company: ${p.company}` : '',
     `Photo: ${p.photo.id}`,
@@ -68,16 +91,25 @@ function remoteSucceeded(res: Response, data: unknown): boolean {
 }
 
 /** FormSubmit AJAX. After activation, POST to the hash — email URLs stop delivering. */
-async function formsubmit(to: string, name: string, email: string, subject: string, message: string): Promise<boolean> {
+async function formsubmit(
+  to: string,
+  name: string,
+  email: string,
+  subject: string,
+  message: string,
+  inquiryCode: string,
+): Promise<boolean> {
   const res = await fetch(formsubmitAjaxUrl(to), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
       name,
       email,
+      inquiry_number: inquiryCode,
       _replyto: email,
-      _subject: subject,
+      _subject: `${subject} [${inquiryCode}]`,
       _captcha: 'false',
+      _autoresponse: confirmationAutoresponse(name, inquiryCode),
       message,
     }),
   });
@@ -86,15 +118,23 @@ async function formsubmit(to: string, name: string, email: string, subject: stri
 }
 
 /** Web3Forms. Access key is meant for the browser. */
-async function web3forms(accessKey: string, name: string, email: string, subject: string, message: string): Promise<boolean> {
+async function web3forms(
+  accessKey: string,
+  name: string,
+  email: string,
+  subject: string,
+  message: string,
+  inquiryCode: string,
+): Promise<boolean> {
   const res = await fetch('https://api.web3forms.com/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       access_key: accessKey,
-      subject,
+      subject: `${subject} [${inquiryCode}]`,
       from_name: name,
       email,
+      inquiry_number: inquiryCode,
       message,
     }),
   });
@@ -102,14 +142,20 @@ async function web3forms(accessKey: string, name: string, email: string, subject
   return remoteSucceeded(res, data);
 }
 
-async function tryRemoteSubmit(name: string, email: string, subject: string, message: string): Promise<boolean> {
+async function tryRemoteSubmit(
+  name: string,
+  email: string,
+  subject: string,
+  message: string,
+  inquiryCode: string,
+): Promise<boolean> {
   const web3 = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY?.trim();
   try {
     if (web3) {
-      if (await web3forms(web3, name, email, subject, message)) return true;
+      if (await web3forms(web3, name, email, subject, message, inquiryCode)) return true;
     } else {
       const to = formsubmitEndpoint();
-      if (to && (await formsubmit(to, name, email, subject, message))) return true;
+      if (to && (await formsubmit(to, name, email, subject, message, inquiryCode))) return true;
     }
   } catch {
     // Fall through to mailto so a static host never eats a sale.
@@ -122,13 +168,16 @@ function assignMailto(subject: string, body: string): void {
 }
 
 export async function submitContactMessage(p: ContactPayload): Promise<void> {
-  const body = `From: ${p.name} (${p.email})\n\n${p.message}`;
-  if (await tryRemoteSubmit(p.name, p.email, p.subject, body)) return;
-  assignMailto(p.subject, body);
+  const inquiryCode = p.inquiryCode ?? newInquiryCode();
+  const body = `Inquiry #: ${inquiryCode}\nFrom: ${p.name} (${p.email})\n\n${p.message}`;
+  if (await tryRemoteSubmit(p.name, p.email, p.subject, body, inquiryCode)) return;
+  assignMailto(`${p.subject} [${inquiryCode}]`, body);
 }
 
 export async function submitPrintInquiry(p: InquirePayload): Promise<void> {
+  const inquiryCode = p.inquiryCode ?? newInquiryCode();
   const subject = `Print inquiry: ${p.photo.alt || p.photo.id}`;
-  if (await tryRemoteSubmit(p.name, p.email, subject, bodyText(p))) return;
-  assignMailto(subject, bodyText(p));
+  const body = bodyText(p, inquiryCode);
+  if (await tryRemoteSubmit(p.name, p.email, subject, body, inquiryCode)) return;
+  assignMailto(`${subject} [${inquiryCode}]`, body);
 }

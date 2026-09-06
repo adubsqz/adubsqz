@@ -1,6 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { COLLECTIONS } from '../data';
+import { contactPrefillForPhoto } from '../inquireStatic';
 import type { Photo, PhotoCollection } from '../types';
 import type { GalleryFilter } from '../types';
 import {
@@ -13,7 +14,7 @@ import WatermarkedImage from './WatermarkedImage';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 
-const InquiryModal = lazy(() => import('./InquiryModal'));
+const ContactModal = lazy(() => import('./ContactModal'));
 
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
@@ -149,15 +150,13 @@ function PhotoCard({
 function Lightbox({
   photo,
   onClose,
-  onInquire,
-  onInquireTearsheet,
+  onContact,
   onPrevious,
   onNext,
 }: {
   photo: Photo;
   onClose: () => void;
-  onInquire: () => void;
-  onInquireTearsheet: () => void;
+  onContact: () => void;
   onPrevious: () => void;
   onNext: () => void;
 }) {
@@ -197,54 +196,48 @@ function Lightbox({
         aria-label="Image lightbox"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <header className="sticky top-0 z-10 flex shrink-0 flex-col gap-6 border-b border-neutral-200 bg-white/95 px-4 py-4 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-8 sm:py-5">
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-neutral-500">
-              Navigate
-            </span>
-            <div className="flex flex-wrap gap-3 sm:gap-4">
-              <Button
-                type="button"
-                onClick={onPrevious}
-                variant="outline"
-                className="rounded-sm border-neutral-300 bg-white px-5 py-2.5 text-[0.7rem] tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white"
-                aria-label="View previous photo"
-              >
-                Prev
-              </Button>
-              <Button
-                type="button"
-                onClick={onNext}
-                variant="outline"
-                className="rounded-sm border-neutral-300 bg-white px-5 py-2.5 text-[0.7rem] tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white"
-                aria-label="View next photo"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 sm:border-l sm:border-neutral-200 sm:pl-6">
+        <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-2 border-b border-neutral-200 bg-white/95 px-3 py-3 backdrop-blur-sm sm:px-8 sm:py-4">
+          <div className="flex items-center gap-2">
             <Button
               type="button"
-              onClick={onInquire}
-              variant="lightboxPrimary"
-              className="rounded-sm px-6 py-2.5 text-[0.7rem] font-semibold tracking-[0.16em] focus-visible:ring-offset-white"
+              onClick={onPrevious}
+              variant="outline"
+              className="rounded-sm border-neutral-300 bg-white px-3 py-2 text-[0.65rem] tracking-[0.16em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white sm:px-5 sm:text-[0.7rem]"
+              aria-label="View previous photo"
             >
-              Request Invoice
+              Prev
+            </Button>
+            <Button
+              type="button"
+              onClick={onNext}
+              variant="outline"
+              className="rounded-sm border-neutral-300 bg-white px-3 py-2 text-[0.65rem] tracking-[0.16em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white sm:px-5 sm:text-[0.7rem]"
+              aria-label="View next photo"
+            >
+              Next
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              onClick={onContact}
+              variant="lightboxPrimary"
+              className="rounded-sm px-3 py-2 text-[0.65rem] font-semibold tracking-[0.14em] focus-visible:ring-offset-white sm:px-6 sm:text-[0.7rem]"
+            >
+              Contact Me
             </Button>
             <Button
               type="button"
               onClick={onClose}
               variant="outline"
-              className="rounded-sm border-neutral-300 bg-white px-5 py-2.5 text-[0.7rem] tracking-[0.18em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white"
+              className="rounded-sm border-neutral-300 bg-white px-3 py-2 text-[0.65rem] tracking-[0.16em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white sm:px-5 sm:text-[0.7rem]"
             >
               Close
             </Button>
           </div>
         </header>
 
-        <div className="mx-auto flex w-full max-w-[min(1200px,100vw)] flex-col px-4 pb-16 pt-8 sm:px-8 sm:pb-12 sm:pt-10 lg:pb-16">
-
+        <div className="mx-auto flex w-full max-w-[min(1200px,100vw)] flex-col px-4 pb-10 pt-6 sm:px-8 sm:pb-12 sm:pt-10">
         <figure className="flex w-full shrink-0 justify-center px-0">
           <div className="lightbox-frame lightbox-frame--hero w-auto max-w-[calc(100vw-3rem)] sm:max-w-[min(1100px,calc(100vw-4rem))]">
             <WatermarkedImage
@@ -259,56 +252,13 @@ function Lightbox({
           </div>
         </figure>
 
-        <div className="h-14 shrink-0 sm:h-20" aria-hidden />
-
         {photo.caption && (
-          <>
-            <Card className="rounded-sm border-neutral-200 bg-neutral-50">
-              <CardContent className="px-5 py-4 sm:px-8">
-                <p className="text-center text-sm italic leading-relaxed text-neutral-600">{photo.caption}</p>
-              </CardContent>
-            </Card>
-            <div className="h-10 sm:h-14" aria-hidden />
-          </>
+          <Card className="mt-6 rounded-sm border-neutral-200 bg-neutral-50">
+            <CardContent className="px-5 py-4 sm:px-8">
+              <p className="text-center text-sm italic leading-relaxed text-neutral-600">{photo.caption}</p>
+            </CardContent>
+          </Card>
         )}
-
-        <section className="space-y-8 border-t border-neutral-200 pt-12 sm:space-y-10 sm:pt-16">
-          <div className="font-mono text-[0.65rem] uppercase tracking-[0.28em] text-neutral-500">
-            Licensing & fulfillment
-          </div>
-          <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 lg:gap-12">
-            <Card className="space-y-4 rounded-sm border-neutral-200 bg-neutral-50 p-6 sm:p-8">
-              <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-neutral-500">
-                Trade Portal + Tearsheet
-              </p>
-              <p className="text-sm leading-relaxed text-neutral-800">
-                Printable 8.5×11 lookbook pages with image SKU and title under each frame—available on request.
-              </p>
-              <Button
-                type="button"
-                onClick={onInquireTearsheet}
-                variant="ghost"
-                className="h-auto justify-start px-0 pt-2 text-left text-[0.75rem] tracking-[0.18em] text-mcm-rust hover:bg-transparent hover:text-mcm-rust/90"
-              >
-                Inquire about tearsheet…
-              </Button>
-            </Card>
-            <Card className="space-y-4 rounded-sm border-neutral-200 bg-neutral-50 p-6 sm:p-8">
-              <p className="font-mono text-[0.7rem] uppercase tracking-[0.2em] text-neutral-500">
-                Fulfillment Options
-              </p>
-              <p className="text-sm leading-relaxed text-neutral-800">
-                Digital licensing: 24 hours. Framed print production: 3-5 business days. Ready-to-hang NYC/NJ
-                delivery: 5-7 business days.
-              </p>
-              <p className="text-sm leading-relaxed text-neutral-800">
-                Short-term set rental is available at 20% of retail per 30-day term.
-              </p>
-            </Card>
-          </div>
-        </section>
-
-        <div className="h-6 shrink-0 sm:h-8" aria-hidden />
         </div>
       </div>
     </>,
@@ -449,7 +399,7 @@ interface GalleryViewProps {
 
 export default function GalleryView({ filter }: GalleryViewProps) {
   const [lightboxPhoto, setLightboxPhoto] = useState<Photo | null>(null);
-  const [inquiry, setInquiry] = useState<{ photo: Photo; initialNotes?: string } | null>(null);
+  const [contactPhoto, setContactPhoto] = useState<Photo | null>(null);
   const collection: PhotoCollection = COLLECTIONS.find((c) => c.id === filter)
     ?? COLLECTIONS[0]
     ?? { id: 'empty', title: 'Empty', photos: [] };
@@ -460,19 +410,9 @@ export default function GalleryView({ filter }: GalleryViewProps) {
     if (!exists) setLightboxPhoto(null);
   }, [collection.photos, lightboxPhoto]);
 
-  const handleInquire = () => {
+  const handleContact = () => {
     if (!lightboxPhoto) return;
-    setInquiry({ photo: lightboxPhoto });
-    setLightboxPhoto(null);
-  };
-
-  const handleInquireTearsheet = () => {
-    if (!lightboxPhoto) return;
-    setInquiry({
-      photo: lightboxPhoto,
-      initialNotes:
-        "I'm interested in the printable tearsheet / lookbook for this image (8.5×11 mood board with SKU and title under each frame). Please share availability and next steps.",
-    });
+    setContactPhoto(lightboxPhoto);
     setLightboxPhoto(null);
   };
 
@@ -487,6 +427,8 @@ export default function GalleryView({ filter }: GalleryViewProps) {
     setLightboxPhoto(collection.photos[nextIndex]);
   };
 
+  const contactPrefill = contactPhoto ? contactPrefillForPhoto(contactPhoto) : null;
+
   return (
     <div className="space-y-6">
       {collection.photos.length === 0 && (
@@ -499,19 +441,18 @@ export default function GalleryView({ filter }: GalleryViewProps) {
         <Lightbox
           photo={lightboxPhoto}
           onClose={() => setLightboxPhoto(null)}
-          onInquire={handleInquire}
-          onInquireTearsheet={handleInquireTearsheet}
+          onContact={handleContact}
           onPrevious={() => handleLightboxMove('previous')}
           onNext={() => handleLightboxMove('next')}
         />
       )}
 
-      {inquiry && (
+      {contactPhoto && contactPrefill && (
         <Suspense fallback={null}>
-          <InquiryModal
-            photo={inquiry.photo}
-            initialNotes={inquiry.initialNotes}
-            onClose={() => setInquiry(null)}
+          <ContactModal
+            initialSubject={contactPrefill.subject}
+            initialMessage={contactPrefill.message}
+            onClose={() => setContactPhoto(null)}
           />
         </Suspense>
       )}

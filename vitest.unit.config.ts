@@ -5,18 +5,19 @@ export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
-      include: ['src/**/*.test.{ts,tsx}'],
+      include: ['src/**/*.test.{ts,tsx}', 'tests/photo-budget.test.ts'],
       exclude: [
         'src/App.test.tsx',
         'src/components/**/*Flow.test.tsx',
         'e2e/**',
-        'tests/**',
+        'tests/inquire*.test.ts',
       ],
       coverage: {
         reportsDirectory: './coverage/unit',
         include: [
           'src/data.ts',
           'src/gallery-reel.ts',
+          'src/gallery-shuffle.ts',
           'src/gallery-constants.ts',
           'src/inquireStatic.ts',
           'src/lib/utils.ts',

@@ -2,7 +2,9 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   submitPrintInquiry,
   submitContactMessage,
+  contactPrefillForPhoto,
   FORMSUBMIT_FORM_ID,
+  newInquiryCode,
   type InquirePayload,
 } from './inquireStatic';
 import { ABOUT } from './data';
@@ -37,6 +39,29 @@ function stubLocation() {
   (window as unknown as { location: Location }).location = { ...location, href: '' } as Location;
 }
 
+describe('contactPrefillForPhoto', () => {
+  it('names the still in subject and message', () => {
+    const prefill = contactPrefillForPhoto({ id: 'greyscale-3', alt: 'Photograph bw alley' });
+    expect(prefill.subject).toBe('About Photograph bw alley');
+    expect(prefill.message).toContain('Photograph bw alley');
+    expect(prefill.message).toContain('greyscale-3');
+  });
+
+  it('falls back to the photo id when alt is empty', () => {
+    const prefill = contactPrefillForPhoto({ id: 'color-2', alt: '' });
+    expect(prefill.subject).toBe('About color-2');
+    expect(prefill.message).toContain('color-2');
+  });
+});
+
+describe('newInquiryCode', () => {
+  it('returns 9 alphanumeric characters', () => {
+    const code = newInquiryCode();
+    expect(code).toMatch(/^[A-Z0-9]{9}$/);
+    expect(newInquiryCode()).not.toBe(code);
+  });
+});
+
 describe('submitPrintInquiry', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -69,6 +94,10 @@ describe('submitPrintInquiry', () => {
       expect.objectContaining({ method: 'POST' }),
     );
     expect(ABOUT.contactEmail).toBe('adubsqz@gmail.com');
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(body.inquiry_number).toMatch(/^[A-Z0-9]{9}$/);
+    expect(body._autoresponse).toContain(body.inquiry_number);
+    expect(body.message).toContain(`Inquiry #: ${body.inquiry_number}`);
   });
 
   it('honors VITE_FORMSUBMIT_EMAIL when set', async () => {
@@ -138,6 +167,9 @@ describe('submitContactMessage', () => {
       expect.objectContaining({ method: 'POST' }),
     );
     expect(window.location.href).not.toMatch(/^mailto:/);
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(body.inquiry_number).toMatch(/^[A-Z0-9]{9}$/);
+    expect(body._autoresponse).toContain(body.inquiry_number);
   });
 
   it('falls back to mailto:adubsqz@gmail.com when FormSubmit fails', async () => {

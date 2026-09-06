@@ -8,13 +8,15 @@ import { Textarea } from './ui/textarea';
 
 interface ContactModalProps {
   onClose: () => void;
+  initialSubject?: string;
+  initialMessage?: string;
 }
 
-export default function ContactModal({ onClose }: ContactModalProps) {
+export default function ContactModal({ onClose, initialSubject = '', initialMessage = '' }: ContactModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [content, setContent] = useState('');
+  const [subject, setSubject] = useState(initialSubject);
+  const [content, setContent] = useState(initialMessage);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
 
