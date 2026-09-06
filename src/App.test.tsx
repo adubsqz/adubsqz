@@ -15,6 +15,7 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: /greyscale/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /full spectrum/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /redscale/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^people$/i })).toBeInTheDocument();
   });
 
   it('switches to About view when About me tab is clicked', async () => {
@@ -26,7 +27,7 @@ describe('App', () => {
     expect(
       within(aboutPanel).getByText(/lightweight portfolio sites for photographers/i),
     ).toBeInTheDocument();
-    expect(within(aboutPanel).getByRole('button', { name: /contact me/i })).toBeInTheDocument();
+    expect(within(aboutPanel).getByRole('button', { name: /let's talk/i })).toBeInTheDocument();
     expect(within(aboutPanel).queryByText(/Originally from the Southwest/i)).not.toBeInTheDocument();
   });
 
@@ -41,7 +42,7 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about me/i }));
-    await user.click(await screen.findByRole('button', { name: /contact me/i }));
+    await user.click(await screen.findByRole('button', { name: /let's talk/i }));
     expect(await screen.findByRole('dialog', { name: /contact/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
@@ -51,9 +52,12 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('button', { name: /^full spectrum$/i }));
-    expect(screen.getByRole('button', { name: /^full spectrum$/i }).className).toMatch(/mcm-rust/);
+    expect(screen.getByRole('button', { name: /^full spectrum$/i }).className).toMatch(/bg-mcm-rust/);
     await user.click(screen.getByRole('button', { name: /^redscale$/i }));
-    expect(screen.getByRole('button', { name: /^redscale$/i }).className).toMatch(/mcm-rust/);
+    expect(screen.getByRole('button', { name: /^redscale$/i }).className).toMatch(/bg-mcm-rust/);
+    await user.click(screen.getByRole('button', { name: /^people$/i }));
+    expect(screen.getByRole('button', { name: /^people$/i }).className).toMatch(/bg-mcm-rust/);
+    expect(screen.getByText(/no photos found in this category/i)).toBeInTheDocument();
   });
 
   it('keeps rights copy on About only once and restores the gallery footer', async () => {
@@ -71,7 +75,7 @@ describe('App', () => {
     const user = userEvent.setup();
     render(<App />);
     await user.click(screen.getByRole('tab', { name: /about me/i }));
-    await user.click(await screen.findByRole('button', { name: /contact me/i }));
+    await user.click(await screen.findByRole('button', { name: /let's talk/i }));
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /close/i }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

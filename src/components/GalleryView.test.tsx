@@ -37,8 +37,8 @@ describe('GalleryView', () => {
     const collection = COLLECTIONS.find((c) => c.id === DEFAULT_FILTER);
     const pages = paginateByOrientation(collection?.photos ?? []);
     if (pages.length > 1) {
-      expect(screen.getByText(/reel \d+ \/ \d+/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /rev −/i })).toBeInTheDocument();
+      expect(screen.getByText(/\d+ \/ \d+/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /previous page/i })).toBeInTheDocument();
     }
   });
 
@@ -78,10 +78,10 @@ describe('GalleryView', () => {
     const collection = COLLECTIONS.find((c) => c.id === DEFAULT_FILTER);
     const pages = paginateByOrientation(collection?.photos ?? []);
     if (pages.length > 1) {
-      await user.click(screen.getByRole('button', { name: /rev \+/i }));
-      expect(screen.getByText(/reel 2 \//i)).toBeInTheDocument();
-      await user.click(screen.getByRole('button', { name: /rev −/i }));
-      expect(screen.getByText(/reel 1 \//i)).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: /next page/i }));
+      expect(screen.getByText(/^2 \/ /)).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: /previous page/i }));
+      expect(screen.getByText(/^1 \/ /)).toBeInTheDocument();
     }
     const clickTarget = container.querySelector('.absolute.inset-0.z-10');
     if (!clickTarget) return;

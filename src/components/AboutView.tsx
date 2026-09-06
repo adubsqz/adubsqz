@@ -8,21 +8,22 @@ interface AboutViewProps {
 
 export default function AboutView({ onContactClick }: AboutViewProps) {
   return (
-    <div className="mx-auto max-w-3xl space-y-10 sm:space-y-14">
-      <p className="text-[0.95rem] leading-[1.75] text-photo-fg/85 sm:text-base">{ABOUT.voice}</p>
-      <p className="text-[0.95rem] leading-[1.75] text-photo-fg/85 sm:text-base">{ABOUT.portfolioPitch}</p>
+    <div className="mx-auto max-w-2xl space-y-8 sm:space-y-12">
+      <p className="font-display text-[1.65rem] leading-[1.35] text-photo-fg sm:text-4xl sm:leading-[1.3]">
+        {ABOUT.voice}
+      </p>
+      <p className="text-[1.05rem] leading-relaxed text-photo-muted sm:text-lg">{ABOUT.portfolioPitch}</p>
 
-      <div className="flex flex-col gap-5 rounded-xl border border-photo-border/80 bg-black/[0.03] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-10 sm:px-6 sm:py-6">
-        <p className="max-w-xl text-[0.85rem] leading-relaxed text-photo-fg/80 sm:text-[0.9rem]">
-          <span className="font-semibold text-photo-fg">Licensing, prints, or a custom site?</span>{' '}
-          <span className="text-photo-muted">Use the form for availability and terms—replies are direct.</span>
+      <div className="flex flex-col gap-4 rounded-3xl bg-photo-panel/80 px-5 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:px-7 sm:py-7">
+        <p className="max-w-md text-[1.02rem] leading-snug text-photo-fg/85">
+          Need prints, a license, or a site? One message. No funnel.
         </p>
         <Button
           type="button"
           onClick={onContactClick}
-          className="shrink-0 rounded-md border-2 border-mcm-rust bg-mcm-rust px-8 py-3.5 text-[0.72rem] font-bold tracking-[0.2em] text-mcm-cream shadow-none hover:bg-mcm-rust/90"
+          className="h-12 shrink-0 rounded-full px-8 text-base font-medium normal-case tracking-normal shadow-none"
         >
-          CONTACT ME
+          Let&apos;s talk
         </Button>
       </div>
 

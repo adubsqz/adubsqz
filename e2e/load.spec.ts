@@ -32,7 +32,7 @@ for (const vp of VIEWPORTS) {
 
       await expect(page.getByRole('tab', { name: /^gallery$/i })).toBeVisible();
       await expect(page.getByRole('tab', { name: /about me/i })).toBeVisible();
-      await expect(page.getByRole('button', { name: /greyscale|full spectrum|redscale/i }).first()).toBeVisible();
+      await expect(page.getByRole('button', { name: /greyscale|full spectrum|redscale|people/i }).first()).toBeVisible();
 
       const img = await firstGalleryImage(page);
       await expect(img).toBeVisible();

@@ -32,15 +32,15 @@ function usePrefersReducedMotion(): boolean {
 function imageClassForReelLayout(layout: ReelLayout): string {
   switch (layout) {
     case 'hero':
-      return 'gallery-image block h-auto max-h-[min(92dvh,1120px)] w-auto max-w-[min(1240px,99vw)] object-contain';
+      return 'gallery-image block h-auto max-h-[min(78dvh,1120px)] w-full max-w-full object-contain sm:w-auto sm:max-w-[min(1240px,99vw)]';
     case 'horizontal-duo':
-      return 'gallery-image block h-auto max-h-[min(84dvh,980px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(70dvh,980px)] w-full max-w-full object-contain sm:w-auto';
     case 'horizontal-trio':
-      return 'gallery-image block h-auto max-h-[min(78dvh,860px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(62dvh,860px)] w-full max-w-full object-contain sm:w-auto';
     case 'vertical-solo':
-      return 'gallery-image block h-auto max-h-[min(84dvh,960px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(78dvh,960px)] w-full max-w-full object-contain sm:w-auto';
     default:
-      return 'gallery-image block h-auto max-h-[min(80dvh,840px)] w-auto max-w-full object-contain';
+      return 'gallery-image block h-auto max-h-[min(68dvh,840px)] w-full max-w-full object-contain sm:w-auto';
   }
 }
 
@@ -95,7 +95,7 @@ function PhotoCard({
   if (failed) {
     return (
       <div
-        className={`aspect-[4/5] w-full rounded-sm border-[3px] border-mcm-line/40 bg-mcm-paper/30 flex items-center justify-center ${className}`}
+        className={`flex aspect-[4/5] w-full items-center justify-center rounded-2xl bg-mcm-paper/30 ring-1 ring-mcm-line/40 ${className}`}
       >
         <span className="text-photo-muted/40 text-sm select-none font-mono">—</span>
       </div>
@@ -111,11 +111,11 @@ function PhotoCard({
       onPointerLeave={onPointerLeave}
       onPointerCancel={onPointerLeave}
       aria-label={`Open photo: ${photo.alt}`}
-      className={`block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-mcm-rust focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg group ${className}`}
+      className={`group flex w-full justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-mcm-rust focus-visible:ring-offset-2 focus-visible:ring-offset-photo-bg ${className}`}
       style={{ perspective: '880px' }}
     >
       <div
-        className="relative mx-auto w-fit max-w-full rounded-sm border-[3px] border-photo-fg/80 bg-photo-panel shadow-[0_10px_28px_rgba(26,23,20,0.12),inset_0_0_0_1px_rgba(26,23,20,0.08)] transition-[border-color,box-shadow] duration-300 group-hover:border-mcm-rust group-hover:shadow-[0_14px_36px_rgba(197,106,58,0.18)] motion-safe:transition-transform motion-safe:duration-300 [transform-style:preserve-3d]"
+        className="relative mx-auto w-fit max-w-full overflow-hidden rounded-2xl bg-photo-panel shadow-[0_16px_40px_rgba(26,23,20,0.12)] ring-1 ring-photo-fg/10 transition-[box-shadow,transform] duration-300 group-hover:shadow-[0_20px_48px_rgba(197,106,58,0.18)] motion-safe:duration-300 [transform-style:preserve-3d]"
         style={
           reducedMotion
             ? undefined
@@ -128,7 +128,7 @@ function PhotoCard({
           key={photo.src}
           src={photo.src}
           alt={photo.alt}
-          wrapperClassName="relative inline-block max-w-full w-fit"
+          wrapperClassName="relative inline-block w-full max-w-full sm:w-fit"
           className={imageClassForReelLayout(reelLayout)}
           loading={loading ?? 'lazy'}
           decoding="async"
@@ -136,7 +136,7 @@ function PhotoCard({
           onError={handleError}
           onClick={onClick}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-mcm-sky/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-sm" />
+        <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-t from-mcm-ink/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
       </div>
       {photo.caption && (
         <p className="mt-3 text-photo-muted/85 text-[0.7rem] leading-relaxed font-mono tracking-wide">
@@ -187,7 +187,7 @@ function Lightbox({
 
   return createPortal(
     <>
-      <div className="fixed inset-0 z-[100] bg-white" aria-hidden onClick={onClose} />
+      <div className="fixed inset-0 z-[100] bg-mcm-cream" aria-hidden onClick={onClose} />
       <div
         ref={scrollRef}
         className="lightbox-shell fixed inset-0 z-[101] overflow-y-auto overflow-x-hidden overscroll-contain bg-mcm-cream text-photo-fg"
@@ -196,69 +196,84 @@ function Lightbox({
         aria-label="Image lightbox"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
-        <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-2 border-b border-neutral-200 bg-white/95 px-3 py-3 backdrop-blur-sm sm:px-8 sm:py-4">
-          <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-3 top-3 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-photo-panel/90 text-2xl leading-none text-photo-fg shadow-[0_8px_24px_rgba(26,23,20,0.1)] sm:right-6 sm:top-6"
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <button
+          type="button"
+          onClick={onPrevious}
+          className="absolute left-2 top-[42%] z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-photo-panel/90 text-xl text-photo-fg shadow-[0_8px_24px_rgba(26,23,20,0.1)] sm:flex"
+          aria-label="View previous photo"
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          className="absolute right-2 top-[42%] z-20 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-photo-panel/90 text-xl text-photo-fg shadow-[0_8px_24px_rgba(26,23,20,0.1)] sm:flex"
+          aria-label="View next photo"
+        >
+          ›
+        </button>
+
+        <div className="mx-auto flex min-h-[100dvh] w-full max-w-[min(1200px,100vw)] flex-col justify-center px-3 pb-32 pt-16 sm:px-8 sm:pb-28 sm:pt-12">
+          <figure className="flex w-full shrink-0 justify-center px-0">
+            <div className="lightbox-frame lightbox-frame--hero w-auto max-w-[calc(100vw-1.5rem)] sm:max-w-[min(1100px,calc(100vw-4rem))]">
+              <WatermarkedImage
+                src={photo.src}
+                alt={photo.alt}
+                wrapperClassName="relative flex w-full max-w-full items-center justify-center"
+                className="pointer-events-none block h-auto max-h-[min(72dvh,920px)] w-auto min-h-0 max-w-full object-contain sm:max-h-[min(80dvh,960px)]"
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
+              />
+            </div>
+          </figure>
+
+          {photo.caption && (
+            <Card className="mt-6 rounded-2xl border-photo-border/70 bg-photo-panel/60">
+              <CardContent className="px-5 py-4 sm:px-8">
+                <p className="text-center text-sm italic leading-relaxed text-photo-muted">{photo.caption}</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 bg-gradient-to-t from-mcm-cream via-mcm-cream/95 to-transparent px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-10">
+          <div className="pointer-events-auto mx-auto flex max-w-md items-center gap-2">
             <Button
               type="button"
               onClick={onPrevious}
-              variant="outline"
-              className="rounded-sm border-neutral-300 bg-white px-3 py-2 text-[0.65rem] tracking-[0.16em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white sm:px-5 sm:text-[0.7rem]"
+              variant="ghost"
+              className="h-12 w-12 shrink-0 rounded-full px-0 text-xl normal-case tracking-normal sm:hidden"
               aria-label="View previous photo"
             >
-              Prev
+              ‹
             </Button>
-            <Button
-              type="button"
-              onClick={onNext}
-              variant="outline"
-              className="rounded-sm border-neutral-300 bg-white px-3 py-2 text-[0.65rem] tracking-[0.16em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white sm:px-5 sm:text-[0.7rem]"
-              aria-label="View next photo"
-            >
-              Next
-            </Button>
-          </div>
-          <div className="flex items-center gap-2">
             <Button
               type="button"
               onClick={onContact}
               variant="lightboxPrimary"
-              className="rounded-sm px-3 py-2 text-[0.65rem] font-semibold tracking-[0.14em] focus-visible:ring-offset-white sm:px-6 sm:text-[0.7rem]"
+              className="h-12 flex-1 rounded-full text-base font-medium normal-case tracking-normal"
             >
-              Contact Me
+              Contact me
             </Button>
             <Button
               type="button"
-              onClick={onClose}
-              variant="outline"
-              className="rounded-sm border-neutral-300 bg-white px-3 py-2 text-[0.65rem] tracking-[0.16em] text-neutral-800 hover:bg-neutral-50 focus-visible:ring-offset-white sm:px-5 sm:text-[0.7rem]"
+              onClick={onNext}
+              variant="ghost"
+              className="h-12 w-12 shrink-0 rounded-full px-0 text-xl normal-case tracking-normal sm:hidden"
+              aria-label="View next photo"
             >
-              Close
+              ›
             </Button>
           </div>
-        </header>
-
-        <div className="mx-auto flex w-full max-w-[min(1200px,100vw)] flex-col px-4 pb-10 pt-6 sm:px-8 sm:pb-12 sm:pt-10">
-        <figure className="flex w-full shrink-0 justify-center px-0">
-          <div className="lightbox-frame lightbox-frame--hero w-auto max-w-[calc(100vw-3rem)] sm:max-w-[min(1100px,calc(100vw-4rem))]">
-            <WatermarkedImage
-              src={photo.src}
-              alt={photo.alt}
-              wrapperClassName="relative flex w-full max-w-full items-center justify-center"
-              className="pointer-events-none block h-auto max-h-[min(78dvh,920px)] w-auto min-h-0 max-w-full object-contain sm:max-h-[min(80dvh,960px)]"
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-            />
-          </div>
-        </figure>
-
-        {photo.caption && (
-          <Card className="mt-6 rounded-sm border-neutral-200 bg-neutral-50">
-            <CardContent className="px-5 py-4 sm:px-8">
-              <p className="text-center text-sm italic leading-relaxed text-neutral-600">{photo.caption}</p>
-            </CardContent>
-          </Card>
-        )}
         </div>
       </div>
     </>,
@@ -360,33 +375,28 @@ function CollectionSection({
         />
       </div>
       {totalPages > 1 && (
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-4 font-mono">
-          <div className="flex flex-col gap-1">
-            <p className="text-photo-muted/80 text-[0.68rem] uppercase tracking-[0.2em]">
-              Reel {page} / {totalPages}
-            </p>
-            <p className="text-photo-muted/50 text-[0.6rem] uppercase tracking-[0.14em]">
-              {pageSlice.length} frame{pageSlice.length === 1 ? '' : 's'} · {photos.length} total
-            </p>
-          </div>
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page <= 1}
-              className="text-[0.65rem] uppercase tracking-[0.22em] text-photo-muted hover:text-photo-fg disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
-            >
-              ◀ Rev −
-            </button>
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
-              className="text-[0.65rem] uppercase tracking-[0.22em] text-photo-muted hover:text-photo-fg disabled:opacity-35 disabled:cursor-not-allowed transition-colors"
-            >
-              Rev + ▶
-            </button>
-          </div>
+        <div className="mt-6 flex items-center justify-center gap-5">
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-xl text-photo-muted transition-colors hover:bg-photo-panel hover:text-photo-fg disabled:cursor-not-allowed disabled:opacity-30"
+            aria-label="Previous page"
+          >
+            ‹
+          </button>
+          <p className="min-w-[3.5rem] text-center text-sm tabular-nums text-photo-muted">
+            {page} / {totalPages}
+          </p>
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-xl text-photo-muted transition-colors hover:bg-photo-panel hover:text-photo-fg disabled:cursor-not-allowed disabled:opacity-30"
+            aria-label="Next page"
+          >
+            ›
+          </button>
         </div>
       )}
     </section>

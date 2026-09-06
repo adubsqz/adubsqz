@@ -4,7 +4,8 @@ import galleryManifest from './gallery-manifest.json';
 
 /**
  * Gallery layout is derived from gallery-manifest.json:
- * - `bw` / `color` / `redscale` → Greyscale / Full Spectrum / Redscale collections (array order = reel order; permuted with GALLERY_SHUFFLE_SEED)
+ * - `bw` / `color` / `redscale` / `people` → Greyscale / Full Spectrum / Redscale / People
+ *   (array order = reel order; permuted with GALLERY_SHUFFLE_SEED)
  * - Row objects may include internal curation/orientation (not shown in the public UI)
  * - `about` → bare filenames at publish root (About page portrait only; not a gallery tab)
  */
@@ -19,8 +20,9 @@ const ABOUT_MANIFEST_KEY = 'about';
 const GREYSCALE_ID = 'greyscale';
 const FULL_SPECTRUM_ID = 'full-spectrum';
 const REDSCALE_ID = 'redscale';
+const PEOPLE_ID = 'people';
 
-const GALLERY_MANIFEST_KEYS = ['bw', 'color', 'redscale'] as const;
+const GALLERY_MANIFEST_KEYS = ['bw', 'color', 'redscale', 'people'] as const;
 
 type ManifestRow =
   | string
@@ -40,6 +42,7 @@ type GalleryManifest = {
   bw?: ManifestRow[];
   color?: ManifestRow[];
   redscale?: ManifestRow[];
+  people?: ManifestRow[];
 };
 
 const IMPORT_NUMERIC_ONLY = /^import-\d+\.(jpe?g|webp)$/i;
@@ -70,7 +73,12 @@ function normalizeManifestEntry(manifestCategory: string, entry: string): string
   const normalized = entry.trim().replace(/^\/+/, '');
   if (!normalized) return '';
   if (normalized.includes('/')) return normalized;
-  if (manifestCategory === 'bw' || manifestCategory === 'color' || manifestCategory === 'redscale') {
+  if (
+    manifestCategory === 'bw' ||
+    manifestCategory === 'color' ||
+    manifestCategory === 'redscale' ||
+    manifestCategory === 'people'
+  ) {
     return `${manifestCategory}/${normalized}`;
   }
   return normalized;
@@ -84,7 +92,14 @@ function selectGalleryEntries(entries: string[]): string[] {
 }
 
 export function classifyManifestEntry(entry: string):
-  | { kind: 'public'; bucket: typeof GREYSCALE_ID | typeof FULL_SPECTRUM_ID | typeof REDSCALE_ID }
+  | {
+      kind: 'public';
+      bucket:
+        | typeof GREYSCALE_ID
+        | typeof FULL_SPECTRUM_ID
+        | typeof REDSCALE_ID
+        | typeof PEOPLE_ID;
+    }
   | { kind: 'hidden'; reason: 'import_numeric' | 'numeric_only_filename' | 'unsupported_path' | 'unsupported_mime' } {
   const normalized = entry.trim().replace(/^\/+/, '');
   const baseName = entryBasename(normalized);
@@ -102,6 +117,7 @@ export function classifyManifestEntry(entry: string):
   if (normalized.startsWith('bw/')) return { kind: 'public', bucket: GREYSCALE_ID };
   if (normalized.startsWith('color/')) return { kind: 'public', bucket: FULL_SPECTRUM_ID };
   if (normalized.startsWith('redscale/')) return { kind: 'public', bucket: REDSCALE_ID };
+  if (normalized.startsWith('people/')) return { kind: 'public', bucket: PEOPLE_ID };
   return { kind: 'hidden', reason: 'unsupported_path' };
 }
 
@@ -130,9 +146,11 @@ function buildPublicCollections(): PhotoCollection[] {
   const greyscaleRows: { path: string; orientation?: Photo['orientation'] }[] = [];
   const fullSpectrumRows: { path: string; orientation?: Photo['orientation'] }[] = [];
   const redscaleRows: { path: string; orientation?: Photo['orientation'] }[] = [];
+  const peopleRows: { path: string; orientation?: Photo['orientation'] }[] = [];
   const seenGrey = new Set<string>();
   const seenColor = new Set<string>();
   const seenRedscale = new Set<string>();
+  const seenPeople = new Set<string>();
 
   for (const manifestCategory of GALLERY_MANIFEST_KEYS) {
     const arr = raw[manifestCategory] ?? [];
@@ -160,6 +178,11 @@ function buildPublicCollections(): PhotoCollection[] {
           seenRedscale.add(entry);
           redscaleRows.push({ path: entry, orientation });
         }
+      } else if (result.bucket === PEOPLE_ID) {
+        if (!seenPeople.has(entry)) {
+          seenPeople.add(entry);
+          peopleRows.push({ path: entry, orientation });
+        }
       }
     }
   }
@@ -179,6 +202,11 @@ function buildPublicCollections(): PhotoCollection[] {
       id: REDSCALE_ID,
       title: 'Redscale',
       photos: photosFromRows(redscaleRows, REDSCALE_ID),
+    },
+    {
+      id: PEOPLE_ID,
+      title: 'People',
+      photos: photosFromRows(peopleRows, PEOPLE_ID),
     },
   ];
 }

@@ -2,10 +2,10 @@ import { lazy, Suspense, useState } from 'react';
 import type { PageView, GalleryFilter } from './types';
 import GalleryView from './components/GalleryView';
 import { COLLECTIONS, DEFAULT_GALLERY_FILTER } from './data';
+import { RightsReservedBlock } from './components/LicensingDetails';
 
 const AboutView = lazy(() => import('./components/AboutView'));
 const ContactModal = lazy(() => import('./components/ContactModal'));
-import { RightsReservedBlock } from './components/LicensingDetails';
 
 const totalGalleryPhotos = COLLECTIONS.reduce((n, c) => n + c.photos.length, 0);
 
@@ -20,103 +20,101 @@ export default function App() {
   const [showContact, setShowContact] = useState(false);
 
   return (
-    <div className="min-h-[100dvh] text-photo-fg font-sans antialiased pb-28 sm:pb-32 relative selection:bg-mcm-rust/20">
+    <div className="relative min-h-[100dvh] pb-16 font-sans text-photo-fg antialiased selection:bg-mcm-rust/20 sm:pb-24">
       <div className="cinematic-grid" aria-hidden />
       <div className="relative z-[1] min-h-[100dvh]">
-        <main className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-10 py-5 sm:py-8">
-          <div className="mb-4 sm:mb-6 flex flex-wrap items-end justify-between gap-4 pb-2">
+        <main className="mx-auto max-w-7xl px-4 pb-8 pt-4 sm:px-8 sm:py-10 lg:px-10">
+          <header className="mb-4 flex items-center justify-between gap-3 sm:mb-8 sm:items-end">
             <div>
-              <h1 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-photo-fg">
+              <h1 className="font-display text-[2rem] font-normal leading-none tracking-tight text-photo-fg sm:text-5xl">
                 adubsqz
               </h1>
+              <p className="mt-2 hidden max-w-[14rem] text-[0.95rem] leading-snug text-photo-muted sm:block">
+                film stills. one conversation.
+              </p>
             </div>
-            <p className="max-w-sm font-mono text-[0.65rem] leading-relaxed text-photo-muted">
-              Still-life frames. Mid-century rigor, darkroom patience, HTTP delivery.
-            </p>
-          </div>
-          <div className="overflow-hidden">
-            <div className="pt-0">
-              <nav className="flex font-mono" role="tablist" aria-label="Main">
-                {TABS.map((tab) => {
-                  const active = view === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      aria-controls={`panel-${tab.id}`}
-                      id={`tab-${tab.id}`}
-                      onClick={() => setView(tab.id)}
-                      className={`relative flex flex-1 flex-col items-center py-3 sm:py-4 text-[0.72rem] font-medium uppercase tracking-[0.24em] transition-colors ${
-                        active
-                          ? 'text-mcm-rust border-b-2 border-mcm-rust'
-                          : 'text-photo-muted hover:text-mcm-sky'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  );
-                })}
-              </nav>
-              {view === 'gallery' && (
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-1 sm:px-3 pb-2 pt-3 font-mono text-[0.68rem] uppercase tracking-[0.22em]">
-                  {COLLECTIONS.map((collection, i) => (
-                    <span key={collection.id} className="inline-flex items-center gap-3">
-                      {i > 0 && (
-                        <span className="text-photo-muted/25 select-none" aria-hidden>
-                          |
-                        </span>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => setGalleryFilter(collection.id)}
-                        className={`transition-colors ${
-                          galleryFilter === collection.id
-                            ? 'text-mcm-rust underline decoration-mcm-sky decoration-2 underline-offset-[6px]'
-                            : 'text-photo-muted hover:text-mcm-sky'
-                        }`}
-                      >
-                        {collection.title}
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div
-              className={
-                view === 'gallery'
-                  ? 'px-0 py-2 sm:px-2 sm:py-3 animate-fade-up'
-                  : 'px-2 py-4 sm:px-4 sm:py-6 md:px-6 animate-fade-up'
-              }
-              role="tabpanel"
-              id={`panel-${view}`}
-              aria-labelledby={`tab-${view}`}
+            <nav
+              className="flex shrink-0 rounded-full bg-photo-panel/90 p-1 shadow-[inset_0_0_0_1px_rgba(26,23,20,0.06)]"
+              role="tablist"
+              aria-label="Main"
             >
-              {view === 'gallery' && (
-                <GalleryView filter={galleryFilter} />
-              )}
-              {view === 'gallery' && totalGalleryPhotos === 0 && (
-                <p className="mt-4 text-sm text-photo-muted">
-                  Gallery is empty. After you finish an import, finalized entries live in{' '}
-                  <code className="text-photo-muted/90">src/gallery-manifest.json</code> and ship from{' '}
-                  <code className="text-photo-muted/90">public/photos/still-life/</code> (see repo design spec for the
-                  Python tool path).
-                </p>
-              )}
-              {view === 'about' && (
-                <Suspense fallback={<p className="text-sm text-photo-muted">Loading…</p>}>
-                  <AboutView onContactClick={() => setShowContact(true)} />
-                </Suspense>
-              )}
+              {TABS.map((tab) => {
+                const active = view === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    aria-controls={`panel-${tab.id}`}
+                    id={`tab-${tab.id}`}
+                    onClick={() => setView(tab.id)}
+                    className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors sm:px-5 sm:py-2.5 sm:text-[0.95rem] ${
+                      active
+                        ? 'bg-mcm-cream text-photo-fg shadow-[0_6px_18px_rgba(26,23,20,0.08)]'
+                        : 'text-photo-muted hover:text-photo-fg'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </nav>
+          </header>
+
+          {view === 'gallery' && (
+            <div className="no-scrollbar mt-4 flex max-w-full gap-2 overflow-x-auto pb-1">
+              {COLLECTIONS.map((collection) => {
+                const active = galleryFilter === collection.id;
+                return (
+                  <button
+                    key={collection.id}
+                    type="button"
+                    onClick={() => setGalleryFilter(collection.id)}
+                    className={`shrink-0 rounded-full px-4 py-2 text-sm transition-colors ${
+                      active
+                        ? 'bg-mcm-rust text-mcm-cream'
+                        : 'bg-photo-panel text-photo-muted hover:text-photo-fg'
+                    }`}
+                  >
+                    {collection.title}
+                  </button>
+                );
+              })}
             </div>
-            {view === 'gallery' && (
-              <footer className="px-1 py-6 sm:px-3 sm:py-8">
-                <RightsReservedBlock plain />
-              </footer>
+          )}
+
+          <div
+            className={
+              view === 'gallery'
+                ? 'animate-fade-up px-0 py-4 sm:py-6'
+                : 'animate-fade-up px-0 py-6 sm:px-2 sm:py-8'
+            }
+            role="tabpanel"
+            id={`panel-${view}`}
+            aria-labelledby={`tab-${view}`}
+          >
+            {view === 'gallery' && <GalleryView filter={galleryFilter} />}
+            {view === 'gallery' && totalGalleryPhotos === 0 && (
+              <p className="mt-4 text-sm text-photo-muted">
+                Gallery is empty. After you finish an import, finalized entries live in{' '}
+                <code className="text-photo-muted/90">src/gallery-manifest.json</code> and ship from{' '}
+                <code className="text-photo-muted/90">public/photos/still-life/</code> (see repo design spec for the
+                Python tool path).
+              </p>
+            )}
+            {view === 'about' && (
+              <Suspense fallback={<p className="text-sm text-photo-muted">Loading…</p>}>
+                <AboutView onContactClick={() => setShowContact(true)} />
+              </Suspense>
             )}
           </div>
+
+          {view === 'gallery' && (
+            <footer className="hidden px-1 py-8 sm:block">
+              <RightsReservedBlock plain />
+            </footer>
+          )}
         </main>
         {showContact && (
           <Suspense fallback={null}>

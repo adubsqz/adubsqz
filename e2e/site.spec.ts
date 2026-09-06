@@ -9,6 +9,8 @@ test.describe('site', () => {
     await expect(page.getByRole('button', { name: /greyscale/i })).toBeVisible();
     await page.getByRole('button', { name: /full spectrum/i }).click();
     await page.getByRole('button', { name: /redscale/i }).click();
+    await page.getByRole('button', { name: /^people$/i }).click();
+    await expect(page.getByText(/no photos found in this category/i)).toBeVisible();
     await page.getByRole('button', { name: /greyscale/i }).click();
 
     const thumb = page.getByRole('button', { name: /open photo/i }).first();
@@ -39,11 +41,11 @@ test.describe('site', () => {
     await page.getByRole('tab', { name: /about me/i }).click();
     await expect(page.getByText(/I am not an AI robot/i)).toBeVisible();
     await expect(page.getByText(/lightweight portfolio sites for photographers/i)).toBeVisible();
-    await expect(page.getByText(/licensing, prints, or a custom site/i)).toBeVisible();
+    await expect(page.getByText(/Need prints, a license, or a site/i)).toBeVisible();
     await expect(page.getByText(/rights reserved/i)).toBeVisible();
     await expect(page.getByAltText(/portrait/i)).toHaveCount(0);
 
-    await page.getByRole('button', { name: /contact me/i }).click();
+    await page.getByRole('button', { name: /let's talk/i }).click();
     await expect(page.getByRole('dialog', { name: /contact/i })).toBeVisible();
     await page.getByLabel(/name/i).fill('Ada');
     await page.getByLabel(/email/i).fill('ada@example.com');
@@ -67,7 +69,7 @@ test.describe('site', () => {
         body: JSON.stringify({ success: true }),
       });
     });
-    await page.getByRole('button', { name: /contact me/i }).click();
+    await page.getByRole('button', { name: /let's talk/i }).click();
     await page.getByLabel(/name/i).fill('Ada');
     await page.getByLabel(/email/i).fill('ada@example.com');
     await page.getByLabel(/subject/i).fill('Prints');

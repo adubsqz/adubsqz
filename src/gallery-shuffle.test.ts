@@ -23,7 +23,7 @@ describe('shuffleSeeded', () => {
   });
 
   it('uses a distinct seed per gallery category', () => {
-    expect(new Set(Object.values(GALLERY_CATEGORY_SEEDS)).size).toBe(3);
+    expect(new Set(Object.values(GALLERY_CATEGORY_SEEDS)).size).toBe(4);
   });
 
   it('shuffles public slots and leaves hidden rows in place', () => {

@@ -11,19 +11,19 @@ describe('AboutView', () => {
     expect(
       screen.getByText(/I design and build lightweight portfolio sites for photographers/i),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Licensing, prints, or a custom site/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /contact me/i })).toBeInTheDocument();
+    expect(screen.getByText(/Need prints, a license, or a site/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /let's talk/i })).toBeInTheDocument();
     expect(screen.getByText(/rights reserved/i)).toBeInTheDocument();
     expect(screen.getByText(/copyright © 2026 Alexander Ames/i)).toBeInTheDocument();
     expect(screen.queryByAltText(/portrait/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /instagram/i })).not.toBeInTheDocument();
   });
 
-  it('invokes onContactClick from CONTACT ME', async () => {
+  it('invokes onContactClick from Let\'s talk', async () => {
     const onContactClick = vi.fn();
     const user = userEvent.setup();
     render(<AboutView onContactClick={onContactClick} />);
-    await user.click(screen.getByRole('button', { name: /contact me/i }));
+    await user.click(screen.getByRole('button', { name: /let's talk/i }));
     expect(onContactClick).toHaveBeenCalledTimes(1);
   });
 });

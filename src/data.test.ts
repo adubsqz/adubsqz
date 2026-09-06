@@ -43,9 +43,12 @@ describe('data', () => {
       });
     });
 
-    it('Greyscale / Full Spectrum / Redscale tabs (About is manifest `about`, not a tab)', () => {
+    it('Greyscale / Full Spectrum / Redscale / People tabs (About is manifest `about`, not a tab)', () => {
       const ids = COLLECTIONS.map((c) => c.id).sort();
-      expect(ids).toEqual(['full-spectrum', 'greyscale', 'redscale']);
+      expect(ids).toEqual(['full-spectrum', 'greyscale', 'people', 'redscale']);
+      const people = COLLECTIONS.find((c) => c.id === 'people');
+      expect(people?.title).toBe('People');
+      expect(people?.photos).toEqual([]);
     });
 
     it('about manifest may be empty until a portrait is republished', () => {
@@ -75,6 +78,7 @@ describe('data', () => {
         bw?: Array<string | { path: string }>;
         color?: Array<string | { path: string }>;
         redscale?: Array<string | { path: string }>;
+        people?: Array<string | { path: string }>;
       };
       const rowPath = (row: string | { path: string }) => (typeof row === 'string' ? row : row.path);
       const publicPaths = (rows: Array<string | { path: string }>) =>
@@ -83,6 +87,7 @@ describe('data', () => {
         greyscale: publicPaths(manifest.bw ?? []),
         'full-spectrum': publicPaths(manifest.color ?? []),
         redscale: publicPaths(manifest.redscale ?? []),
+        people: publicPaths(manifest.people ?? []),
       };
       for (const collection of COLLECTIONS) {
         const srcs = collection.photos.map((photo) => {
@@ -132,6 +137,8 @@ describe('data', () => {
       expect(classifyManifestEntry('bw/a.jpg').kind).toBe('public');
       expect(classifyManifestEntry('color/a.jpg').kind).toBe('public');
       expect(classifyManifestEntry('redscale/a.jpg').kind).toBe('public');
+      expect(classifyManifestEntry('people/a.jpg').kind).toBe('public');
+      expect(classifyManifestEntry('people/a.jpg')).toEqual({ kind: 'public', bucket: 'people' });
       expect(classifyManifestEntry('import-1.jpg')).toEqual({ kind: 'hidden', reason: 'import_numeric' });
       expect(classifyManifestEntry('12.jpg')).toEqual({ kind: 'hidden', reason: 'numeric_only_filename' });
       expect(classifyManifestEntry('note.txt')).toEqual({ kind: 'hidden', reason: 'unsupported_mime' });

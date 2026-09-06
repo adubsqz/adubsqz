@@ -37,6 +37,16 @@ def test_verify_detects_orphan(tmp_path, monkeypatch):
     assert any("orphan" in e for e in errs)
 
 
+def test_verify_detects_people_orphan(tmp_path, monkeypatch):
+    repo = _repo(tmp_path)
+    save_manifest(repo, {"about": [], "bw": [], "color": [], "redscale": [], "people": []})
+    orphan = repo / "public/photos/still-life/people/ghost.png"
+    orphan.parent.mkdir(parents=True, exist_ok=True)
+    orphan.write_bytes(b"x")
+    errs = verify_manifest(repo)
+    assert any("orphan" in e and "people/ghost.png" in e for e in errs)
+
+
 def test_verify_detects_root_orphan(tmp_path, monkeypatch):
     repo = _repo(tmp_path)
     monkeypatch.chdir(repo)

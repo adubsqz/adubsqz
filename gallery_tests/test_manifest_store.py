@@ -6,7 +6,7 @@ from gallery.manifest_store import append_if_absent, load_manifest, save_manifes
 
 
 def _minimal_manifest():
-    return {"about": [], "bw": [], "color": [], "redscale": []}
+    return {"about": [], "bw": [], "color": [], "redscale": [], "people": []}
 
 
 def test_manifest_key_order_stable(tmp_path, monkeypatch):
@@ -21,7 +21,8 @@ def test_manifest_key_order_stable(tmp_path, monkeypatch):
     i_bw = text.index('"bw"')
     i_co = text.index('"color"')
     i_rs = text.index('"redscale"')
-    assert i_about < i_bw < i_co < i_rs
+    i_people = text.index('"people"')
+    assert i_about < i_bw < i_co < i_rs < i_people
 
 
 def test_append_duplicate_returns_false(tmp_path, monkeypatch):

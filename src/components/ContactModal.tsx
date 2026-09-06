@@ -58,11 +58,11 @@ export default function ContactModal({ onClose, initialSubject = '', initialMess
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto p-0">
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-photo-border bg-photo-panel px-5 py-4">
           <DialogHeader className="space-y-1">
-            <DialogTitle className="font-display">
+            <DialogTitle className="font-display text-2xl">
               Contact
             </DialogTitle>
-            <DialogDescription className="text-xs uppercase tracking-wider">
-              Start a private licensing conversation
+            <DialogDescription className="text-sm text-photo-muted normal-case tracking-normal">
+              Say hi. It goes to adubsqz@gmail.com.
             </DialogDescription>
           </DialogHeader>
           <Button aria-label="Close" className="h-8 px-2 text-lg leading-none" variant="ghost" onClick={onClose} disabled={isSubmitting}>
@@ -71,15 +71,8 @@ export default function ContactModal({ onClose, initialSubject = '', initialMess
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 p-5">
-          <FilmTvClearanceBlock />
-          <p className="text-xs text-photo-muted leading-relaxed">
-            Licensing, syndication, and custom terms are handled privately by contract. Send a message to start that
-            conversation—no public checkout.
-          </p>
-          <TearsheetAndFulfillmentGrid surface="modal" />
-          <RightsReservedBlock className="bg-photo-bg/50" />
           <div>
-            <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-photo-muted mb-1">
+            <label htmlFor="contact-name" className="mb-1.5 block text-sm text-photo-muted">
               Name
             </label>
             <Input
@@ -92,7 +85,7 @@ export default function ContactModal({ onClose, initialSubject = '', initialMess
             />
           </div>
           <div>
-            <label htmlFor="contact-email" className="block text-xs uppercase tracking-wider text-photo-muted mb-1">
+            <label htmlFor="contact-email" className="mb-1.5 block text-sm text-photo-muted">
               Email
             </label>
             <Input
@@ -105,7 +98,7 @@ export default function ContactModal({ onClose, initialSubject = '', initialMess
             />
           </div>
           <div>
-            <label htmlFor="contact-subject" className="block text-xs uppercase tracking-wider text-photo-muted mb-1">
+            <label htmlFor="contact-subject" className="mb-1.5 block text-sm text-photo-muted">
               Subject
             </label>
             <Input
@@ -118,7 +111,7 @@ export default function ContactModal({ onClose, initialSubject = '', initialMess
             />
           </div>
           <div>
-            <label htmlFor="contact-content" className="block text-xs uppercase tracking-wider text-photo-muted mb-1">
+            <label htmlFor="contact-content" className="mb-1.5 block text-sm text-photo-muted">
               Message
             </label>
             <Textarea
@@ -135,7 +128,7 @@ export default function ContactModal({ onClose, initialSubject = '', initialMess
             <Button
               type="button"
               onClick={onClose}
-              className="flex-1"
+              className="flex-1 rounded-full normal-case tracking-normal"
               variant="ghost"
               disabled={isSubmitting}
             >
@@ -143,12 +136,23 @@ export default function ContactModal({ onClose, initialSubject = '', initialMess
             </Button>
             <Button
               type="submit"
-              className="flex-1"
+              className="flex-1 rounded-full normal-case tracking-normal"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Sending...' : 'Send'}
             </Button>
           </div>
+          <details className="pt-2">
+            <summary className="cursor-pointer text-xs text-photo-muted">Rights and terms</summary>
+            <div className="mt-3 space-y-3">
+              <FilmTvClearanceBlock />
+              <p className="text-[0.7rem] leading-relaxed text-photo-muted">
+                Licensing and custom terms stay private. No public checkout.
+              </p>
+              <TearsheetAndFulfillmentGrid surface="modal" />
+              <RightsReservedBlock className="bg-photo-bg/50" />
+            </div>
+          </details>
         </form>
       </DialogContent>
     </Dialog>

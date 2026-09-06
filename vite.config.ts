@@ -21,7 +21,7 @@ function normalizeManifestEntry(category: string, entry: string): string {
   const normalized = entry.trim().replace(/^\/+/, '');
   if (!normalized) return '';
   if (normalized.includes('/')) return normalized;
-  if (category === 'bw' || category === 'color' || category === 'redscale') {
+  if (category === 'bw' || category === 'color' || category === 'redscale' || category === 'people') {
     return `${category}/${normalized}`;
   }
   return normalized;

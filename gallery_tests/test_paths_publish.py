@@ -15,6 +15,12 @@ def test_publish_redscale(tmp_path):
     assert p == repo / "public" / "photos" / "still-life" / "redscale" / "a.jpg"
 
 
+def test_publish_people(tmp_path):
+    repo = tmp_path / "repo"
+    p = publish_file_for(repo, "people", "a.jpg")
+    assert p == repo / "public" / "photos" / "still-life" / "people" / "a.jpg"
+
+
 def test_staging_bw_mirrors_publish(tmp_path):
     repo = tmp_path / "repo"
     p = staging_file_for(repo, "bw", "a.jpg")
@@ -32,6 +38,7 @@ def test_publish_about_root_equivalent(tmp_path):
 def test_manifest_token():
     assert manifest_token("bw", "z.jpg") == "bw/z.jpg"
     assert manifest_token("redscale", "z.jpg") == "redscale/z.jpg"
+    assert manifest_token("people", "z.jpg") == "people/z.jpg"
     assert manifest_token("still-life", "about.jpg") == "about.jpg"
     assert manifest_token("about", "about.jpg") == "about.jpg"
 

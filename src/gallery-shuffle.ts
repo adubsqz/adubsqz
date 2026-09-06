@@ -10,6 +10,7 @@ export const GALLERY_CATEGORY_SEEDS = {
   bw: GALLERY_SHUFFLE_SEED,
   color: GALLERY_SHUFFLE_SEED + 1,
   redscale: GALLERY_SHUFFLE_SEED + 2,
+  people: GALLERY_SHUFFLE_SEED + 3,
 } as const;
 
 export function mulberry32(seed: number): () => number {
